@@ -43,12 +43,13 @@ function mockFrom() {
   } as any;
 }
 
+const SUPABASE_CONFIGURED = Boolean(runtimeUrl && runtimeAnon);
 let supabase: any;
-if (runtimeUrl && runtimeAnon) {
+if (SUPABASE_CONFIGURED) {
   supabase = createClient(runtimeUrl, runtimeAnon);
 } else {
   // provide a minimal mock to avoid runtime constructor errors; methods return a rejection-like response
   supabase = { from: () => mockFrom() } as any;
 }
 
-export { supabase };
+export { supabase, SUPABASE_CONFIGURED };
