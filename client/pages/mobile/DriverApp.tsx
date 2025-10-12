@@ -808,6 +808,26 @@ export default function DriverApp() {
     }
     setVerifying(true);
     try {
+      // If Supabase isn't configured, allow local demo login
+      const maybeConfigured = ((): boolean => {
+        try {
+          // dynamic import to avoid circular deps at module init
+          return (require as any)?.("@/lib/supabase").SUPABASE_CONFIGURED ?? false;
+        } catch {
+          return false;
+        }
+      })();
+      if (!maybeConfigured) {
+        const prof = { name: n, phone: "" };
+        setProfile(prof);
+        setDemoMode(true);
+        try {
+          localStorage.setItem("driver.profile", JSON.stringify(prof));
+          localStorage.setItem("driver.demo", "true");
+        } catch {}
+        return;
+      }
+
       const { row, error } = await fetchDriver(n);
       if (error) {
         console.error("Driver lookup failed", error);
