@@ -859,7 +859,8 @@ export default function DriverApp() {
         setProfile(prof);
         setDemoMode(true);
         try {
-          localStorage.setItem("driver.profile", JSON.stringify(prof));
+          if (remember)
+            localStorage.setItem("driver.profile", JSON.stringify(prof));
           localStorage.setItem("driver.demo", "true");
         } catch {}
         return;
