@@ -1302,10 +1302,11 @@ export default function DriverApp() {
 
         <section className="space-y-4">
           {filtered.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-[#202B6D]/30 bg-white p-10 text-center text-sm text-[#6B7280]">
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#202B6D]/30 bg-white p-10 text-center text-sm text-[#6B7280]">
+              <PlusCircle className="mb-2 h-10 w-10 text-[#D1D5DB]" />
               {filterMode === "returned"
                 ? "No returned tasks at the moment."
-                : "No tasks found for this filter."}
+                : "No fueling missions assigned yet."}
             </div>
           ) : (
             filtered.map((t) => {
