@@ -1389,6 +1389,13 @@ export default function DriverApp() {
                         Complete
                       </Button>
                     )}
+                    <Button
+                      variant="outline"
+                      className="rounded-xl border border-[#D1D5DB] px-4 py-2 text-sm font-semibold text-[#9CA3AF] hover:bg-[#FDE8EA] hover:text-[#E52329]"
+                      onClick={() => reportIssue(t)}
+                    >
+                      Report Issue
+                    </Button>
                   </div>
                 </div>
               );
