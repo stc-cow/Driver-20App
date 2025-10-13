@@ -903,7 +903,8 @@ export default function DriverApp() {
       };
       setProfile(prof);
       try {
-        localStorage.setItem("driver.profile", JSON.stringify(prof));
+        if (remember)
+          localStorage.setItem("driver.profile", JSON.stringify(prof));
       } catch (storageError) {
         console.warn("Failed to persist driver profile", storageError);
       }
