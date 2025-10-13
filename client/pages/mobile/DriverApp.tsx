@@ -1291,8 +1291,8 @@ export default function DriverApp() {
                   }`}
                 >
                   <span>{option.label}</span>
-                  <span className="ml-1 text-xs font-semibold text-[#6B7280]">
-                    ({count})
+                  <span className={`ml-2 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${badgeColor}`}>
+                    {count}
                   </span>
                 </button>
               );
