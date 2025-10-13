@@ -116,7 +116,10 @@ export default function DriverApp() {
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState<boolean>(() => {
     try {
-      return (localStorage.getItem("driver.remember") || "true").toLowerCase() === "true";
+      return (
+        (localStorage.getItem("driver.remember") || "true").toLowerCase() ===
+        "true"
+      );
     } catch {
       return true;
     }
@@ -971,7 +974,11 @@ export default function DriverApp() {
         .from("driver_tasks")
         .update({ status: "issue", notes: note || null })
         .eq("id", t.id);
-      setTasks((arr) => arr.map((x) => (x.id === t.id ? { ...x, status: "issue", notes: note || x.notes } : x)));
+      setTasks((arr) =>
+        arr.map((x) =>
+          x.id === t.id ? { ...x, status: "issue", notes: note || x.notes } : x,
+        ),
+      );
     } catch (e) {
       console.error("Failed to report issue", e);
     }
@@ -1307,7 +1314,9 @@ export default function DriverApp() {
                   }`}
                 >
                   <span>{option.label}</span>
-                  <span className={`ml-2 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${badgeColor}`}>
+                  <span
+                    className={`ml-2 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${badgeColor}`}
+                  >
                     {count}
                   </span>
                 </button>
