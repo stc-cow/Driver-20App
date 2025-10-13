@@ -16,7 +16,7 @@ import {
   bindDriverToPushNotifications,
   initializePushNotifications,
 } from "@/lib/pushNotifications";
-import { Bell, Eye, EyeOff } from "lucide-react";
+import { Bell, Eye, EyeOff, Loader2, PlusCircle } from "lucide-react";
 import {
   Camera,
   CameraDirection,
