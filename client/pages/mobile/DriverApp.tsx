@@ -1269,6 +1269,14 @@ export default function DriverApp() {
                     : option.key === "completed"
                       ? completedCount
                       : openCount;
+              const badgeColor =
+                option.key === "active"
+                  ? "bg-[#E6E9F5] text-[#202B6D]"
+                  : option.key === "returned"
+                    ? "bg-[#FDE8EA] text-[#E52329]"
+                    : option.key === "completed"
+                      ? "bg-[#E6F4EA] text-[#1F9254]"
+                      : "bg-[#EEF2F7] text-[#374151]";
               return (
                 <button
                   key={option.key}
