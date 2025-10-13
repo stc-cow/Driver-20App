@@ -562,6 +562,13 @@ export default function DriverApp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, demoMode]);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem("driver.remember", String(remember));
+      if (remember && name) localStorage.setItem("driver.lastUsername", name);
+    } catch {}
+  }, [remember, name]);
+
   const applyFilter = (next: "all" | "active" | "returned" | "completed") => {
     setFilterMode(next);
     try {
