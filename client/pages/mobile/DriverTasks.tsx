@@ -9,7 +9,6 @@ export default function DriverTasks() {
         <div className="flex justify-between items-center w-full">
           {/* Left: Logo and name */}
           <div className="flex items-center gap-2">
-            <img src="aces-logo.png" alt="ACES Logo" className="h-5 w-auto" />
             <div className="flex flex-col leading-tight">
               <span className="text-[11px] text-gray-500">Signed in as</span>
               <span className="text-sm font-semibold text-blue-900">{username}</span>
