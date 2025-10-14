@@ -28,7 +28,7 @@ const NativeStartRedirect = () => {
     const isNative = (Capacitor as any)?.isNativePlatform?.() ?? false;
     if (isNative) {
       const p = loc.pathname || "/";
-      if (p === "/" || p === "/login") {
+      if (p === "/" || p === "/login" || p === "/driver-login") {
         nav("/driver", { replace: true });
       }
     }
