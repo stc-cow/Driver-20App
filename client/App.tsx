@@ -17,6 +17,7 @@ import {
 import { I18nProvider } from "./i18n";
 import DriverApp from "./pages/mobile/DriverApp";
 import DriverDashboard from "./pages/mobile/DriverDashboard";
+import DriverTasks from "./pages/mobile/DriverTasks";
 import DriverLogin from "./pages/mobile/DriverLogin";
 import { Capacitor } from "@capacitor/core";
 
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/" element={<Navigate to="/driver-login" replace />} />
             <Route path="/driver" element={<DriverApp />} />
             <Route path="/driver-dashboard" element={<DriverDashboard />} />
+            <Route path="/driver-tasks" element={<DriverTasks />} />
             <Route path="/driver-login" element={<DriverLogin />} />
             <Route path="*" element={<Navigate to="/driver-login" replace />} />
           </Routes>
