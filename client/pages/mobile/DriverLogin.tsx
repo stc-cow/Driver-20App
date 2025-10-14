@@ -14,7 +14,7 @@ export default function DriverLogin() {
     e.preventDefault();
     if (remember && username) localStorage.setItem("driver.remember", username);
     if (!remember) localStorage.removeItem("driver.remember");
-    window.location.hash = "#/driver";
+    window.location.hash = "#/driver-dashboard";
   };
 
   return (
