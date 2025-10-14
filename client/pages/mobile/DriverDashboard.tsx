@@ -3,9 +3,9 @@ import { Bell, LogOut, PlusCircle } from "lucide-react";
 export default function DriverDashboard() {
   const username = localStorage.getItem("driver.remember") || "baligh";
   return (
-    <div className="min-h-screen flex flex-col font-sans text-slate-800 bg-gradient-to-b from-[#001E60] via-[#1C2A52] to-[#F5F7FB] overflow-hidden">
+    <div className="min-h-screen flex flex-col font-sans bg-gradient-to-b from-[#001E60] via-[#0b1b3a] to-[#F5F7FB] text-slate-800">
       {/* Header */}
-      <header className="bg-white/95 shadow-md rounded-b-2xl px-4 py-3 flex flex-col gap-3 sticky top-0 z-10">
+      <header className="bg-white/95 shadow-md rounded-b-2xl px-4 py-3 flex flex-col gap-3">
         {/* Top Row: ACES + Username */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -46,7 +46,7 @@ export default function DriverDashboard() {
       </header>
 
       {/* Task Tabs */}
-      <div className="flex justify-center flex-wrap gap-2 px-3 py-3">
+      <div className="flex flex-wrap justify-center gap-2 px-3 py-3">
         <button className="px-4 py-1.5 rounded-full bg-blue-700 text-white text-sm font-semibold shadow-md">
           Active <span className="ml-1 bg-white text-blue-700 text-xs px-1.5 rounded">0</span>
         </button>
@@ -56,8 +56,8 @@ export default function DriverDashboard() {
         <button className="px-4 py-1.5 rounded-full bg-green-50 text-green-600 text-sm font-semibold">
           Completed <span className="ml-1 bg-green-600 text-white text-xs px-1.5 rounded">0</span>
         </button>
-        <button className="px-4 py-1.5 rounded-full border border-slate-300 bg-white/80 text-slate-600 text-sm font-semibold">
-          All <span className="ml-1 bg-slate-300 text-white text-xs px-1.5 rounded">0</span>
+        <button className="px-4 py-1.5 rounded-full bg-white/80 border border-slate-300 text-slate-700 text-sm font-semibold">
+          All <span className="ml-1 text-xs bg-slate-300 text-white px-1.5 rounded">0</span>
         </button>
       </div>
 
