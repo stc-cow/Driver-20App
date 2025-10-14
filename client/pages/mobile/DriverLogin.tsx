@@ -18,74 +18,54 @@ export default function DriverLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-slate-200 font-sans p-4">
-      <Card className="w-full max-w-sm bg-white shadow-2xl rounded-2xl border border-slate-100">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-b from-[#001E60] to-[#F5F7FB] px-5 font-sans">
+      <Card className="w-full max-w-sm bg-white/95 backdrop-blur-sm p-6 rounded-2xl shadow-xl">
         <CardContent className="p-8">
-          <div className="flex justify-center mb-6">
-            <img
-              src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2Fdf60032fd7d44277b7f568b8478ff12e?format=webp&width=400"
-              alt="ACES Logo"
-              className="h-16 w-auto"
-            />
+          <div className="flex justify-center mb-5">
+            <img src="aces-logo.png" alt="ACES Logo" className="h-12 w-auto" />
           </div>
 
-          <h2 className="text-2xl font-semibold text-center text-slate-800 mb-2">Driver App</h2>
-          <p className="text-center text-slate-500 text-sm mb-8">
+          <h1 className="text-2xl font-semibold text-center text-blue-900 mb-1">Driver App</h1>
+          <p className="text-center text-slate-500 text-sm mb-6">
             Sign in with your assigned credentials to access fueling tasks.
           </p>
 
           <form onSubmit={onSubmit} className="space-y-4">
-            <label className="block">
-              <span className="text-sm font-medium text-slate-700">Username *</span>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Username *</label>
               <Input
                 type="text"
+                className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-700 focus:outline-none text-sm"
                 placeholder="Enter username"
-                className="mt-1"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
-            </label>
-
-            <label className="block">
-              <span className="text-sm font-medium text-slate-700">Password *</span>
-              <div className="relative mt-1">
-                <Input
-                  type={showPwd ? "text" : "password"}
-                  placeholder="Enter password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPwd((s) => !s)}
-                  className="absolute right-3 top-2.5 text-slate-400"
-                  aria-label={showPwd ? "Hide password" : "Show password"}
-                >
-                  {showPwd ? "🙈" : "👁️"}
-                </button>
-              </div>
-            </label>
-
-            <div className="flex items-center justify-between">
-              <label className="flex items-center text-sm text-slate-600 gap-2">
-                <Checkbox
-                  checked={remember}
-                  onCheckedChange={(v) => setRemember(Boolean(v))}
-                />
-                Remember me
-              </label>
-              <a href="#" className="text-sm text-blue-600 hover:underline">
-                Forgot password?
-              </a>
             </div>
 
-            <Button type="submit" className="w-full bg-blue-800 hover:bg-blue-900 text-white font-semibold py-2.5 rounded-lg shadow-md">
-              LOGIN
-            </Button>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Password *</label>
+              <Input
+                type="password"
+                className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-700 focus:outline-none text-sm"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between text-sm text-slate-600">
+              <label className="flex items-center gap-2">
+                <input type="checkbox" className="accent-blue-700" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+                Remember me
+              </label>
+              <a href="#" className="text-blue-700 hover:underline">Forgot password?</a>
+            </div>
+
+            <Button type="submit" className="w-full bg-blue-800 text-white py-2.5 rounded-lg font-semibold shadow hover:bg-blue-900 transition">LOGIN</Button>
           </form>
 
           <p className="text-center text-xs text-slate-400 mt-6">
-            Powered by <span className="font-semibold text-blue-800"><strong>ACES MSD</strong></span>
+            Powered by <span className="text-blue-800 font-semibold">ACES</span>
           </p>
         </CardContent>
       </Card>
