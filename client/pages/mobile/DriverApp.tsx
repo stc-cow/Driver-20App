@@ -994,7 +994,9 @@ export default function DriverApp() {
     try {
       // If Supabase isn't configured, allow local demo login
       const { SUPABASE_CONFIGURED } = await import("@/lib/supabase");
+      console.debug("Supabase configured:", SUPABASE_CONFIGURED);
       if (!SUPABASE_CONFIGURED) {
+        console.warn("Supabase not configured, entering demo mode");
         const prof = { name: n, phone: "" };
         setProfile(prof);
         setDemoMode(true);
