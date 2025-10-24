@@ -60,6 +60,14 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  // Driver API routes
+  app.post("/api/driver/login", handleDriverLogin);
+  app.get("/api/driver/tasks", handleGetDriverTasks);
+  app.get("/api/driver/notifications", handleGetDriverNotifications);
+  app.post("/api/driver/notifications/read", handleMarkNotificationRead);
+  app.post("/api/driver/tasks/update-status", handleUpdateTaskStatus);
+  app.post("/api/driver/push-token/register", handleRegisterPushToken);
+
   app.post("/api/password-reset", async (req, res) => {
     const { email } = req.body as { email?: string };
     console.log("Password reset requested for:", email);
