@@ -39,19 +39,20 @@ const syncTokenWithServer = async () => {
   if (syncing) return;
   syncing = true;
   try {
-    const { error } = await supabase
-      .from("driver_push_tokens")
-      .upsert(
-        {
-          token: latestToken,
-          driver_name: latestProfile?.name?.trim() || null,
-          driver_phone: latestProfile?.phone?.trim() || null,
-          platform: (typeof window !== "undefined" ? (window as any).Capacitor : undefined)?.getPlatform?.() || "web",
-        },
-        { onConflict: "token" },
-      );
-    if (error) {
-      console.error("Failed to sync push token", error);
+    const platform = (typeof window !== "undefined" ? (window as any).Capacitor : undefined)?.getPlatform?.() || "web";
+    const response = await fetch("/api/driver/push-token/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        token: latestToken,
+        driverName: latestProfile?.name?.trim() || null,
+        driverPhone: latestProfile?.phone?.trim() || null,
+        platform,
+      }),
+    });
+    const result = await response.json() as { ok?: boolean; error?: string };
+    if (!response.ok || !result.ok) {
+      console.error("Failed to sync push token", result.error);
       return;
     }
     lastSyncedSignature = signature;
