@@ -542,26 +542,26 @@ export default function DriverApp() {
         profile.name,
         profile.phone,
       );
-      const ors: string[] = [`driver_name.eq.${profile.name}`];
-      if (profile.phone && profile.phone.trim())
-        ors.push(`driver_phone.eq.${profile.phone}`);
 
-      const query = ors.join(",");
-      console.debug("loadTasks query filter:", query);
+      const params = new URLSearchParams({
+        driverName: profile.name,
+        ...(profile.phone && { driverPhone: profile.phone }),
+      });
 
-      const { data, error } = await supabase
-        .from("driver_tasks")
-        .select("*")
-        .or(query)
-        .order("scheduled_at", { ascending: true });
+      const response = await fetch(`/api/driver/tasks?${params.toString()}`);
+      const result = await response.json() as {
+        ok?: boolean;
+        tasks?: any[];
+        error?: string;
+      };
 
-      if (error) {
-        console.error("loadTasks Supabase error:", error);
+      if (!response.ok || !result.ok) {
+        console.error("loadTasks API error:", result.error);
         setTasks([]);
         return;
       }
 
-      const incoming = data || [];
+      const incoming = result.tasks || [];
       console.debug("loadTasks received data:", incoming.length, "tasks");
 
       const now = Date.now();
