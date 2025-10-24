@@ -512,8 +512,20 @@ export default function DriverApp() {
         return;
       }
       const raw = localStorage.getItem("driver.profile");
-      if (raw) setProfile(JSON.parse(raw));
-    } catch {}
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          console.debug("Loaded profile from localStorage:", parsed);
+          setProfile(parsed);
+        } catch (parseErr) {
+          console.error("Failed to parse stored profile:", parseErr);
+        }
+      } else {
+        console.debug("No stored profile found in localStorage");
+      }
+    } catch (err) {
+      console.error("Profile initialization error:", err);
+    }
   }, []);
 
   const loadTasks = async () => {
