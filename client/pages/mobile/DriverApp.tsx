@@ -1040,10 +1040,13 @@ export default function DriverApp() {
         name: (row.name as string) || n,
         phone: (row.phone as string) || "",
       };
+      console.debug("Login successful, setting profile:", prof);
       setProfile(prof);
       try {
-        if (remember)
+        if (remember) {
           localStorage.setItem("driver.profile", JSON.stringify(prof));
+          console.debug("Profile persisted to localStorage");
+        }
       } catch (storageError) {
         console.warn("Failed to persist driver profile", storageError);
       }
