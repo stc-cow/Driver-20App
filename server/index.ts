@@ -2,6 +2,14 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import {
+  handleDriverLogin,
+  handleGetDriverTasks,
+  handleGetDriverNotifications,
+  handleMarkNotificationRead,
+  handleUpdateTaskStatus,
+  handleRegisterPushToken,
+} from "./routes/driver-api";
 import { createClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
