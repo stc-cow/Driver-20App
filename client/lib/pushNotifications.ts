@@ -9,8 +9,9 @@ import {
 import { supabase } from "./supabase";
 
 const pushNotificationsEnabled =
-  String(import.meta.env.VITE_PUSH_NOTIFICATIONS_ENABLED ?? "").toLowerCase() ===
-  "true";
+  String(
+    import.meta.env.VITE_PUSH_NOTIFICATIONS_ENABLED ?? "",
+  ).toLowerCase() === "true";
 
 type DriverProfile = {
   name?: string | null;
@@ -27,7 +28,11 @@ let lastSyncedSignature = "";
 const buildSignature = (token: string, profile: DriverProfile) => {
   const name = profile?.name?.trim() || "";
   const phone = profile?.phone?.trim() || "";
-  const platform = (typeof window !== "undefined" ? (window as any).Capacitor : undefined)?.getPlatform?.() || "web";
+  const platform =
+    (typeof window !== "undefined"
+      ? (window as any).Capacitor
+      : undefined
+    )?.getPlatform?.() || "web";
   return `${token}|${name}|${phone}|${platform}`;
 };
 
@@ -39,7 +44,11 @@ const syncTokenWithServer = async () => {
   if (syncing) return;
   syncing = true;
   try {
-    const platform = (typeof window !== "undefined" ? (window as any).Capacitor : undefined)?.getPlatform?.() || "web";
+    const platform =
+      (typeof window !== "undefined"
+        ? (window as any).Capacitor
+        : undefined
+      )?.getPlatform?.() || "web";
     const response = await fetch("/api/driver/push-token/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -50,7 +59,7 @@ const syncTokenWithServer = async () => {
         platform,
       }),
     });
-    const result = await response.json() as { ok?: boolean; error?: string };
+    const result = (await response.json()) as { ok?: boolean; error?: string };
     if (!response.ok || !result.ok) {
       console.error("Failed to sync push token", result.error);
       return;
@@ -86,13 +95,10 @@ const handleNotificationTap = (event: ActionPerformed) => {
 };
 
 const attachListeners = () => {
-  PushNotifications.addListener(
-    "registration",
-    async (token: Token) => {
-      latestToken = token.value;
-      await syncTokenWithServer();
-    },
-  );
+  PushNotifications.addListener("registration", async (token: Token) => {
+    latestToken = token.value;
+    await syncTokenWithServer();
+  });
 
   PushNotifications.addListener("registrationError", (error) => {
     console.error("Push registration error", error);
@@ -113,7 +119,13 @@ const attachListeners = () => {
 
 const ensureAndroidChannel = async () => {
   if (channelCreated) return;
-  if ((typeof window === "undefined" ? undefined : (window as any).Capacitor)?.getPlatform?.() !== "android") return;
+  if (
+    (typeof window === "undefined"
+      ? undefined
+      : (window as any).Capacitor
+    )?.getPlatform?.() !== "android"
+  )
+    return;
   try {
     await PushNotifications.createChannel({
       id: "driver-updates",
@@ -135,7 +147,8 @@ export const initializePushNotifications = async (): Promise<boolean> => {
     console.info("Push notifications disabled via configuration");
     return false;
   }
-  const cap = typeof window !== "undefined" ? (window as any).Capacitor : undefined;
+  const cap =
+    typeof window !== "undefined" ? (window as any).Capacitor : undefined;
   if (!cap || !cap.isNativePlatform?.()) return false;
   if (initialized) return true;
   initialized = true;

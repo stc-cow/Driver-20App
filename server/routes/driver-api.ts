@@ -1,10 +1,15 @@
 import { RequestHandler } from "express";
 import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
+const SUPABASE_URL =
+  process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
+const SUPABASE_ANON_KEY =
+  process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
 
-const supa = SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const supa =
+  SUPABASE_URL && SUPABASE_ANON_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
 
 interface DriverProfile {
   id?: number;
@@ -42,7 +47,10 @@ export const handleDriverLogin: RequestHandler = async (req, res) => {
     return;
   }
 
-  const { username, password } = req.body as { username?: string; password?: string };
+  const { username, password } = req.body as {
+    username?: string;
+    password?: string;
+  };
 
   if (!username || !password) {
     res.status(400).json({ ok: false, error: "Missing username or password" });
@@ -102,7 +110,10 @@ export const handleGetDriverTasks: RequestHandler = async (req, res) => {
     return;
   }
 
-  const { driverName, driverPhone } = req.query as { driverName?: string; driverPhone?: string };
+  const { driverName, driverPhone } = req.query as {
+    driverName?: string;
+    driverPhone?: string;
+  };
 
   if (!driverName) {
     res.status(400).json({ ok: false, error: "Missing driverName" });
@@ -136,7 +147,10 @@ export const handleGetDriverTasks: RequestHandler = async (req, res) => {
   }
 };
 
-export const handleGetDriverNotifications: RequestHandler = async (req, res) => {
+export const handleGetDriverNotifications: RequestHandler = async (
+  req,
+  res,
+) => {
   if (!supa) {
     res.status(500).json({ ok: false, error: "Database not configured" });
     return;
@@ -160,7 +174,9 @@ export const handleGetDriverNotifications: RequestHandler = async (req, res) => 
 
     if (error) {
       console.error("Get notifications error:", error);
-      res.status(500).json({ ok: false, error: "Failed to fetch notifications" });
+      res
+        .status(500)
+        .json({ ok: false, error: "Failed to fetch notifications" });
       return;
     }
 
@@ -177,10 +193,15 @@ export const handleMarkNotificationRead: RequestHandler = async (req, res) => {
     return;
   }
 
-  const { notificationId, driverName } = req.body as { notificationId?: number; driverName?: string };
+  const { notificationId, driverName } = req.body as {
+    notificationId?: number;
+    driverName?: string;
+  };
 
   if (!notificationId || !driverName) {
-    res.status(400).json({ ok: false, error: "Missing notificationId or driverName" });
+    res
+      .status(400)
+      .json({ ok: false, error: "Missing notificationId or driverName" });
     return;
   }
 
@@ -194,7 +215,9 @@ export const handleMarkNotificationRead: RequestHandler = async (req, res) => {
 
     if (error) {
       console.error("Mark read error:", error);
-      res.status(500).json({ ok: false, error: "Failed to mark notification as read" });
+      res
+        .status(500)
+        .json({ ok: false, error: "Failed to mark notification as read" });
       return;
     }
 
@@ -211,10 +234,16 @@ export const handleUpdateTaskStatus: RequestHandler = async (req, res) => {
     return;
   }
 
-  const { taskId, status, driverName } = req.body as { taskId?: number; status?: string; driverName?: string };
+  const { taskId, status, driverName } = req.body as {
+    taskId?: number;
+    status?: string;
+    driverName?: string;
+  };
 
   if (!taskId || !status || !driverName) {
-    res.status(400).json({ ok: false, error: "Missing taskId, status, or driverName" });
+    res
+      .status(400)
+      .json({ ok: false, error: "Missing taskId, status, or driverName" });
     return;
   }
 
@@ -239,7 +268,12 @@ export const handleUpdateTaskStatus: RequestHandler = async (req, res) => {
 
     // Verify driver owns this task
     if (taskData.driver_name !== driverName) {
-      res.status(403).json({ ok: false, error: "Unauthorized: Task does not belong to this driver" });
+      res
+        .status(403)
+        .json({
+          ok: false,
+          error: "Unauthorized: Task does not belong to this driver",
+        });
       return;
     }
 
@@ -289,7 +323,7 @@ export const handleRegisterPushToken: RequestHandler = async (req, res) => {
         platform: platform || null,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: "token" }
+      { onConflict: "token" },
     );
 
     if (error) {

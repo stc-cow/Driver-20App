@@ -549,7 +549,7 @@ export default function DriverApp() {
       });
 
       const response = await fetch(`/api/driver/tasks?${params.toString()}`);
-      const result = await response.json() as {
+      const result = (await response.json()) as {
         ok?: boolean;
         tasks?: any[];
         error?: string;
@@ -780,8 +780,10 @@ export default function DriverApp() {
     if (!profile) return;
     try {
       const params = new URLSearchParams({ driverName: profile.name });
-      const response = await fetch(`/api/driver/notifications?${params.toString()}`);
-      const result = await response.json() as {
+      const response = await fetch(
+        `/api/driver/notifications?${params.toString()}`,
+      );
+      const result = (await response.json()) as {
         ok?: boolean;
         notifications?: any[];
         error?: string;
