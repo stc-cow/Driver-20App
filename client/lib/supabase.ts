@@ -14,7 +14,7 @@ function failingResponse() {
   return Promise.resolve({
     data: null,
     error: new Error(
-      "Supabase not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY",
+      "Supabase not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY (run `pnpm sync:supabase-config`).",
     ),
   });
 }
