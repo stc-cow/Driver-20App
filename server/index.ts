@@ -2,17 +2,30 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import {
+  handleDriverLogin,
+  handleGetDriverTasks,
+  handleGetDriverNotifications,
+  handleMarkNotificationRead,
+  handleUpdateTaskStatus,
+  handleRegisterPushToken,
+} from "./routes/driver-api";
 import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
+const SUPABASE_URL =
+  process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
+const SUPABASE_ANON_KEY =
+  process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
 const FCM_SERVER_KEY = process.env.FCM_SERVER_KEY || "";
 
-const supa = SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : (null as any);
+const supa =
+  SUPABASE_URL && SUPABASE_ANON_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : (null as any);
 
 async function sendFcm(
   tokens: string[],
-  payload: { title: string; body: string; data?: Record<string, string> }
+  payload: { title: string; body: string; data?: Record<string, string> },
 ) {
   if (!FCM_SERVER_KEY) throw new Error("FCM not configured");
   if (!tokens.length) return { ok: true, sent: 0 };
@@ -32,7 +45,8 @@ async function sendFcm(
     body: JSON.stringify(body),
   });
   const json = await resp.json().catch(() => ({}));
-  if (!resp.ok) throw new Error(`FCM error ${resp.status}: ${JSON.stringify(json)}`);
+  if (!resp.ok)
+    throw new Error(`FCM error ${resp.status}: ${JSON.stringify(json)}`);
   return json;
 }
 
@@ -51,6 +65,14 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // Driver API routes
+  app.post("/api/driver/login", handleDriverLogin);
+  app.get("/api/driver/tasks", handleGetDriverTasks);
+  app.get("/api/driver/notifications", handleGetDriverNotifications);
+  app.post("/api/driver/notifications/read", handleMarkNotificationRead);
+  app.post("/api/driver/tasks/update-status", handleUpdateTaskStatus);
+  app.post("/api/driver/push-token/register", handleRegisterPushToken);
 
   app.post("/api/password-reset", async (req, res) => {
     const { email } = req.body as { email?: string };
@@ -101,13 +123,15 @@ export function createServer() {
       } else {
         const minutes = Math.max(
           1,
-          Math.round((Date.parse(expires_at || "") - Date.now()) / 60000)
+          Math.round((Date.parse(expires_at || "") - Date.now()) / 60000),
         );
         const body = `Your ACES MSD Fuel OTP is ${code}. It expires in ${Number.isFinite(minutes) ? minutes : 5} minutes.`;
         params.append("Body", body);
       }
 
-      const authHeader = Buffer.from(`${accountSid}:${authToken}`).toString("base64");
+      const authHeader = Buffer.from(`${accountSid}:${authToken}`).toString(
+        "base64",
+      );
       const resp = await fetch(url, {
         method: "POST",
         headers: {
@@ -119,14 +143,18 @@ export function createServer() {
 
       if (!resp.ok) {
         const text = await resp.text();
-        res.status(500).json({ ok: false, error: "Twilio API error", details: text });
+        res
+          .status(500)
+          .json({ ok: false, error: "Twilio API error", details: text });
         return;
       }
 
       const data = await resp.json();
       res.json({ ok: true, sid: data.sid });
     } catch (err: any) {
-      res.status(500).json({ ok: false, error: err?.message || "Unknown error" });
+      res
+        .status(500)
+        .json({ ok: false, error: err?.message || "Unknown error" });
     }
   });
 
@@ -160,7 +188,9 @@ export function createServer() {
 
       // Fallback: allow direct tokens in payload
       if (!tokens.length && Array.isArray((req.body as any).tokens)) {
-        tokens = (req.body as any).tokens.filter((t: any) => typeof t === "string");
+        tokens = (req.body as any).tokens.filter(
+          (t: any) => typeof t === "string",
+        );
       }
 
       if (!tokens.length) {
@@ -183,7 +213,9 @@ export function createServer() {
       res.json({ ok: true, result });
     } catch (err: any) {
       console.error("/api/notify error", err);
-      res.status(500).json({ ok: false, error: err?.message || "Unknown error" });
+      res
+        .status(500)
+        .json({ ok: false, error: err?.message || "Unknown error" });
     }
   });
 

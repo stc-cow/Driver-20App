@@ -512,49 +512,94 @@ export default function DriverApp() {
         return;
       }
       const raw = localStorage.getItem("driver.profile");
-      if (raw) setProfile(JSON.parse(raw));
-    } catch {}
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          console.debug("Loaded profile from localStorage:", parsed);
+          setProfile(parsed);
+        } catch (parseErr) {
+          console.error("Failed to parse stored profile:", parseErr);
+        }
+      } else {
+        console.debug("No stored profile found in localStorage");
+      }
+    } catch (err) {
+      console.error("Profile initialization error:", err);
+    }
   }, []);
 
   const loadTasks = async () => {
-    if (!profile || demoMode) return;
-    const ors: string[] = [`driver_name.eq.${profile.name}`];
-    if (profile.phone && profile.phone.trim())
-      ors.push(`driver_phone.eq.${profile.phone}`);
-    const { data } = await supabase
-      .from("driver_tasks")
-      .select("*")
-      .or(ors.join(","))
-      .order("scheduled_at", { ascending: true });
-    const incoming = data || [];
-    const now = Date.now();
-    const nextTasks: any[] = [];
-    for (const task of incoming) {
-      if (task?.status === "completed") {
-        const completionDate = getCompletionDate(task);
-        if (
-          completionDate &&
-          now - completionDate.getTime() > COMPLETED_RETENTION_MS
-        ) {
-          continue;
-        }
-        if (!task.local_completed_at && completionDate) {
-          nextTasks.push({
-            ...task,
-            local_completed_at: completionDate.toISOString(),
-          });
-          continue;
-        }
-      }
-      nextTasks.push(task);
+    if (!profile || demoMode) {
+      console.debug("loadTasks skipped: profile or demoMode", {
+        profile,
+        demoMode,
+      });
+      return;
     }
-    let enrichedTasks = nextTasks;
     try {
-      enrichedTasks = await enrichTasksWithCoordinates(nextTasks);
-    } catch (error) {
-      console.error("Failed to enrich tasks with site coordinates", error);
+      console.debug(
+        "loadTasks starting for driver:",
+        profile.name,
+        profile.phone,
+      );
+
+      const params = new URLSearchParams({
+        driverName: profile.name,
+        ...(profile.phone && { driverPhone: profile.phone }),
+      });
+
+      const response = await fetch(`/api/driver/tasks?${params.toString()}`);
+      const result = (await response.json()) as {
+        ok?: boolean;
+        tasks?: any[];
+        error?: string;
+      };
+
+      if (!response.ok || !result.ok) {
+        console.error("loadTasks API error:", result.error);
+        setTasks([]);
+        return;
+      }
+
+      const incoming = result.tasks || [];
+      console.debug("loadTasks received data:", incoming.length, "tasks");
+
+      const now = Date.now();
+      const nextTasks: any[] = [];
+      for (const task of incoming) {
+        if (task?.status === "completed") {
+          const completionDate = getCompletionDate(task);
+          if (
+            completionDate &&
+            now - completionDate.getTime() > COMPLETED_RETENTION_MS
+          ) {
+            continue;
+          }
+          if (!task.local_completed_at && completionDate) {
+            nextTasks.push({
+              ...task,
+              local_completed_at: completionDate.toISOString(),
+            });
+            continue;
+          }
+        }
+        nextTasks.push(task);
+      }
+      let enrichedTasks = nextTasks;
+      try {
+        enrichedTasks = await enrichTasksWithCoordinates(nextTasks);
+      } catch (error) {
+        console.error("Failed to enrich tasks with site coordinates", error);
+      }
+      console.debug(
+        "loadTasks setting",
+        enrichedTasks.length,
+        "enriched tasks",
+      );
+      setTasks(enrichedTasks);
+    } catch (err) {
+      console.error("loadTasks unexpected error:", err);
     }
-    setTasks(enrichedTasks);
   };
 
   useEffect(() => {
@@ -574,12 +619,17 @@ export default function DriverApp() {
       try {
         // normalize payload for different supabase client versions
         const evtType =
-          (payload?.eventType as string) || (payload?.event as string) || type || '';
+          (payload?.eventType as string) ||
+          (payload?.event as string) ||
+          type ||
+          "";
         const row = (payload?.new ?? payload?.record ?? payload?.old) as any;
         if (!row) return;
         const matches =
           (row?.driver_name && row.driver_name === profile.name) ||
-          (row?.driver_phone && profile.phone && String(row.driver_phone) === String(profile.phone));
+          (row?.driver_phone &&
+            profile.phone &&
+            String(row.driver_phone) === String(profile.phone));
         if (!matches) return;
 
         if (/delete/i.test(evtType)) {
@@ -596,47 +646,49 @@ export default function DriverApp() {
           const updated = exists
             ? arr.map((t) => (t.id === finalRow.id ? { ...t, ...finalRow } : t))
             : [...arr, finalRow];
-          return updated
-            .slice()
-            .sort((a: any, b: any) => {
-              const aDone = a?.status === 'completed' ? 1 : 0;
-              const bDone = b?.status === 'completed' ? 1 : 0;
-              if (aDone !== bDone) return aDone - bDone;
-              const aTime = a?.scheduled_at ? Date.parse(a.scheduled_at) : 0;
-              const bTime = b?.scheduled_at ? Date.parse(b.scheduled_at) : 0;
-              return aTime - bTime;
-            });
+          return updated.slice().sort((a: any, b: any) => {
+            const aDone = a?.status === "completed" ? 1 : 0;
+            const bDone = b?.status === "completed" ? 1 : 0;
+            if (aDone !== bDone) return aDone - bDone;
+            const aTime = a?.scheduled_at ? Date.parse(a.scheduled_at) : 0;
+            const bTime = b?.scheduled_at ? Date.parse(b.scheduled_at) : 0;
+            return aTime - bTime;
+          });
         });
       } catch (err) {
-        console.error('Realtime update failed', err);
+        console.error("Realtime update failed", err);
       }
     };
 
     const setupRealtime = async () => {
       try {
         // supabase-js v2 realtime
-        if (typeof (supabase as any).channel === 'function') {
+        if (typeof (supabase as any).channel === "function") {
           subscription = (supabase as any)
-            .channel(`driver_tasks:${profile.name || 'anon'}`)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'driver_tasks' }, handlePayload)
+            .channel(`driver_tasks:${profile.name || "anon"}`)
+            .on(
+              "postgres_changes",
+              { event: "*", schema: "public", table: "driver_tasks" },
+              handlePayload,
+            )
             .subscribe();
           return;
         }
 
         // legacy supabase-js v1 realtime
-        if (typeof (supabase as any).from === 'function') {
+        if (typeof (supabase as any).from === "function") {
           subscription = (supabase as any)
-            .from('driver_tasks')
-            .on('INSERT', (p: any) => handlePayload(p, 'INSERT'))
-            .on('UPDATE', (p: any) => handlePayload(p, 'UPDATE'))
-            .on('DELETE', (p: any) => handlePayload(p, 'DELETE'))
+            .from("driver_tasks")
+            .on("INSERT", (p: any) => handlePayload(p, "INSERT"))
+            .on("UPDATE", (p: any) => handlePayload(p, "UPDATE"))
+            .on("DELETE", (p: any) => handlePayload(p, "DELETE"))
             .subscribe?.();
           return;
         }
 
-        console.info('Realtime not available on this supabase client');
+        console.info("Realtime not available on this supabase client");
       } catch (err) {
-        console.error('Failed to setup realtime subscription', err);
+        console.error("Failed to setup realtime subscription", err);
       }
     };
 
@@ -645,19 +697,19 @@ export default function DriverApp() {
     return () => {
       try {
         if (!subscription) return;
-        if (typeof (supabase as any).removeChannel === 'function') {
+        if (typeof (supabase as any).removeChannel === "function") {
           try {
             (supabase as any).removeChannel(subscription);
             return;
           } catch {}
         }
-        if (typeof subscription.unsubscribe === 'function') {
+        if (typeof subscription.unsubscribe === "function") {
           try {
             subscription.unsubscribe();
             return;
           } catch {}
         }
-        if (typeof (supabase as any).removeSubscription === 'function') {
+        if (typeof (supabase as any).removeSubscription === "function") {
           try {
             (supabase as any).removeSubscription(subscription);
             return;
@@ -726,26 +778,39 @@ export default function DriverApp() {
 
   const loadNotifications = async () => {
     if (!profile) return;
-    const { data } = await supabase
-      .from("driver_notifications")
-      .select("id, created_at, title, message, driver_name, sent_by")
-      .or(`driver_name.is.null,driver_name.eq.${profile.name}`)
-      .order("created_at", { ascending: false })
-      .limit(50);
-    setNotifications(data || []);
-    const ids = (data || []).map((n: any) => n.id);
-    if (ids.length === 0) {
+    try {
+      const params = new URLSearchParams({ driverName: profile.name });
+      const response = await fetch(
+        `/api/driver/notifications?${params.toString()}`,
+      );
+      const result = (await response.json()) as {
+        ok?: boolean;
+        notifications?: any[];
+        error?: string;
+      };
+
+      if (!response.ok || !result.ok) {
+        console.error("loadNotifications API error:", result.error);
+        setNotifications([]);
+        setUnreadCount(0);
+        return;
+      }
+
+      const data = result.notifications || [];
+      setNotifications(data);
+      const ids = data.map((n: any) => n.id);
+      if (ids.length === 0) {
+        setUnreadCount(0);
+        return;
+      }
+
+      // For now, mark all as read (or implement read tracking separately)
+      setUnreadCount(Math.max(0, ids.length));
+    } catch (err) {
+      console.error("loadNotifications error:", err);
+      setNotifications([]);
       setUnreadCount(0);
-      return;
     }
-    const { data: reads } = await supabase
-      .from("driver_notification_reads")
-      .select("notification_id")
-      .eq("driver_name", profile.name)
-      .in("notification_id", ids);
-    const readSet = new Set((reads || []).map((r: any) => r.notification_id));
-    const unread = ids.filter((id: number) => !readSet.has(id)).length;
-    setUnreadCount(unread);
   };
 
   const filtered = useMemo(() => {
@@ -958,19 +1023,6 @@ export default function DriverApp() {
     }
     setVerifying(true);
     try {
-      // If Supabase isn't configured, allow local demo login
-      const { SUPABASE_CONFIGURED } = await import("@/lib/supabase");
-      if (!SUPABASE_CONFIGURED) {
-        const prof = { name: n, phone: "" };
-        setProfile(prof);
-        setDemoMode(true);
-        try {
-          if (remember)
-            localStorage.setItem("driver.profile", JSON.stringify(prof));
-          localStorage.setItem("driver.demo", "true");
-        } catch {}
-        return;
-      }
       const { row, error } = await fetchDriver(n);
       if (error) {
         console.error("Driver lookup failed", error);
@@ -1006,10 +1058,13 @@ export default function DriverApp() {
         name: (row.name as string) || n,
         phone: (row.phone as string) || "",
       };
+      console.debug("Login successful, setting profile:", prof);
       setProfile(prof);
       try {
-        if (remember)
+        if (remember) {
           localStorage.setItem("driver.profile", JSON.stringify(prof));
+          console.debug("Profile persisted to localStorage");
+        }
       } catch (storageError) {
         console.warn("Failed to persist driver profile", storageError);
       }
@@ -1039,14 +1094,14 @@ export default function DriverApp() {
         arr.map((x) => (x.id === t.id ? { ...x, status: "in_progress" } : x)),
       );
     try {
-      await fetch('/api/notify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: 'Task started',
-          message: `Driver ${profile?.name || ''} started task #${t.id} at ${t.site_name || 'site'}`,
-          driver_names: [profile?.name || '']
-        })
+          title: "Task started",
+          message: `Driver ${profile?.name || ""} started task #${t.id} at ${t.site_name || "site"}`,
+          driver_names: [profile?.name || ""],
+        }),
       }).catch(() => {});
     } catch {}
   };
