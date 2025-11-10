@@ -182,7 +182,9 @@ export const handleGetDriverNotifications: RequestHandler = async (
       return;
     }
 
-    console.log(`Found ${notifications?.length || 0} notifications for driver: "${driverName}"`);
+    console.log(
+      `Found ${notifications?.length || 0} notifications for driver: "${driverName}"`,
+    );
     res.json({ ok: true, notifications: notifications || [] });
   } catch (err: any) {
     console.error("Get driver notifications error:", err);
@@ -271,12 +273,10 @@ export const handleUpdateTaskStatus: RequestHandler = async (req, res) => {
 
     // Verify driver owns this task
     if (taskData.driver_name !== driverName) {
-      res
-        .status(403)
-        .json({
-          ok: false,
-          error: "Unauthorized: Task does not belong to this driver",
-        });
+      res.status(403).json({
+        ok: false,
+        error: "Unauthorized: Task does not belong to this driver",
+      });
       return;
     }
 

@@ -806,7 +806,10 @@ export default function DriverApp() {
       console.log("Notification response:", result);
 
       if (!response.ok || !result.ok) {
-        console.error("loadNotifications API error:", result.error || response.statusText);
+        console.error(
+          "loadNotifications API error:",
+          result.error || response.statusText,
+        );
         setNotifications([]);
         setUnreadCount(0);
         return;
