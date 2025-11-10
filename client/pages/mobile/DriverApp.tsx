@@ -1368,7 +1368,6 @@ export default function DriverApp() {
                   aria-label="Notifications"
                   className="h-10 w-10 rounded-full border border-[#D1D5DB] bg-white text-[#111827] shadow-sm transition hover:bg-[#F4F5F7]"
                   onClick={async () => {
-                    await loadNotifications();
                     const ids = (notifications || []).map((n) => n.id);
                     if (ids.length > 0) {
                       const rows = ids.map((id) => ({
