@@ -777,34 +777,52 @@ export default function DriverApp() {
   );
 
   const loadNotifications = async () => {
-    if (!profile) return;
+    if (!profile) {
+      console.warn("loadNotifications: No profile available");
+      return;
+    }
     try {
-      const params = new URLSearchParams({ driverName: profile.name });
-      const response = await fetch(
-        `/api/driver/notifications?${params.toString()}`,
-      );
+      const driverName = profile.name || profile.username || "";
+      if (!driverName) {
+        console.warn("loadNotifications: No driver name in profile");
+        setNotifications([]);
+        setUnreadCount(0);
+        return;
+      }
+
+      const params = new URLSearchParams({ driverName });
+      const url = `/api/driver/notifications?${params.toString()}`;
+      console.log("Fetching notifications from:", url);
+
+      const response = await fetch(url);
+      console.log("Notification response status:", response.status);
+
       const result = (await response.json()) as {
         ok?: boolean;
         notifications?: any[];
         error?: string;
       };
 
+      console.log("Notification response:", result);
+
       if (!response.ok || !result.ok) {
-        console.error("loadNotifications API error:", result.error);
+        console.error("loadNotifications API error:", result.error || response.statusText);
         setNotifications([]);
         setUnreadCount(0);
         return;
       }
 
       const data = result.notifications || [];
+      console.log(`Loaded ${data.length} notifications for ${driverName}`);
       setNotifications(data);
+
       const ids = data.map((n: any) => n.id);
       if (ids.length === 0) {
+        console.log("No notifications found");
         setUnreadCount(0);
         return;
       }
 
-      // For now, mark all as read (or implement read tracking separately)
       setUnreadCount(Math.max(0, ids.length));
     } catch (err) {
       console.error("loadNotifications error:", err);
