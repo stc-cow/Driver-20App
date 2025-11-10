@@ -58,7 +58,7 @@ export function SitesTable({
       const { data, error } = await supabase
         .from("sites")
         .select(
-          "site_name, vendor, region, district, city, cow_status, latitude, longitude, power_source"
+          "site_name, vendor, region, district, city, cow_status, latitude, longitude, power_source",
         )
         .order("created_at", { ascending: false });
 

@@ -63,7 +63,6 @@ export function createServer() {
     res.json({ message: ping });
   });
 
-
   // Driver API routes
   app.post("/api/driver/login", handleDriverLogin);
   app.get("/api/driver/tasks", handleGetDriverTasks);
@@ -71,7 +70,6 @@ export function createServer() {
   app.post("/api/driver/notifications/read", handleMarkNotificationRead);
   app.post("/api/driver/tasks/update-status", handleUpdateTaskStatus);
   app.post("/api/driver/push-token/register", handleRegisterPushToken);
-
 
   // Send push notification to drivers
   app.post("/api/notify", async (req, res) => {
