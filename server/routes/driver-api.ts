@@ -164,6 +164,8 @@ export const handleGetDriverNotifications: RequestHandler = async (
   }
 
   try {
+    console.log(`Fetching notifications for driver: "${driverName}"`);
+
     // Get unread notifications for this driver
     const { data: notifications, error } = await supa
       .from("driver_notifications")
@@ -180,6 +182,7 @@ export const handleGetDriverNotifications: RequestHandler = async (
       return;
     }
 
+    console.log(`Found ${notifications?.length || 0} notifications for driver: "${driverName}"`);
     res.json({ ok: true, notifications: notifications || [] });
   } catch (err: any) {
     console.error("Get driver notifications error:", err);
