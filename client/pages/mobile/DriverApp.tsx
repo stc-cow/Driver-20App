@@ -1417,21 +1417,25 @@ export default function DriverApp() {
                   aria-label="Notifications"
                   className="h-10 w-10 rounded-full border border-[#D1D5DB] bg-white text-[#111827] shadow-sm transition hover:bg-[#F4F5F7]"
                   onClick={async () => {
-                    await loadNotifications();
-                    const ids = (notifications || []).map((n) => n.id);
-                    if (ids.length > 0) {
-                      const rows = ids.map((id) => ({
-                        notification_id: id,
-                        driver_name: profile.name,
-                      }));
-                      await supabase
-                        .from("driver_notification_reads")
-                        .upsert(rows, {
-                          onConflict: "notification_id,driver_name",
-                        } as any);
-                      setUnreadCount(0);
+                    try {
+                      await loadNotifications();
+                      const ids = (notifications || []).map((n) => n.id);
+                      if (ids.length > 0) {
+                        const rows = ids.map((id) => ({
+                          notification_id: id,
+                          driver_name: profile.name,
+                        }));
+                        await supabase
+                          .from("driver_notification_reads")
+                          .upsert(rows, {
+                            onConflict: "notification_id,driver_name",
+                          } as any);
+                        setUnreadCount(0);
+                      }
+                      setNotifOpen(true);
+                    } catch (err) {
+                      console.error("Notification button error:", err);
                     }
-                    setNotifOpen(true);
                   }}
                 >
                   <Bell className="h-5 w-5" />
