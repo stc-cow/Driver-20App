@@ -607,9 +607,6 @@ export default function DriverApp() {
 
   useEffect(() => {
     loadTasks();
-    if (profile && !demoMode) {
-      loadNotifications();
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, demoMode]);
 
