@@ -58,7 +58,7 @@ export function SitesTable({
       const { data, error } = await supabase
         .from("sites")
         .select(
-          "site_name, vendor, region, district, city, cow_status, latitude, longitude, power_source"
+          "site_name, vendor, region, district, city, cow_status, latitude, longitude, power_source",
         )
         .order("created_at", { ascending: false });
 
@@ -143,3 +143,44 @@ export function SitesTable({
 
   return (
     <Card>
+      <CardContent className="pt-6">
+        {loading && <div className="text-center py-4">{t("loading")}</div>}
+        {error && <div className="text-center py-4 text-red-600">{error}</div>}
+        {!loading && !error && (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("siteName") || "Site Name"}</TableHead>
+                <TableHead>{t("vendor") || "Vendor"}</TableHead>
+                <TableHead>{t("region") || "Region"}</TableHead>
+                <TableHead>{t("district") || "District"}</TableHead>
+                <TableHead>{t("city") || "City"}</TableHead>
+                <TableHead>{t("powerSource") || "Power Source"}</TableHead>
+                <TableHead>{t("cowStatus") || "COW Status"}</TableHead>
+                <TableHead>Coordinates</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((row, idx) => (
+                <TableRow key={idx}>
+                  <TableCell>{row.siteName}</TableCell>
+                  <TableCell>{row.vendor}</TableCell>
+                  <TableCell>{row.region}</TableCell>
+                  <TableCell>{row.district}</TableCell>
+                  <TableCell>{row.city}</TableCell>
+                  <TableCell>{row.powerSource}</TableCell>
+                  <TableCell>{row.cowStatus}</TableCell>
+                  <TableCell>
+                    {row.latitude && row.longitude
+                      ? `${row.latitude}, ${row.longitude}`
+                      : "-"}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
