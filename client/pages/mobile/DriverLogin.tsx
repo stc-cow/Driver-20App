@@ -72,6 +72,11 @@ export default function DriverLogin() {
       <Card className="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 backdrop-blur-sm">
         <CardContent className="p-0">
           <form onSubmit={onSubmit} className="space-y-4">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Username *</label>
               <Input
@@ -80,6 +85,7 @@ export default function DriverLogin() {
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-700 focus:outline-none shadow-sm text-sm"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             <div>
@@ -90,12 +96,19 @@ export default function DriverLogin() {
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-700 focus:outline-none shadow-sm text-sm"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
               />
             </div>
 
             <div className="flex justify-between items-center text-sm">
               <label className="flex items-center gap-2 text-slate-600">
-                <input type="checkbox" className="accent-blue-700" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+                <input
+                  type="checkbox"
+                  className="accent-blue-700"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  disabled={isLoading}
+                />
                 Remember me
               </label>
               <a href="#" className="text-blue-700 font-medium hover:underline">
@@ -103,8 +116,12 @@ export default function DriverLogin() {
               </a>
             </div>
 
-            <Button type="submit" className="w-full bg-blue-800 text-white font-semibold py-2.5 rounded-lg shadow-md hover:bg-blue-900 transition">
-              LOGIN
+            <Button
+              type="submit"
+              className="w-full bg-blue-800 text-white font-semibold py-2.5 rounded-lg shadow-md hover:bg-blue-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}
+            >
+              {isLoading ? "Logging in..." : "LOGIN"}
             </Button>
           </form>
         </CardContent>
