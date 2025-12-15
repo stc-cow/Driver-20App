@@ -1715,34 +1715,49 @@ function hasDataChanged(oldData, newData) {
     return true;
   }
 
-  // Check if any critical fields changed (status, fuel date, etc)
-  for (let i = 0; i < oldData.length; i++) {
-    const oldSite = oldData[i];
-    const newSite = newData.find((s) => s.sitename === oldSite.sitename);
+  // Create maps for easier comparison
+  const oldMap = {};
+  const newMap = {};
 
-    if (!newSite) {
-      return true; // Site was removed
+  oldData.forEach(site => {
+    oldMap[site.sitename] = site;
+  });
+
+  newData.forEach(site => {
+    newMap[site.sitename] = site;
+  });
+
+  // Check if any site data changed
+  for (const sitename in newMap) {
+    const oldSite = oldMap[sitename];
+    const newSite = newMap[sitename];
+
+    if (!oldSite) {
+      return true; // New site added
     }
 
-    // Check if critical fields changed
+    // Check all important fields for changes
     if (
       oldSite.status !== newSite.status ||
       oldSite.days !== newSite.days ||
       oldSite.nextfuelingplan !== newSite.nextfuelingplan ||
-      oldSite.lastfuelingdate !== newSite.lastfuelingdate
+      oldSite.lastfuelingdate !== newSite.lastfuelingdate ||
+      oldSite.cityname !== newSite.cityname ||
+      oldSite.lastfuelingqty !== newSite.lastfuelingqty ||
+      oldSite.color !== newSite.color
     ) {
-      return true; // Critical data changed
+      return true;
     }
   }
 
-  // Check for new sites
-  for (const newSite of newData) {
-    if (!oldData.find((s) => s.sitename === newSite.sitename)) {
-      return true; // New site added
+  // Check if any old site was removed
+  for (const sitename in oldMap) {
+    if (!newMap[sitename]) {
+      return true;
     }
   }
 
-  return false; // No changes detected
+  return false;
 }
 
 // Invoicing Module Functions
