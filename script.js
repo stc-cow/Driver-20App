@@ -274,7 +274,7 @@ async function startDashboardAsync() {
     if (refreshIntervalId) clearInterval(refreshIntervalId);
     refreshIntervalId = setInterval(() => {
       backgroundSyncData();
-    }, 2000);
+    }, 1000);
 
     const searchInput = document.getElementById("searchInput");
     if (searchInput) {
