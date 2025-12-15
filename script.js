@@ -358,7 +358,7 @@ async function fetchCSV() {
       });
 
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("timeout")), 5000);
+        setTimeout(() => reject(new Error("timeout")), 3000);
       });
 
       try {
