@@ -820,7 +820,7 @@ function populateOverdueTable(sites) {
   if (sites.length === 0) {
     const tr = document.createElement("tr");
     tr.innerHTML =
-      '<td colspan="2" style="text-align: center; color: #94a3b8; padding: 12px;">No overdue sites</td>';
+      '<td colspan="3" style="text-align: center; color: #94a3b8; padding: 12px;">No overdue sites</td>';
     tbody.appendChild(tr);
     return;
   }
@@ -830,6 +830,7 @@ function populateOverdueTable(sites) {
     tr.style.cursor = "pointer";
     tr.innerHTML = `
             <td>${site.sitename}</td>
+            <td>${site.cityname || 'N/A'}</td>
             <td>${site.nextfuelingplan}</td>
         `;
     tr.addEventListener("click", () => zoomToSite(site.sitename));
@@ -844,7 +845,7 @@ function populateTodayTable(sites) {
   if (sites.length === 0) {
     const tr = document.createElement("tr");
     tr.innerHTML =
-      '<td colspan="2" style="text-align: center; color: #94a3b8; padding: 12px;">No sites due today</td>';
+      '<td colspan="3" style="text-align: center; color: #94a3b8; padding: 12px;">No sites due today</td>';
     tbody.appendChild(tr);
     return;
   }
@@ -854,6 +855,7 @@ function populateTodayTable(sites) {
     tr.style.cursor = "pointer";
     tr.innerHTML = `
             <td>${site.sitename}</td>
+            <td>${site.cityname || 'N/A'}</td>
             <td>${site.nextfuelingplan}</td>
         `;
     tr.addEventListener("click", () => zoomToSite(site.sitename));
@@ -877,7 +879,7 @@ function populateComingTable(sites) {
   if (sites.length === 0) {
     const tr = document.createElement("tr");
     tr.innerHTML =
-      '<td colspan="2" style="text-align: center; color: #94a3b8; padding: 12px;">No sites coming in 3 days</td>';
+      '<td colspan="3" style="text-align: center; color: #94a3b8; padding: 12px;">No sites coming in 3 days</td>';
     tbody.appendChild(tr);
     return;
   }
@@ -886,6 +888,7 @@ function populateComingTable(sites) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
             <td>${site.sitename}</td>
+            <td>${site.cityname || 'N/A'}</td>
             <td><span style="color: #ffbe0b; font-weight: 600;">${site.days}</span></td>
         `;
     tbody.appendChild(tr);
