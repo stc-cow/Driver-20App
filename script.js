@@ -335,8 +335,9 @@ window.handleLogout = function handleLogout() {
 };
 
 async function fetchCSV() {
-  const CSV_URL =
+  const baseURL =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1149576218&single=true&output=csv";
+  const CSV_URL = baseURL + "&t=" + Date.now();
   const CORS_PROXIES = [
     "https://corsproxy.io/?",
     "https://api.codetabs.com/v1/proxy?quest=",
