@@ -397,6 +397,9 @@ async function fetchCSV() {
         method: "GET",
         headers: {
           Accept: "text/plain",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
         },
       });
 
