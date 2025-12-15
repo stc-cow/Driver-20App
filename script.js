@@ -1730,11 +1730,11 @@ function hasDataChanged(oldData, newData) {
   const oldMap = {};
   const newMap = {};
 
-  oldData.forEach(site => {
+  oldData.forEach((site) => {
     oldMap[site.sitename] = site;
   });
 
-  newData.forEach(site => {
+  newData.forEach((site) => {
     newMap[site.sitename] = site;
   });
 
