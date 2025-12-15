@@ -828,11 +828,8 @@ function populateOverdueTable(sites) {
   sites.forEach((site) => {
     const tr = document.createElement("tr");
     tr.style.cursor = "pointer";
-    tr.innerHTML = `
-            <td>${site.sitename}</td>
-            <td>${site.cityname || 'N/A'}</td>
-            <td>${site.nextfuelingplan}</td>
-        `;
+    tr.innerHTML =
+      '<td>' + site.sitename + '</td><td>' + (site.cityname || 'N/A') + '</td><td>' + formatDateWithoutYear(site.nextfuelingplan) + '</td>';
     tr.addEventListener("click", () => zoomToSite(site.sitename));
     tbody.appendChild(tr);
   });
@@ -853,11 +850,8 @@ function populateTodayTable(sites) {
   sites.forEach((site) => {
     const tr = document.createElement("tr");
     tr.style.cursor = "pointer";
-    tr.innerHTML = `
-            <td>${site.sitename}</td>
-            <td>${site.cityname || 'N/A'}</td>
-            <td>${site.nextfuelingplan}</td>
-        `;
+    tr.innerHTML =
+      '<td>' + site.sitename + '</td><td>' + (site.cityname || 'N/A') + '</td><td>' + formatDateWithoutYear(site.nextfuelingplan) + '</td>';
     tr.addEventListener("click", () => zoomToSite(site.sitename));
     tbody.appendChild(tr);
   });
@@ -893,6 +887,34 @@ function populateComingTable(sites) {
         `;
     tbody.appendChild(tr);
   });
+}
+
+function formatDateWithoutYear(dateStr) {
+  if (!dateStr) return "N/A";
+
+  let date;
+
+  if (/^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
+    date = new Date(dateStr + "T00:00:00");
+  }
+  else if (/^\d{2}\/\d{2}\/\d{4}/.test(dateStr)) {
+    const parts = dateStr.split("/");
+    date = new Date(parts[2], parts[1] - 1, parts[0]);
+  }
+  else {
+    date = new Date(dateStr);
+  }
+
+  if (isNaN(date.getTime())) return "N/A";
+
+  const months = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  ];
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = months[date.getMonth()];
+
+  return day + " " + month;
 }
 
 function initMap() {
@@ -1735,6 +1757,16 @@ function parseDateToString(dateStr) {
   // Convert to string if needed
   let str = String(dateStr).trim();
   if (!str) return null;
+
+  // Silently skip Excel error codes and invalid values
+  if (
+    str === "#N/A" ||
+    str === "#REF!" ||
+    str === "#VALUE!" ||
+    str === "#ERROR!"
+  ) {
+    return null;
+  }
 
   // Try ISO format first (YYYY-MM-DD or YYYY-MM-DD HH:MM:SS)
   if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
