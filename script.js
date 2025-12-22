@@ -2465,6 +2465,9 @@ async function handleAnalysisLogin() {
     closeAnalysisAuthModal();
     document.getElementById("analysisModal").style.display = "flex";
 
+    // Reset to first tab
+    switchAnalysisTab("analysis1");
+
     // Load analysis data
     loadAnalysisData();
   } else {
