@@ -3000,8 +3000,8 @@ function applyAnalysisFilters(analysisId) {
     );
   }
 
-  // Apply status filter
-  if (filterSelect && filterSelect.value) {
+  // Apply status filter (only for analysis1 and analysis2)
+  if (filterSelect && filterSelect.value && (analysisId === "analysis1" || analysisId === "analysis2")) {
     filteredData = filteredData.filter((row) => row.status === filterSelect.value);
   }
 
