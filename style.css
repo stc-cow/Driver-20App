@@ -2738,13 +2738,15 @@ body {
 
 .fueling-chart-container {
   background: linear-gradient(135deg, #ffffff 0%, #f9fbff 100%);
-  border: 2px solid #e8ecff;
+  border: 2px solid #c8e6c9;
   border-radius: 16px;
-  padding: 24px;
+  padding: 28px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 16px rgba(32, 43, 109, 0.08);
+  box-shadow:
+    0 4px 16px rgba(39, 174, 96, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
   position: relative;
-  min-height: 400px;
+  min-height: 450px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2753,6 +2755,7 @@ body {
 .fueling-chart-container canvas {
   max-width: 100%;
   max-height: 600px;
+  filter: drop-shadow(0 2px 8px rgba(39, 174, 96, 0.1));
 }
 
 .chart-legend {
