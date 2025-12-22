@@ -2452,7 +2452,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-globalThis.handleAnalysisLogin = async function handleAnalysisLogin() {
+window.handleAnalysisLogin = async function handleAnalysisLogin() {
   const username = document.getElementById("analysisUsername").value.trim();
   const password = document.getElementById("analysisPassword").value;
   const errorMsg = document.getElementById("analysisAuthError");
