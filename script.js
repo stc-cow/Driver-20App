@@ -2384,6 +2384,10 @@ window.closeAnalysisAuthModal = function closeAnalysisAuthModal() {
 window.closeAnalysisModal = function closeAnalysisModal() {
   document.getElementById("analysisModal").style.display = "none";
   analysisAuthSession = null;
+  if (fuelingChartInstance) {
+    fuelingChartInstance.destroy();
+    fuelingChartInstance = null;
+  }
 };
 
 document.addEventListener("DOMContentLoaded", () => {
