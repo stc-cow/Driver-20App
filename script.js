@@ -2749,61 +2749,73 @@ function parseEnergyDashboardCSV(csvText) {
   // AH = 33 (Last Total Quantity)
   // AI = 34 (Span - days between fueling cycles)
 
-  const fuelConsumptionIndex = headerLower.findIndex(
-    (h) =>
-      h.includes("fuel consumption") ||
-      h.includes("consumption per day") ||
-      h === "ad" ||
-      h.includes("column ad"),
-  ) >= 0 ? headerLower.findIndex(
-    (h) =>
-      h.includes("fuel consumption") ||
-      h.includes("consumption per day") ||
-      h === "ad" ||
-      h.includes("column ad"),
-  ) : 29;
+  const fuelConsumptionIndex =
+    headerLower.findIndex(
+      (h) =>
+        h.includes("fuel consumption") ||
+        h.includes("consumption per day") ||
+        h === "ad" ||
+        h.includes("column ad"),
+    ) >= 0
+      ? headerLower.findIndex(
+          (h) =>
+            h.includes("fuel consumption") ||
+            h.includes("consumption per day") ||
+            h === "ad" ||
+            h.includes("column ad"),
+        )
+      : 29;
 
-  const lastFuelingDateIndex = headerLower.findIndex(
-    (h) =>
-      h.includes("last fueling date") ||
-      h.includes("planned") ||
-      h === "ae" ||
-      h.includes("column ae"),
-  ) >= 0 ? headerLower.findIndex(
-    (h) =>
-      h.includes("last fueling date") ||
-      h.includes("planned") ||
-      h === "ae" ||
-      h.includes("column ae"),
-  ) : 30;
+  const lastFuelingDateIndex =
+    headerLower.findIndex(
+      (h) =>
+        h.includes("last fueling date") ||
+        h.includes("planned") ||
+        h === "ae" ||
+        h.includes("column ae"),
+    ) >= 0
+      ? headerLower.findIndex(
+          (h) =>
+            h.includes("last fueling date") ||
+            h.includes("planned") ||
+            h === "ae" ||
+            h.includes("column ae"),
+        )
+      : 30;
 
-  const lastTotalQuantityIndex = headerLower.findIndex(
-    (h) =>
-      h.includes("last total quantity") ||
-      h.includes("tank quantity") ||
-      h === "ah" ||
-      h.includes("column ah"),
-  ) >= 0 ? headerLower.findIndex(
-    (h) =>
-      h.includes("last total quantity") ||
-      h.includes("tank quantity") ||
-      h === "ah" ||
-      h.includes("column ah"),
-  ) : 33;
+  const lastTotalQuantityIndex =
+    headerLower.findIndex(
+      (h) =>
+        h.includes("last total quantity") ||
+        h.includes("tank quantity") ||
+        h === "ah" ||
+        h.includes("column ah"),
+    ) >= 0
+      ? headerLower.findIndex(
+          (h) =>
+            h.includes("last total quantity") ||
+            h.includes("tank quantity") ||
+            h === "ah" ||
+            h.includes("column ah"),
+        )
+      : 33;
 
-  const spanIndex = headerLower.findIndex(
-    (h) =>
-      h.includes("span") ||
-      h.includes("days between") ||
-      h === "ai" ||
-      h.includes("column ai"),
-  ) >= 0 ? headerLower.findIndex(
-    (h) =>
-      h.includes("span") ||
-      h.includes("days between") ||
-      h === "ai" ||
-      h.includes("column ai"),
-  ) : 34;
+  const spanIndex =
+    headerLower.findIndex(
+      (h) =>
+        h.includes("span") ||
+        h.includes("days between") ||
+        h === "ai" ||
+        h.includes("column ai"),
+    ) >= 0
+      ? headerLower.findIndex(
+          (h) =>
+            h.includes("span") ||
+            h.includes("days between") ||
+            h === "ai" ||
+            h.includes("column ai"),
+        )
+      : 34;
 
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i];
@@ -2813,13 +2825,18 @@ function parseEnergyDashboardCSV(csvText) {
     const sitename =
       siteNameIndex >= 0 ? (values[siteNameIndex] || "").trim() : "";
     const consumption =
-      fuelConsumptionIndex >= 0 ? (values[fuelConsumptionIndex] || "").trim() : "";
+      fuelConsumptionIndex >= 0
+        ? (values[fuelConsumptionIndex] || "").trim()
+        : "";
     const lastFuelingDate =
-      lastFuelingDateIndex >= 0 ? (values[lastFuelingDateIndex] || "").trim() : "";
+      lastFuelingDateIndex >= 0
+        ? (values[lastFuelingDateIndex] || "").trim()
+        : "";
     const lastTotalQuantity =
-      lastTotalQuantityIndex >= 0 ? (values[lastTotalQuantityIndex] || "").trim() : "";
-    const span =
-      spanIndex >= 0 ? (values[spanIndex] || "").trim() : "";
+      lastTotalQuantityIndex >= 0
+        ? (values[lastTotalQuantityIndex] || "").trim()
+        : "";
+    const span = spanIndex >= 0 ? (values[spanIndex] || "").trim() : "";
 
     if (sitename) {
       const consumptionValue = parseFloat(consumption);
@@ -3360,7 +3377,10 @@ window.discrepancyAnalysisData = { discrepancies: [], riskSummary: [] };
 window.analyzeDiscrepancies = function analyzeDiscrepancies() {
   const tolerance = window.discrepancyAnalysisTolerance || 10;
 
-  if (!analysisData.invoiceArchive || analysisData.invoiceArchive.length === 0) {
+  if (
+    !analysisData.invoiceArchive ||
+    analysisData.invoiceArchive.length === 0
+  ) {
     document.getElementById("discrepancyNoData").style.display = "block";
     document.getElementById("discrepancyLoading").style.display = "none";
     document.getElementById("riskNoData").style.display = "block";
@@ -3409,12 +3429,16 @@ window.analyzeDiscrepancies = function analyzeDiscrepancies() {
 
     // Get latest fueling record
     const latestInvoice = invoices[0];
-    const actualFuelingDate = latestInvoice.fuelingdate || latestInvoice.lastfuelingdate || "N/A";
-    const actualFuelAdded = parseFloat(latestInvoice.fuelquantity || latestInvoice.lastfuelingqty || 0);
+    const actualFuelingDate =
+      latestInvoice.fuelingdate || latestInvoice.lastfuelingdate || "N/A";
+    const actualFuelAdded = parseFloat(
+      latestInvoice.fuelquantity || latestInvoice.lastfuelingqty || 0,
+    );
 
     // Find corresponding Energy Dashboard record
     const energyDashboardSite = analysisData.energyDashboard.find(
-      (site) => site.sitename && site.sitename.toUpperCase() === siteName.toUpperCase(),
+      (site) =>
+        site.sitename && site.sitename.toUpperCase() === siteName.toUpperCase(),
     );
 
     let plannedDate = "N/A";
@@ -3434,7 +3458,9 @@ window.analyzeDiscrepancies = function analyzeDiscrepancies() {
         energyDashboardSite.fuelconsumption || 0,
       );
       span = parseInt(energyDashboardSite.span || 0);
-      lastTotalQuantity = parseFloat(energyDashboardSite.lasttotalquantity || 0);
+      lastTotalQuantity = parseFloat(
+        energyDashboardSite.lasttotalquantity || 0,
+      );
 
       if (
         !isNaN(fuelConsumptionPerDay) &&
@@ -3460,7 +3486,10 @@ window.analyzeDiscrepancies = function analyzeDiscrepancies() {
           ) {
             status = "Normal";
             rootCauseHint = "Fuel added aligns with consumption";
-          } else if (actualFuelAdded > expectedConsumption * (1 + tolerance / 100)) {
+          } else if (
+            actualFuelAdded >
+            expectedConsumption * (1 + tolerance / 100)
+          ) {
             status = "Over-Fueling";
             rootCauseHint = `Fuel added (${actualFuelAdded.toFixed(2)} L) exceeds expected consumption (${expectedConsumption.toFixed(2)} L) by more than ${tolerance}%`;
           } else {
@@ -3601,7 +3630,9 @@ window.switchDiscrepancyTab = function switchDiscrepancyTab(tabId) {
 };
 
 window.filterDiscrepancyTable = function filterDiscrepancyTable() {
-  const filterInput = document.getElementById("discrepancyFilter").value.toUpperCase();
+  const filterInput = document
+    .getElementById("discrepancyFilter")
+    .value.toUpperCase();
   const statusFilter = document.getElementById("discrepancyStatusFilter").value;
   const rows = document.querySelectorAll("#discrepancyTableBody tr");
 
