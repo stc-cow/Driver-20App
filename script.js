@@ -2488,7 +2488,6 @@ window.handleAnalysisLogin = async function handleAnalysisLogin() {
     document.getElementById("analysisPassword").value = "";
   }
 }
-window.handleAnalysisLogin = globalThis.handleAnalysisLogin;
 
 async function loadAnalysisData() {
   try {
