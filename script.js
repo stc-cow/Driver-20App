@@ -3253,5 +3253,3 @@ window.updateFuelingChart = function updateFuelingChart() {
     });
   }
 }
-
-export {};
