@@ -2366,6 +2366,7 @@ let analysisData = {
   invoiceArchive: [],
   energyDashboard: [],
 };
+let fuelingChartInstance = null;
 
 window.openAnalysisModal = function openAnalysisModal() {
   const authModal = document.getElementById("analysisAuthModal");
