@@ -3006,6 +3006,7 @@ window.switchAnalysisTab = function switchAnalysisTab(tabId) {
     "analysis2",
     "analysis3",
     "analysisChart",
+    "discrepancyAnalysis",
   ].indexOf(tabId);
   if (tabIndex >= 0 && buttons[tabIndex]) {
     buttons[tabIndex].classList.add("active");
