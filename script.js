@@ -2368,27 +2368,44 @@ let analysisData = {
 };
 let fuelingChartInstance = null;
 
-window.openAnalysisModal = function openAnalysisModal() {
+// Global functions for inline onclick handlers
+globalThis.openAnalysisModal = function openAnalysisModal() {
   const authModal = document.getElementById("analysisAuthModal");
-  authModal.style.display = "flex";
-  document.getElementById("analysisAuthError").style.display = "none";
-  document.getElementById("analysisUsername").value = "";
-  document.getElementById("analysisPassword").value = "";
+  if (authModal) {
+    authModal.style.display = "flex";
+    document.getElementById("analysisAuthError").style.display = "none";
+    document.getElementById("analysisUsername").value = "";
+    document.getElementById("analysisPassword").value = "";
+  }
 };
 
-window.closeAnalysisAuthModal = function closeAnalysisAuthModal() {
-  document.getElementById("analysisAuthModal").style.display = "none";
-  document.getElementById("analysisAuthError").style.display = "none";
+globalThis.closeAnalysisAuthModal = function closeAnalysisAuthModal() {
+  const authModal = document.getElementById("analysisAuthModal");
+  if (authModal) {
+    authModal.style.display = "none";
+  }
+  const errorMsg = document.getElementById("analysisAuthError");
+  if (errorMsg) {
+    errorMsg.style.display = "none";
+  }
 };
 
-window.closeAnalysisModal = function closeAnalysisModal() {
-  document.getElementById("analysisModal").style.display = "none";
+globalThis.closeAnalysisModal = function closeAnalysisModal() {
+  const modal = document.getElementById("analysisModal");
+  if (modal) {
+    modal.style.display = "none";
+  }
   analysisAuthSession = null;
   if (fuelingChartInstance) {
     fuelingChartInstance.destroy();
     fuelingChartInstance = null;
   }
 };
+
+// Also expose to window for compatibility
+window.openAnalysisModal = globalThis.openAnalysisModal;
+window.closeAnalysisAuthModal = globalThis.closeAnalysisAuthModal;
+window.closeAnalysisModal = globalThis.closeAnalysisModal;
 
 document.addEventListener("DOMContentLoaded", () => {
   const analysisAuthForm = document.getElementById("analysisAuthForm");
