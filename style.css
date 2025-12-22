@@ -2703,10 +2703,11 @@ body {
   align-items: center;
   gap: 12px;
   margin-bottom: 24px;
-  padding: 16px;
-  background: linear-gradient(135deg, #f9fbff 0%, #f0f4ff 100%);
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
   border-radius: 12px;
-  border: 2px solid #e8ecff;
+  border: 2px solid #c8e6c9;
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.08);
 }
 
 .chart-controls label {
