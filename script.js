@@ -3002,7 +3002,7 @@ globalThis.switchAnalysisTab = function switchAnalysisTab(tabId) {
 };
 window.switchAnalysisTab = globalThis.switchAnalysisTab;
 
-window.sortAnalysisTable = function sortAnalysisTable(analysisId, column) {
+globalThis.sortAnalysisTable = function sortAnalysisTable(analysisId, column) {
   const data = window[`${analysisId}Data`];
   if (!data) return;
 
@@ -3018,6 +3018,7 @@ window.sortAnalysisTable = function sortAnalysisTable(analysisId, column) {
 
   applyAnalysisFilters(analysisId);
 };
+window.sortAnalysisTable = globalThis.sortAnalysisTable;
 
 function applyAnalysisFilters(analysisId) {
   const data = window[`${analysisId}Data`];
