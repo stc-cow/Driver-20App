@@ -2369,7 +2369,7 @@ let analysisData = {
 let fuelingChartInstance = null;
 
 // Global functions for inline onclick handlers
-globalThis.openAnalysisModal = function openAnalysisModal() {
+window.openAnalysisModal = function openAnalysisModal() {
   const authModal = document.getElementById("analysisAuthModal");
   if (authModal) {
     authModal.style.display = "flex";
@@ -2379,7 +2379,7 @@ globalThis.openAnalysisModal = function openAnalysisModal() {
   }
 };
 
-globalThis.closeAnalysisAuthModal = function closeAnalysisAuthModal() {
+window.closeAnalysisAuthModal = function closeAnalysisAuthModal() {
   const authModal = document.getElementById("analysisAuthModal");
   if (authModal) {
     authModal.style.display = "none";
@@ -2390,7 +2390,7 @@ globalThis.closeAnalysisAuthModal = function closeAnalysisAuthModal() {
   }
 };
 
-globalThis.closeAnalysisModal = function closeAnalysisModal() {
+window.closeAnalysisModal = function closeAnalysisModal() {
   const modal = document.getElementById("analysisModal");
   if (modal) {
     modal.style.display = "none";
@@ -2401,11 +2401,6 @@ globalThis.closeAnalysisModal = function closeAnalysisModal() {
     fuelingChartInstance = null;
   }
 };
-
-// Also expose to window for compatibility
-window.openAnalysisModal = globalThis.openAnalysisModal;
-window.closeAnalysisAuthModal = globalThis.closeAnalysisAuthModal;
-window.closeAnalysisModal = globalThis.closeAnalysisModal;
 
 document.addEventListener("DOMContentLoaded", () => {
   const analysisAuthForm = document.getElementById("analysisAuthForm");
