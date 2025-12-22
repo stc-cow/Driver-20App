@@ -3088,22 +3088,31 @@ window.updateFuelingChart = function updateFuelingChart() {
   const labels = displayData.map((item) => item.siteName);
   const data = displayData.map((item) => item.quantity);
 
-  // Generate color gradient
+  // Generate color gradient from green (high) to orange/red (low)
   const colors = displayData.map((_, index) => {
     const ratio = index / Math.max(displayData.length - 1, 1);
-    // Gradient from green (high) to orange/red (low)
-    if (ratio < 0.5) {
-      // Green to yellow
-      const r = Math.round(39 + (255 - 39) * (ratio * 2));
-      const g = 174;
-      const b = Math.round(96 + (0 - 96) * (ratio * 2));
-      return `rgba(${r}, ${g}, ${b}, 0.8)`;
-    } else {
-      // Yellow to red
+    // Green (#27ae60) -> Yellow (#ffb300) -> Orange (#ff6b35) -> Red (#d32f2f)
+    if (ratio < 0.33) {
+      // Green to Yellow
+      const localRatio = ratio / 0.33;
+      const r = Math.round(39 + (255 - 39) * localRatio);
+      const g = Math.round(174 + (179 - 174) * localRatio);
+      const b = Math.round(96 + (0 - 96) * localRatio);
+      return `rgba(${r}, ${g}, ${b}, 0.85)`;
+    } else if (ratio < 0.66) {
+      // Yellow to Orange
+      const localRatio = (ratio - 0.33) / 0.33;
       const r = 255;
-      const g = Math.round(158 + (94 - 158) * ((ratio - 0.5) * 2));
-      const b = 0;
-      return `rgba(${r}, ${g}, ${b}, 0.8)`;
+      const g = Math.round(179 - (107 * localRatio));
+      const b = Math.round(0 + (53 * localRatio));
+      return `rgba(${r}, ${g}, ${b}, 0.85)`;
+    } else {
+      // Orange to Red
+      const localRatio = (ratio - 0.66) / 0.34;
+      const r = Math.round(255 - (31 * localRatio));
+      const g = Math.round(72 - (72 * localRatio));
+      const b = Math.round(53 + (15 * localRatio));
+      return `rgba(${r}, ${g}, ${b}, 0.85)`;
     }
   });
 
