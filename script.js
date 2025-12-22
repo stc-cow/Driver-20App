@@ -3071,7 +3071,7 @@ function generateFuelingChart() {
 }
 
 window.updateFuelingChart = function updateFuelingChart() {
-  if (!window.fuelingChartData) return;
+  if (!window.fuelingChartData || window.fuelingChartData.length === 0) return;
 
   const limitSelect = document.getElementById("chartLimitSelect");
   const limit = parseInt(limitSelect?.value || "10");
@@ -3079,7 +3079,11 @@ window.updateFuelingChart = function updateFuelingChart() {
   const displayData = window.fuelingChartData.slice(0, limit);
 
   const ctx = document.getElementById("fuelingChart");
-  if (!ctx) return;
+  if (!ctx) {
+    // Retry after a short delay
+    setTimeout(() => window.updateFuelingChart(), 100);
+    return;
+  }
 
   const labels = displayData.map((item) => item.siteName);
   const data = displayData.map((item) => item.quantity);
