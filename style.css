@@ -2507,7 +2507,8 @@ body {
 .analysis-modal-body {
   flex: 1;
   overflow-y: auto;
-  padding: 24px;
+  padding: 28px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8faff 50%, #f0f5ff 100%);
 }
 
 .analysis-tabs {
