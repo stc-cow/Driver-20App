@@ -2348,4 +2348,625 @@ window.downloadInvoiceExcel = function downloadInvoiceExcel() {
   XLSX.writeFile(wb, filename);
 };
 
+// ==========================================
+// CER FUELING ANALYSIS - Secured Feature
+// ==========================================
+
+const ANALYSIS_CREDENTIALS = {
+  username: "Admin",
+  password: "Aces@6343",
+};
+
+// URLs for analysis data sources
+const INVOICE_ARCHIVE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1289106706&single=true&output=csv";
+const ENERGY_DASHBOARD_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1149576218&single=true&output=csv";
+
+let analysisAuthSession = null;
+let analysisData = {
+  invoiceArchive: [],
+  energyDashboard: [],
+};
+
+window.openAnalysisModal = function openAnalysisModal() {
+  const authModal = document.getElementById("analysisAuthModal");
+  authModal.style.display = "flex";
+  document.getElementById("analysisAuthError").style.display = "none";
+  document.getElementById("analysisUsername").value = "";
+  document.getElementById("analysisPassword").value = "";
+};
+
+window.closeAnalysisAuthModal = function closeAnalysisAuthModal() {
+  document.getElementById("analysisAuthModal").style.display = "none";
+  document.getElementById("analysisAuthError").style.display = "none";
+};
+
+window.closeAnalysisModal = function closeAnalysisModal() {
+  document.getElementById("analysisModal").style.display = "none";
+  analysisAuthSession = null;
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  const analysisAuthForm = document.getElementById("analysisAuthForm");
+  if (analysisAuthForm) {
+    analysisAuthForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      handleAnalysisLogin();
+    });
+  }
+
+  const analysisModal = document.getElementById("analysisAuthModal");
+  const analysisDataModal = document.getElementById("analysisModal");
+
+  window.addEventListener("click", (e) => {
+    if (e.target === analysisModal) {
+      closeAnalysisAuthModal();
+    }
+    if (e.target === analysisDataModal) {
+      closeAnalysisModal();
+    }
+  });
+});
+
+async function handleAnalysisLogin() {
+  const username = document.getElementById("analysisUsername").value.trim();
+  const password = document.getElementById("analysisPassword").value;
+  const errorMsg = document.getElementById("analysisAuthError");
+
+  if (!username || !password) {
+    errorMsg.textContent = "Please enter both username and password";
+    errorMsg.style.display = "block";
+    return;
+  }
+
+  if (
+    username === ANALYSIS_CREDENTIALS.username &&
+    password === ANALYSIS_CREDENTIALS.password
+  ) {
+    errorMsg.style.display = "none";
+    analysisAuthSession = {
+      username: username,
+      timestamp: Date.now(),
+    };
+
+    // Close auth modal and open analysis modal
+    closeAnalysisAuthModal();
+    document.getElementById("analysisModal").style.display = "flex";
+
+    // Load analysis data
+    loadAnalysisData();
+  } else {
+    errorMsg.textContent = "Invalid username or password";
+    errorMsg.style.display = "block";
+    document.getElementById("analysisPassword").value = "";
+  }
+}
+
+async function loadAnalysisData() {
+  try {
+    showAnalysisLoading(true);
+
+    // Fetch both data sources in parallel
+    const [invoiceData, energyData] = await Promise.all([
+      fetchInvoiceArchiveData(),
+      fetchEnergyDashboardData(),
+    ]);
+
+    analysisData.invoiceArchive = invoiceData;
+    analysisData.energyDashboard = energyData;
+
+    // Generate analyses
+    generateAnalysis1();
+    generateAnalysis2();
+    generateAnalysis3();
+
+    showAnalysisLoading(false);
+  } catch (error) {
+    console.error("Error loading analysis data:", error);
+    showAnalysisLoading(false);
+    document.getElementById("analysis1NoData").style.display = "block";
+  }
+}
+
+async function fetchInvoiceArchiveData() {
+  try {
+    const csvUrl = INVOICE_ARCHIVE_URL + "&t=" + Date.now();
+    const CORS_PROXIES = [
+      "https://corsproxy.io/?",
+      "https://api.codetabs.com/v1/proxy?quest=",
+    ];
+
+    for (let i = 0; i < CORS_PROXIES.length; i++) {
+      try {
+        let proxyUrl;
+        if (CORS_PROXIES[i].includes("?")) {
+          proxyUrl = CORS_PROXIES[i] + csvUrl;
+        } else {
+          proxyUrl = CORS_PROXIES[i] + encodeURIComponent(csvUrl);
+        }
+
+        const response = await fetch(proxyUrl, {
+          method: "GET",
+          headers: {
+            Accept: "text/plain",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        });
+
+        if (response.ok) {
+          const csvText = await response.text();
+          if (csvText.trim()) {
+            return parseInvoiceArchiveCSV(csvText);
+          }
+        }
+      } catch (proxyError) {
+        continue;
+      }
+    }
+
+    try {
+      const response = await fetch(csvUrl, {
+        method: "GET",
+        mode: "cors",
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      });
+
+      if (response.ok) {
+        const csvText = await response.text();
+        if (csvText.trim()) {
+          return parseInvoiceArchiveCSV(csvText);
+        }
+      }
+    } catch (error) {
+      console.error("Direct fetch failed:", error);
+    }
+
+    return [];
+  } catch (error) {
+    console.error("Error fetching invoice archive:", error);
+    return [];
+  }
+}
+
+async function fetchEnergyDashboardData() {
+  try {
+    const csvUrl = ENERGY_DASHBOARD_URL + "&t=" + Date.now();
+    const CORS_PROXIES = [
+      "https://corsproxy.io/?",
+      "https://api.codetabs.com/v1/proxy?quest=",
+    ];
+
+    for (let i = 0; i < CORS_PROXIES.length; i++) {
+      try {
+        let proxyUrl;
+        if (CORS_PROXIES[i].includes("?")) {
+          proxyUrl = CORS_PROXIES[i] + csvUrl;
+        } else {
+          proxyUrl = CORS_PROXIES[i] + encodeURIComponent(csvUrl);
+        }
+
+        const response = await fetch(proxyUrl, {
+          method: "GET",
+          headers: {
+            Accept: "text/plain",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        });
+
+        if (response.ok) {
+          const csvText = await response.text();
+          if (csvText.trim()) {
+            return parseEnergyDashboardCSV(csvText);
+          }
+        }
+      } catch (proxyError) {
+        continue;
+      }
+    }
+
+    try {
+      const response = await fetch(csvUrl, {
+        method: "GET",
+        mode: "cors",
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      });
+
+      if (response.ok) {
+        const csvText = await response.text();
+        if (csvText.trim()) {
+          return parseEnergyDashboardCSV(csvText);
+        }
+      }
+    } catch (error) {
+      console.error("Direct fetch failed:", error);
+    }
+
+    return [];
+  } catch (error) {
+    console.error("Error fetching energy dashboard:", error);
+    return [];
+  }
+}
+
+function parseInvoiceArchiveCSV(csvText) {
+  const lines = csvText.trim().split("\n");
+  if (lines.length === 0) return [];
+
+  const headers = lines[0].split(",").map((h) => h.trim());
+  const headerLower = headers.map((h) => h.toLowerCase());
+  const data = [];
+
+  const siteNameIndex = headerLower.findIndex(
+    (h) => h === "sitename" || h === "site name" || h === "site_name"
+  );
+  const qtyIndex = headerLower.findIndex(
+    (h) =>
+      h === "fuelquantity" ||
+      h === "fuel quantity" ||
+      h === "qty" ||
+      h === "quantity" ||
+      h === "lastfuelingqty" ||
+      h === "lastfuelingquantity"
+  );
+  const invoiceDateIndex = headerLower.findIndex(
+    (h) =>
+      h === "invoicedate" ||
+      h === "invoice date" ||
+      h === "planneddate" ||
+      h === "planned date" ||
+      h === "lastfuelingdate" ||
+      h === "last fueling date"
+  );
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.trim()) continue;
+
+    const values = parseCSVLine(line);
+    const sitename =
+      siteNameIndex >= 0 ? (values[siteNameIndex] || "").trim() : "";
+    const quantity = qtyIndex >= 0 ? (values[qtyIndex] || "").trim() : "";
+    const invoiceDate =
+      invoiceDateIndex >= 0 ? (values[invoiceDateIndex] || "").trim() : "";
+
+    if (sitename && quantity && invoiceDate) {
+      const qty = parseFloat(quantity);
+      if (!isNaN(qty) && qty > 0) {
+        data.push({
+          sitename: sitename,
+          fuelquantity: qty,
+          invoicedate: invoiceDate,
+        });
+      }
+    }
+  }
+
+  return data;
+}
+
+function parseEnergyDashboardCSV(csvText) {
+  const lines = csvText.trim().split("\n");
+  if (lines.length === 0) return [];
+
+  const headers = lines[0].split(",").map((h) => h.trim());
+  const headerLower = headers.map((h) => h.toLowerCase());
+  const data = [];
+
+  const siteNameIndex = headerLower.findIndex(
+    (h) => h === "sitename" || h === "site name" || h === "site_name"
+  );
+
+  // Column AD index calculation - AD is the 30th column (A=0, B=1, ..., AD=29)
+  const fuelConsumptionIndex = 29; // Column AD in 0-indexed format
+  const alternativeFuelIndex = headerLower.findIndex(
+    (h) =>
+      h.includes("fuel consumption") ||
+      h.includes("consumption") ||
+      h.includes("column ad")
+  );
+
+  const consumptionIndex =
+    alternativeFuelIndex >= 0 ? alternativeFuelIndex : fuelConsumptionIndex;
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.trim()) continue;
+
+    const values = parseCSVLine(line);
+    const sitename =
+      siteNameIndex >= 0 ? (values[siteNameIndex] || "").trim() : "";
+    const consumption =
+      consumptionIndex >= 0 ? (values[consumptionIndex] || "").trim() : "";
+
+    if (sitename && consumption) {
+      const consumptionValue = parseFloat(consumption);
+      if (!isNaN(consumptionValue) && consumptionValue >= 0) {
+        data.push({
+          sitename: sitename,
+          fuelconsumption: consumptionValue,
+        });
+      }
+    }
+  }
+
+  return data;
+}
+
+function generateAnalysis1() {
+  // Analysis 1: Highest Fueling Quantity vs Consumption
+  const tbody = document.getElementById("analysis1Body");
+  tbody.innerHTML = "";
+
+  if (
+    analysisData.invoiceArchive.length === 0 ||
+    analysisData.energyDashboard.length === 0
+  ) {
+    document.getElementById("analysis1NoData").style.display = "block";
+    return;
+  }
+
+  const siteConsumptionMap = {};
+  analysisData.energyDashboard.forEach((row) => {
+    const siteName = row.sitename.toLowerCase().trim();
+    siteConsumptionMap[siteName] = row.fuelconsumption;
+  });
+
+  // Group invoice data by site name
+  const siteInvoiceMap = {};
+  analysisData.invoiceArchive.forEach((row) => {
+    const siteName = row.sitename.toLowerCase().trim();
+    if (!siteInvoiceMap[siteName]) {
+      siteInvoiceMap[siteName] = {
+        totalQuantity: 0,
+        count: 0,
+        originalName: row.sitename,
+      };
+    }
+    siteInvoiceMap[siteName].totalQuantity += row.fuelquantity;
+    siteInvoiceMap[siteName].count += 1;
+  });
+
+  // Find duplicated sites and perform comparison
+  const analysisRows = [];
+  Object.keys(siteInvoiceMap).forEach((siteName) => {
+    const invoiceInfo = siteInvoiceMap[siteName];
+
+    // Only process duplicated sites (where fuel was added multiple times)
+    if (invoiceInfo.count >= 1) {
+      const consumption = siteConsumptionMap[siteName] || 0;
+      const totalFuel = invoiceInfo.totalQuantity;
+      const variance = totalFuel - consumption;
+      const status =
+        variance > consumption * 0.1
+          ? "High Fueling"
+          : "Normal";
+
+      analysisRows.push({
+        sitename: invoiceInfo.originalName,
+        totalfuel: totalFuel,
+        avgconsumption: consumption,
+        variance: variance,
+        status: status,
+      });
+    }
+  });
+
+  if (analysisRows.length === 0) {
+    document.getElementById("analysis1NoData").style.display = "block";
+    return;
+  }
+
+  document.getElementById("analysis1NoData").style.display = "none";
+  displayAnalysisTable("analysis1", analysisRows);
+}
+
+function generateAnalysis2() {
+  // Analysis 2: Planned Date Validation (±2 Days Rule)
+  const tbody = document.getElementById("analysis2Body");
+  tbody.innerHTML = "";
+
+  if (analysisData.invoiceArchive.length === 0) {
+    document.getElementById("analysis2NoData").style.display = "block";
+    return;
+  }
+
+  // Get planned dates from main sites data
+  const sitePlanMap = {};
+  sitesData.forEach((site) => {
+    const siteName = site.sitename.toLowerCase().trim();
+    sitePlanMap[siteName] = {
+      plannedDate: site.nextfuelingplan,
+      fuelDate: site.fuelDate,
+      originalName: site.sitename,
+    };
+  });
+
+  const analysisRows = [];
+  const processedSites = new Set();
+
+  analysisData.invoiceArchive.forEach((invoice) => {
+    const siteName = invoice.sitename.toLowerCase().trim();
+
+    if (processedSites.has(siteName)) return;
+    processedSites.add(siteName);
+
+    const planInfo = sitePlanMap[siteName];
+    if (!planInfo || !planInfo.fuelDate) {
+      return;
+    }
+
+    const plannedDate = planInfo.fuelDate;
+    const invoiceDate = parseFuelDate(invoice.invoicedate);
+
+    if (!invoiceDate) {
+      return;
+    }
+
+    const dayDifference = Math.round(
+      (invoiceDate - plannedDate) / (1000 * 60 * 60 * 24)
+    );
+    const status =
+      Math.abs(dayDifference) <= 2 ? "OK" : "Discrepancy";
+
+    analysisRows.push({
+      sitename: planInfo.originalName,
+      planneddate: planInfo.plannedDate,
+      actualdate: invoice.invoicedate,
+      daydiff: dayDifference,
+      status: status,
+    });
+  });
+
+  if (analysisRows.length === 0) {
+    document.getElementById("analysis2NoData").style.display = "block";
+    return;
+  }
+
+  document.getElementById("analysis2NoData").style.display = "none";
+  displayAnalysisTable("analysis2", analysisRows);
+}
+
+function generateAnalysis3() {
+  // Analysis 3: Site-Level Fuel Quantity Summary
+  const tbody = document.getElementById("analysis3Body");
+  tbody.innerHTML = "";
+
+  if (analysisData.invoiceArchive.length === 0) {
+    document.getElementById("analysis3NoData").style.display = "block";
+    return;
+  }
+
+  // Aggregate by site
+  const siteTotalMap = {};
+  analysisData.invoiceArchive.forEach((invoice) => {
+    const siteName = invoice.sitename.toLowerCase().trim();
+    if (!siteTotalMap[siteName]) {
+      siteTotalMap[siteName] = {
+        totalQty: 0,
+        originalName: invoice.sitename,
+      };
+    }
+    siteTotalMap[siteName].totalQty += invoice.fuelquantity;
+  });
+
+  const analysisRows = Object.keys(siteTotalMap).map((siteName) => ({
+    sitename: siteTotalMap[siteName].originalName,
+    totalqty: siteTotalMap[siteName].totalQty,
+  }));
+
+  if (analysisRows.length === 0) {
+    document.getElementById("analysis3NoData").style.display = "block";
+    return;
+  }
+
+  document.getElementById("analysis3NoData").style.display = "none";
+  displayAnalysisTable("analysis3", analysisRows);
+}
+
+function displayAnalysisTable(analysisId, rows) {
+  const tbody = document.getElementById(`${analysisId}Body`);
+  tbody.innerHTML = "";
+
+  // Store original rows for filtering/sorting
+  window[`${analysisId}Data`] = rows;
+
+  rows.forEach((row) => {
+    const tr = document.createElement("tr");
+
+    if (analysisId === "analysis1") {
+      tr.innerHTML = `
+        <td>${escapeHTML(row.sitename)}</td>
+        <td>${row.totalfuel.toFixed(2)}</td>
+        <td>${row.avgconsumption.toFixed(2)}</td>
+        <td>${row.variance.toFixed(2)}</td>
+        <td><span class="status-badge ${row.status === "High Fueling" ? "status-high" : "status-normal"}">${row.status}</span></td>
+      `;
+    } else if (analysisId === "analysis2") {
+      const statusClass =
+        row.status === "OK" ? "status-ok" : "status-discrepancy";
+      tr.innerHTML = `
+        <td>${escapeHTML(row.sitename)}</td>
+        <td>${row.planneddate}</td>
+        <td>${row.actualdate}</td>
+        <td>${row.daydiff}</td>
+        <td><span class="status-badge ${statusClass}">${row.status}</span></td>
+      `;
+    } else if (analysisId === "analysis3") {
+      tr.innerHTML = `
+        <td>${escapeHTML(row.sitename)}</td>
+        <td>${row.totalqty.toFixed(2)}</td>
+      `;
+    }
+
+    tbody.appendChild(tr);
+  });
+}
+
+window.switchAnalysisTab = function switchAnalysisTab(tabId) {
+  // Hide all tabs
+  document.querySelectorAll(".analysis-tab-content").forEach((tab) => {
+    tab.style.display = "none";
+  });
+
+  // Deactivate all buttons
+  document.querySelectorAll(".analysis-tab-btn").forEach((btn) => {
+    btn.classList.remove("active");
+  });
+
+  // Show selected tab
+  const selectedTab = document.getElementById(tabId);
+  if (selectedTab) {
+    selectedTab.style.display = "block";
+  }
+
+  // Activate corresponding button
+  const buttons = document.querySelectorAll(".analysis-tab-btn");
+  const tabIndex = ["analysis1", "analysis2", "analysis3"].indexOf(tabId);
+  if (tabIndex >= 0 && buttons[tabIndex]) {
+    buttons[tabIndex].classList.add("active");
+  }
+};
+
+window.sortAnalysisTable = function sortAnalysisTable(analysisId, column) {
+  const data = window[`${analysisId}Data`];
+  if (!data) return;
+
+  data.sort((a, b) => {
+    let aVal = a[column];
+    let bVal = b[column];
+
+    if (typeof aVal === "string") {
+      return aVal.localeCompare(bVal);
+    }
+    return aVal - bVal;
+  });
+
+  displayAnalysisTable(analysisId, data);
+};
+
+function showAnalysisLoading(show) {
+  const loadingElements = [
+    document.getElementById("analysis1Loading"),
+    document.getElementById("analysis2Loading"),
+    document.getElementById("analysis3Loading"),
+  ];
+
+  loadingElements.forEach((el) => {
+    if (el) {
+      el.style.display = show ? "block" : "none";
+    }
+  });
+}
+
 export {};
