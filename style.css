@@ -2454,15 +2454,17 @@ body {
 }
 
 .analysis-modal-content {
-  background: white;
+  background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(39, 174, 96, 0.1);
   width: 95%;
   max-width: 1200px;
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  border: 2px solid #e8ecff;
+  border: 2px solid #c8e6c9;
   border-top: 4px solid #27ae60;
 }
 
