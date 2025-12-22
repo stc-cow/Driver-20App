@@ -2980,8 +2980,33 @@ window.sortAnalysisTable = function sortAnalysisTable(analysisId, column) {
     return aVal - bVal;
   });
 
-  displayAnalysisTable(analysisId, data);
+  applyAnalysisFilters(analysisId);
 };
+
+function applyAnalysisFilters(analysisId) {
+  const data = window[`${analysisId}Data`];
+  if (!data) return;
+
+  const filterInput = document.getElementById(`${analysisId}Filter`);
+  const filterSelect = document.getElementById(`${analysisId}Status`);
+
+  let filteredData = data;
+
+  // Apply text filter
+  if (filterInput && filterInput.value.trim()) {
+    const searchTerm = filterInput.value.trim().toLowerCase();
+    filteredData = filteredData.filter((row) =>
+      row.sitename.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  // Apply status filter
+  if (filterSelect && filterSelect.value) {
+    filteredData = filteredData.filter((row) => row.status === filterSelect.value);
+  }
+
+  displayAnalysisTable(analysisId, filteredData);
+}
 
 function showAnalysisLoading(show) {
   const loadingElements = [
