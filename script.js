@@ -3284,4 +3284,306 @@ window.updateFuelingChart = function updateFuelingChart() {
   }
 };
 
+// ==========================================
+// DISCREPANCY ANALYSIS SECTION
+// ==========================================
+
+window.discrepancyAnalysisTolerance = 10; // Default tolerance percentage
+window.discrepancyAnalysisData = { discrepancies: [], riskSummary: [] };
+
+window.analyzeDiscrepancies = function analyzeDiscrepancies() {
+  const tolerance = window.discrepancyAnalysisTolerance || 10;
+
+  if (!analysisData.invoiceArchive || analysisData.invoiceArchive.length === 0) {
+    document.getElementById("discrepancyNoData").style.display = "block";
+    document.getElementById("discrepancyLoading").style.display = "none";
+    document.getElementById("riskNoData").style.display = "block";
+    document.getElementById("riskLoading").style.display = "none";
+    return;
+  }
+
+  // Step 1: Group invoices by site name and identify duplicates
+  const siteGroups = {};
+  analysisData.invoiceArchive.forEach((invoice) => {
+    const siteName = invoice.sitename || "";
+    if (!siteName.trim()) return;
+
+    if (!siteGroups[siteName]) {
+      siteGroups[siteName] = [];
+    }
+    siteGroups[siteName].push(invoice);
+  });
+
+  // Keep only duplicated sites
+  const duplicatedSites = Object.entries(siteGroups)
+    .filter(([_, invoices]) => invoices.length > 1)
+    .map(([siteName, invoices]) => ({
+      siteName,
+      invoices: invoices.sort(
+        (a, b) =>
+          new Date(b.fuelingdate || b.lastfuelingdate || 0) -
+          new Date(a.fuelingdate || a.lastfuelingdate || 0),
+      ),
+    }));
+
+  if (duplicatedSites.length === 0) {
+    document.getElementById("discrepancyNoData").style.display = "block";
+    document.getElementById("discrepancyLoading").style.display = "none";
+    document.getElementById("riskNoData").style.display = "block";
+    document.getElementById("riskLoading").style.display = "none";
+    return;
+  }
+
+  // Step 2: Perform analysis on each duplicated site
+  const discrepancies = [];
+  const riskSummary = [];
+
+  duplicatedSites.forEach(({ siteName, invoices }) => {
+    if (invoices.length === 0) return;
+
+    // Get latest fueling record
+    const latestInvoice = invoices[0];
+    const actualFuelingDate = latestInvoice.fuelingdate || latestInvoice.lastfuelingdate || "N/A";
+    const actualFuelAdded = parseFloat(latestInvoice.fuelquantity || latestInvoice.lastfuelingqty || 0);
+
+    // Find corresponding Energy Dashboard record
+    const energyDashboardSite = sitesData.find(
+      (site) => site.sitename && site.sitename.toUpperCase() === siteName.toUpperCase(),
+    );
+
+    let plannedDate = "N/A";
+    let expectedConsumption = null;
+    let span = null;
+    let lastTotalQuantity = null;
+    let status = "Data Mismatch";
+    let variance = "N/A";
+    let rootCauseHint = "Missing Energy Dashboard data";
+
+    if (energyDashboardSite) {
+      plannedDate = energyDashboardSite.nextfuelingplan || "N/A";
+
+      // Get AD (Fuel Consumption per day) and AI (Span) from Energy Dashboard
+      const fuelConsumptionPerDay = parseFloat(
+        energyDashboardSite.fuelconsumptionperday || 0,
+      );
+      span = parseInt(energyDashboardSite.span || 0);
+      lastTotalQuantity = parseFloat(energyDashboardSite.lasttotalquantity || 0);
+
+      if (
+        !isNaN(fuelConsumptionPerDay) &&
+        !isNaN(span) &&
+        span > 0 &&
+        fuelConsumptionPerDay > 0
+      ) {
+        // Calculate expected consumption
+        expectedConsumption = fuelConsumptionPerDay * span;
+
+        if (expectedConsumption > 0) {
+          // Calculate variance
+          const variancePercentage = (
+            ((actualFuelAdded - expectedConsumption) / expectedConsumption) *
+            100
+          ).toFixed(2);
+          variance = `${variancePercentage}%`;
+
+          // Determine status based on tolerance
+          if (
+            actualFuelAdded >= expectedConsumption * (1 - tolerance / 100) &&
+            actualFuelAdded <= expectedConsumption * (1 + tolerance / 100)
+          ) {
+            status = "Normal";
+            rootCauseHint = "Fuel added aligns with consumption";
+          } else if (actualFuelAdded > expectedConsumption * (1 + tolerance / 100)) {
+            status = "Over-Fueling";
+            rootCauseHint = `Fuel added (${actualFuelAdded.toFixed(2)} L) exceeds expected consumption (${expectedConsumption.toFixed(2)} L) by more than ${tolerance}%`;
+          } else {
+            status = "Under-Fueling";
+            rootCauseHint = `Fuel added (${actualFuelAdded.toFixed(2)} L) is less than expected consumption (${expectedConsumption.toFixed(2)} L) by more than ${tolerance}%`;
+          }
+        }
+      }
+
+      // Check date discrepancy
+      if (plannedDate !== "N/A" && actualFuelingDate !== "N/A") {
+        const planned = new Date(plannedDate);
+        const actual = new Date(actualFuelingDate);
+
+        if (!isNaN(planned.getTime()) && !isNaN(actual.getTime())) {
+          const dayDifference = Math.abs(
+            Math.round((actual - planned) / (1000 * 60 * 60 * 24)),
+          );
+
+          if (dayDifference > 2) {
+            status = "Schedule Discrepancy";
+            rootCauseHint = `Fueling occurred ${dayDifference} days from planned date`;
+          }
+        }
+      }
+    }
+
+    // Add to discrepancies list
+    discrepancies.push({
+      sitename: siteName,
+      planneddate: plannedDate,
+      actualdate: actualFuelingDate,
+      span: span !== null ? span : "N/A",
+      expectedconsumption:
+        expectedConsumption !== null
+          ? expectedConsumption.toFixed(2)
+          : "Invalid Data",
+      actualfueladded: actualFuelAdded.toFixed(2),
+      variance: variance,
+      status: status,
+    });
+
+    // Add to risk summary if status is not normal
+    if (status !== "Normal") {
+      riskSummary.push({
+        sitename: siteName,
+        issuetype: status,
+        rootcausehint: rootCauseHint,
+      });
+    }
+  });
+
+  // Store data for filtering
+  window.discrepancyAnalysisData = { discrepancies, riskSummary };
+
+  // Populate tables
+  populateDiscrepancyTable(discrepancies);
+  populateRiskSummaryTable(riskSummary);
+
+  document.getElementById("discrepancyNoData").style.display =
+    discrepancies.length === 0 ? "block" : "none";
+  document.getElementById("discrepancyLoading").style.display = "none";
+
+  document.getElementById("riskNoData").style.display =
+    riskSummary.length === 0 ? "block" : "none";
+  document.getElementById("riskLoading").style.display = "none";
+};
+
+function populateDiscrepancyTable(data) {
+  const tbody = document.getElementById("discrepancyTableBody");
+  tbody.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    return;
+  }
+
+  data.forEach((row) => {
+    const tr = document.createElement("tr");
+    const statusClass =
+      row.status === "Normal" ? "status-ok" : "status-discrepancy";
+
+    tr.innerHTML = `
+      <td>${escapeHTML(row.sitename)}</td>
+      <td>${escapeHTML(row.planneddate)}</td>
+      <td>${escapeHTML(row.actualdate)}</td>
+      <td>${row.span}</td>
+      <td>${row.expectedconsumption}</td>
+      <td>${row.actualfueladded} L</td>
+      <td>${row.variance}</td>
+      <td><span class="${statusClass}">${escapeHTML(row.status)}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function populateRiskSummaryTable(data) {
+  const tbody = document.getElementById("riskSummaryTableBody");
+  tbody.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    return;
+  }
+
+  data.forEach((row) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${escapeHTML(row.sitename)}</td>
+      <td>${escapeHTML(row.issuetype)}</td>
+      <td>${escapeHTML(row.rootcausehint)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+window.switchDiscrepancyTab = function switchDiscrepancyTab(tabId) {
+  // Hide all discrepancy tab panes
+  document.querySelectorAll(".discrepancy-tab-pane").forEach((pane) => {
+    pane.classList.remove("active");
+  });
+
+  // Deactivate all discrepancy tab buttons
+  document.querySelectorAll(".discrepancy-tab-btn").forEach((btn) => {
+    btn.classList.remove("active");
+  });
+
+  // Show selected tab pane
+  const selectedPane = document.getElementById(tabId);
+  if (selectedPane) {
+    selectedPane.classList.add("active");
+  }
+
+  // Activate corresponding button
+  const buttons = document.querySelectorAll(".discrepancy-tab-btn");
+  const tabIndex = ["discrepancyTable", "riskSummaryTable"].indexOf(tabId);
+  if (tabIndex >= 0 && buttons[tabIndex]) {
+    buttons[tabIndex].classList.add("active");
+  }
+};
+
+window.filterDiscrepancyTable = function filterDiscrepancyTable() {
+  const filterInput = document.getElementById("discrepancyFilter").value.toUpperCase();
+  const statusFilter = document.getElementById("discrepancyStatusFilter").value;
+  const rows = document.querySelectorAll("#discrepancyTableBody tr");
+
+  rows.forEach((row) => {
+    const siteName = row.cells[0].textContent.toUpperCase();
+    const status = row.cells[7].textContent.trim();
+
+    const matchesName = siteName.includes(filterInput);
+    const matchesStatus = statusFilter === "" || status.includes(statusFilter);
+
+    row.style.display = matchesName && matchesStatus ? "" : "none";
+  });
+};
+
+window.filterRiskSummaryTable = function filterRiskSummaryTable() {
+  const filterInput = document.getElementById("riskFilter").value.toUpperCase();
+  const typeFilter = document.getElementById("riskTypeFilter").value;
+  const rows = document.querySelectorAll("#riskSummaryTableBody tr");
+
+  rows.forEach((row) => {
+    const siteName = row.cells[0].textContent.toUpperCase();
+    const issueType = row.cells[1].textContent.trim();
+
+    const matchesName = siteName.includes(filterInput);
+    const matchesType = typeFilter === "" || issueType.includes(typeFilter);
+
+    row.style.display = matchesName && matchesType ? "" : "none";
+  });
+};
+
+window.applyDiscrepancyTolerance = function applyDiscrepancyTolerance() {
+  const toleranceInput = document.getElementById("toleranceInput");
+  const tolerance = parseInt(toleranceInput.value, 10);
+
+  if (isNaN(tolerance) || tolerance < 0 || tolerance > 100) {
+    alert("Please enter a valid tolerance value between 0 and 100");
+    return;
+  }
+
+  window.discrepancyAnalysisTolerance = tolerance;
+
+  // Show loading state
+  document.getElementById("discrepancyLoading").style.display = "block";
+  document.getElementById("discrepancyNoData").style.display = "none";
+  document.getElementById("riskLoading").style.display = "block";
+  document.getElementById("riskNoData").style.display = "none";
+
+  // Re-run analysis with new tolerance
+  window.analyzeDiscrepancies();
+};
+
 export {};
