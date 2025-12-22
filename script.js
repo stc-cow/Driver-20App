@@ -2994,7 +2994,6 @@ window.switchAnalysisTab = function switchAnalysisTab(tabId) {
     }, 100);
   }
 };
-window.switchAnalysisTab = globalThis.switchAnalysisTab;
 
 globalThis.sortAnalysisTable = function sortAnalysisTable(analysisId, column) {
   const data = window[`${analysisId}Data`];
