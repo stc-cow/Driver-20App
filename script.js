@@ -2689,16 +2689,18 @@ function parseInvoiceArchiveCSV(csvText) {
       h === "qty" ||
       h === "quantity" ||
       h === "lastfuelingqty" ||
-      h === "lastfuelingquantity",
+      h === "lastfuelingquantity" ||
+      h === "d",
   );
   const invoiceDateIndex = headerLower.findIndex(
     (h) =>
       h === "invoicedate" ||
       h === "invoice date" ||
-      h === "planneddate" ||
-      h === "planned date" ||
+      h === "fuelingdate" ||
+      h === "fueling date" ||
       h === "lastfuelingdate" ||
-      h === "last fueling date",
+      h === "last fueling date" ||
+      h === "c",
   );
 
   for (let i = 1; i < lines.length; i++) {
@@ -2719,6 +2721,8 @@ function parseInvoiceArchiveCSV(csvText) {
           sitename: sitename,
           fuelquantity: qty,
           invoicedate: invoiceDate,
+          fuelingdate: invoiceDate,
+          lastfuelingdate: invoiceDate,
         });
       }
     }
