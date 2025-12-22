@@ -2469,11 +2469,13 @@ body {
 }
 
 .analysis-modal-header {
-  padding: 24px;
-  border-bottom: 2px solid #e8ecff;
+  padding: 28px 24px;
+  background: linear-gradient(135deg, #f9fbff 0%, #e8f5e9 100%);
+  border-bottom: 2px solid #c8e6c9;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-radius: 14px 14px 0 0;
 }
 
 .modal-header-content {
