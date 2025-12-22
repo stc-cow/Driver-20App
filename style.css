@@ -2682,6 +2682,120 @@ body {
   border-radius: 12px;
 }
 
+/* Fueling Chart Styles */
+.chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: linear-gradient(135deg, #f9fbff 0%, #f0f4ff 100%);
+  border-radius: 12px;
+  border: 2px solid #e8ecff;
+}
+
+.chart-controls label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--aces-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.chart-limit-select {
+  padding: 8px 12px;
+  border: 2px solid #e8ecff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: Verdana, sans-serif;
+  background: white;
+  color: var(--aces-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.chart-limit-select:focus {
+  outline: none;
+  border-color: var(--aces-primary);
+  box-shadow: 0 0 0 3px rgba(32, 43, 109, 0.1);
+}
+
+.fueling-chart-container {
+  background: linear-gradient(135deg, #ffffff 0%, #f9fbff 100%);
+  border: 2px solid #e8ecff;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(32, 43, 109, 0.08);
+  position: relative;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fueling-chart-container canvas {
+  max-width: 100%;
+  max-height: 600px;
+}
+
+.chart-legend {
+  padding: 16px;
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+  border: 2px solid #c8e6c9;
+  border-radius: 12px;
+  margin-top: 16px;
+}
+
+.chart-legend-text {
+  margin: 0;
+  color: #2e7d32;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Enhanced Tab Styling */
+.analysis-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 3px solid #e8ecff;
+  padding-bottom: 0;
+  overflow-x: auto;
+}
+
+.analysis-tab-btn {
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #f9fbff 0%, #f0f4ff 100%);
+  border: 2px solid #e8ecff;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 10px 10px 0 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.analysis-tab-btn:hover {
+  color: var(--aces-primary);
+  border-color: var(--aces-primary);
+  background: white;
+}
+
+.analysis-tab-btn.active {
+  color: white;
+  background: linear-gradient(135deg, var(--aces-primary) 0%, #27ae60 100%);
+  border-color: transparent;
+  border-bottom-color: transparent;
+  box-shadow: 0 4px 12px rgba(32, 43, 109, 0.15);
+}
+
 @media (max-width: 768px) {
   .analysis-modal-content {
     width: 98%;
@@ -2712,5 +2826,15 @@ body {
 
   .analysis-tabs {
     flex-wrap: wrap;
+  }
+
+  .fueling-chart-container {
+    padding: 16px;
+    min-height: 300px;
+  }
+
+  .chart-controls {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
