@@ -383,5 +383,163 @@
         </div>
       </div>
     </div>
+
+    <!-- Analysis Authentication Modal -->
+    <div id="analysisAuthModal" class="modal analysis-auth-modal" style="display: none">
+      <div class="modal-content analysis-auth-content">
+        <div class="modal-header">
+          <h2>🔐 Fueling Analysis Access</h2>
+          <button class="modal-close" onclick="closeAnalysisAuthModal()">×</button>
+        </div>
+        <div class="modal-body analysis-auth-body">
+          <p class="auth-subtitle">This feature requires authentication</p>
+          <form class="analysis-auth-form" id="analysisAuthForm" autocomplete="off">
+            <div class="form-group">
+              <label for="analysisUsername" class="form-label">Username</label>
+              <input
+                type="text"
+                id="analysisUsername"
+                name="username"
+                class="form-input"
+                placeholder="Enter username"
+                autocomplete="username"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="analysisPassword" class="form-label">Password</label>
+              <input
+                type="password"
+                id="analysisPassword"
+                name="password"
+                class="form-input"
+                placeholder="Enter password"
+                autocomplete="current-password"
+                required
+              />
+            </div>
+            <button type="submit" class="auth-button">Access Analysis</button>
+            <p class="auth-error" id="analysisAuthError" style="display: none"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fueling Analysis Modal -->
+    <div id="analysisModal" class="modal analysis-modal" style="display: none">
+      <div class="modal-content analysis-modal-content">
+        <div class="modal-header analysis-modal-header">
+          <h2>📊 CER Fueling Analysis</h2>
+          <button class="modal-close" onclick="closeAnalysisModal()">×</button>
+        </div>
+        <div class="modal-body analysis-modal-body">
+          <div class="analysis-tabs">
+            <button class="analysis-tab-btn active" onclick="switchAnalysisTab('analysis1')">
+              Fueling vs Consumption
+            </button>
+            <button class="analysis-tab-btn" onclick="switchAnalysisTab('analysis2')">
+              Schedule Compliance
+            </button>
+            <button class="analysis-tab-btn" onclick="switchAnalysisTab('analysis3')">
+              Site Summary
+            </button>
+          </div>
+
+          <!-- Analysis 1: Highest Fueling Quantity vs Consumption -->
+          <div id="analysis1" class="analysis-tab-content active">
+            <h3>Analysis 1: Highest Fueling Quantity vs Consumption</h3>
+            <div class="analysis-controls">
+              <input
+                type="text"
+                id="analysis1Filter"
+                class="analysis-filter-input"
+                placeholder="Filter by Site Name..."
+              />
+              <select id="analysis1Status" class="analysis-filter-select">
+                <option value="">All Status</option>
+                <option value="Normal">Normal</option>
+                <option value="High Fueling">High Fueling</option>
+              </select>
+            </div>
+            <div class="analysis-table-wrapper">
+              <table class="analysis-table" id="analysis1Table">
+                <thead>
+                  <tr>
+                    <th onclick="sortAnalysisTable('analysis1', 'sitename')">Site Name ↕</th>
+                    <th onclick="sortAnalysisTable('analysis1', 'totalfuel')">Total Fuel Added ↕</th>
+                    <th onclick="sortAnalysisTable('analysis1', 'avgconsumption')">Avg Daily Consumption ↕</th>
+                    <th onclick="sortAnalysisTable('analysis1', 'variance')">Difference / Variance ↕</th>
+                    <th onclick="sortAnalysisTable('analysis1', 'status')">Status ↕</th>
+                  </tr>
+                </thead>
+                <tbody id="analysis1Body"></tbody>
+              </table>
+            </div>
+            <div id="analysis1Loading" class="analysis-loading" style="display: none">Loading data...</div>
+            <div id="analysis1NoData" class="analysis-no-data" style="display: none">Data Not Available</div>
+          </div>
+
+          <!-- Analysis 2: Planned Date Validation -->
+          <div id="analysis2" class="analysis-tab-content" style="display: none">
+            <h3>Analysis 2: Planned Date Validation (±2 Days Rule)</h3>
+            <div class="analysis-controls">
+              <input
+                type="text"
+                id="analysis2Filter"
+                class="analysis-filter-input"
+                placeholder="Filter by Site Name..."
+              />
+              <select id="analysis2Status" class="analysis-filter-select">
+                <option value="">All Status</option>
+                <option value="OK">OK</option>
+                <option value="Discrepancy">Discrepancy</option>
+              </select>
+            </div>
+            <div class="analysis-table-wrapper">
+              <table class="analysis-table" id="analysis2Table">
+                <thead>
+                  <tr>
+                    <th onclick="sortAnalysisTable('analysis2', 'sitename')">Site Name ↕</th>
+                    <th onclick="sortAnalysisTable('analysis2', 'planneddate')">Planned Date ↕</th>
+                    <th onclick="sortAnalysisTable('analysis2', 'actualdate')">Actual Invoice Date ↕</th>
+                    <th onclick="sortAnalysisTable('analysis2', 'daydiff')">Day Difference ↕</th>
+                    <th onclick="sortAnalysisTable('analysis2', 'status')">Schedule Status ↕</th>
+                  </tr>
+                </thead>
+                <tbody id="analysis2Body"></tbody>
+              </table>
+            </div>
+            <div id="analysis2Loading" class="analysis-loading" style="display: none">Loading data...</div>
+            <div id="analysis2NoData" class="analysis-no-data" style="display: none">Data Not Available</div>
+          </div>
+
+          <!-- Analysis 3: Site-Level Fuel Quantity Summary -->
+          <div id="analysis3" class="analysis-tab-content" style="display: none">
+            <h3>Analysis 3: Site-Level Fuel Quantity Summary</h3>
+            <div class="analysis-controls">
+              <input
+                type="text"
+                id="analysis3Filter"
+                class="analysis-filter-input"
+                placeholder="Filter by Site Name..."
+              />
+            </div>
+            <div class="analysis-table-wrapper">
+              <table class="analysis-table" id="analysis3Table">
+                <thead>
+                  <tr>
+                    <th onclick="sortAnalysisTable('analysis3', 'sitename')">Site Name ↕</th>
+                    <th onclick="sortAnalysisTable('analysis3', 'totalqty')">Total Fuel Quantity Added ↕</th>
+                  </tr>
+                </thead>
+                <tbody id="analysis3Body"></tbody>
+              </table>
+            </div>
+            <div id="analysis3Loading" class="analysis-loading" style="display: none">Loading data...</div>
+            <div id="analysis3NoData" class="analysis-no-data" style="display: none">Data Not Available</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
