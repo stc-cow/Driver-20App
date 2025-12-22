@@ -404,7 +404,7 @@ async function fetchCSV() {
           Pragma: "no-cache",
           Expires: "0",
         },
-      });
+      }).catch(() => Promise.reject(new Error("fetch_failed")));
 
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error("proxy_timeout")), 3000);
@@ -441,7 +441,7 @@ async function fetchCSV() {
         Pragma: "no-cache",
         Expires: "0",
       },
-    });
+    }).catch(() => Promise.reject(new Error("direct_fetch_failed")));
 
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error("direct_timeout")), 3000);
