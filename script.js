@@ -2796,6 +2796,7 @@ function generateAnalysis1() {
   }
 
   document.getElementById("analysis1NoData").style.display = "none";
+  window.analysis1Data = analysisRows;
   displayAnalysisTable("analysis1", analysisRows);
 }
 
