@@ -3413,7 +3413,7 @@ window.analyzeDiscrepancies = function analyzeDiscrepancies() {
     const actualFuelAdded = parseFloat(latestInvoice.fuelquantity || latestInvoice.lastfuelingqty || 0);
 
     // Find corresponding Energy Dashboard record
-    const energyDashboardSite = sitesData.find(
+    const energyDashboardSite = analysisData.energyDashboard.find(
       (site) => site.sitename && site.sitename.toUpperCase() === siteName.toUpperCase(),
     );
 
@@ -3426,11 +3426,12 @@ window.analyzeDiscrepancies = function analyzeDiscrepancies() {
     let rootCauseHint = "Missing Energy Dashboard data";
 
     if (energyDashboardSite) {
-      plannedDate = energyDashboardSite.nextfuelingplan || "N/A";
+      // Get AE (Last Fueling Date - planned)
+      plannedDate = energyDashboardSite.lastfuelingdate || "N/A";
 
       // Get AD (Fuel Consumption per day) and AI (Span) from Energy Dashboard
       const fuelConsumptionPerDay = parseFloat(
-        energyDashboardSite.fuelconsumptionperday || 0,
+        energyDashboardSite.fuelconsumption || 0,
       );
       span = parseInt(energyDashboardSite.span || 0);
       lastTotalQuantity = parseFloat(energyDashboardSite.lasttotalquantity || 0);
