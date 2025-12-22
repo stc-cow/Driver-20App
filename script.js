@@ -2958,13 +2958,21 @@ window.switchAnalysisTab = function switchAnalysisTab(tabId) {
   const selectedTab = document.getElementById(tabId);
   if (selectedTab) {
     selectedTab.style.display = "block";
+    selectedTab.classList.add("active");
   }
 
   // Activate corresponding button
   const buttons = document.querySelectorAll(".analysis-tab-btn");
-  const tabIndex = ["analysis1", "analysis2", "analysis3"].indexOf(tabId);
+  const tabIndex = ["analysis1", "analysis2", "analysis3", "analysisChart"].indexOf(tabId);
   if (tabIndex >= 0 && buttons[tabIndex]) {
     buttons[tabIndex].classList.add("active");
+  }
+
+  // Update chart if switching to chart tab
+  if (tabId === "analysisChart" && fuelingChartInstance) {
+    setTimeout(() => {
+      fuelingChartInstance.resize();
+    }, 100);
   }
 };
 
