@@ -3024,4 +3024,194 @@ function showAnalysisLoading(show) {
   });
 }
 
+function generateFuelingChart() {
+  if (analysisData.invoiceArchive.length === 0) {
+    document.getElementById("analysisChartNoData").style.display = "block";
+    return;
+  }
+
+  // Aggregate fuel by site
+  const siteFuelMap = {};
+  analysisData.invoiceArchive.forEach((invoice) => {
+    const siteName = invoice.sitename;
+    if (!siteFuelMap[siteName]) {
+      siteFuelMap[siteName] = 0;
+    }
+    siteFuelMap[siteName] += invoice.fuelquantity;
+  });
+
+  // Convert to array and sort from highest to lowest
+  const siteData = Object.entries(siteFuelMap).map(([siteName, quantity]) => ({
+    siteName,
+    quantity,
+  }));
+
+  siteData.sort((a, b) => b.quantity - a.quantity);
+
+  // Store for limit selector
+  window.fuelingChartData = siteData;
+
+  document.getElementById("analysisChartNoData").style.display = "none";
+  updateFuelingChart();
+}
+
+window.updateFuelingChart = function updateFuelingChart() {
+  if (!window.fuelingChartData) return;
+
+  const limitSelect = document.getElementById("chartLimitSelect");
+  const limit = parseInt(limitSelect?.value || "10");
+
+  const displayData = window.fuelingChartData.slice(0, limit);
+
+  const ctx = document.getElementById("fuelingChart");
+  if (!ctx) return;
+
+  const labels = displayData.map((item) => item.siteName);
+  const data = displayData.map((item) => item.quantity);
+
+  // Generate color gradient
+  const colors = displayData.map((_, index) => {
+    const ratio = index / Math.max(displayData.length - 1, 1);
+    // Gradient from green (high) to orange/red (low)
+    if (ratio < 0.5) {
+      // Green to yellow
+      const r = Math.round(39 + (255 - 39) * (ratio * 2));
+      const g = 174;
+      const b = Math.round(96 + (0 - 96) * (ratio * 2));
+      return `rgba(${r}, ${g}, ${b}, 0.8)`;
+    } else {
+      // Yellow to red
+      const r = 255;
+      const g = Math.round(158 + (94 - 158) * ((ratio - 0.5) * 2));
+      const b = 0;
+      return `rgba(${r}, ${g}, ${b}, 0.8)`;
+    }
+  });
+
+  if (fuelingChartInstance) {
+    fuelingChartInstance.data.labels = labels;
+    fuelingChartInstance.data.datasets[0].data = data;
+    fuelingChartInstance.data.datasets[0].backgroundColor = colors;
+    fuelingChartInstance.options.indexAxis = window.innerWidth < 768 ? "y" : "x";
+    fuelingChartInstance.update();
+  } else {
+    fuelingChartInstance = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Total Fuel Quantity (Liters)",
+            data: data,
+            backgroundColor: colors,
+            borderColor: colors.map((color) => color.replace("0.8", "1")),
+            borderWidth: 2,
+            borderRadius: 8,
+            barPercentage: 0.8,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        indexAxis: window.innerWidth < 768 ? "y" : "x",
+        plugins: {
+          legend: {
+            display: true,
+            position: "top",
+            labels: {
+              font: {
+                size: 13,
+                weight: "600",
+                family: "Verdana, sans-serif",
+              },
+              color: "#202b6d",
+              usePointStyle: true,
+              padding: 16,
+            },
+          },
+          tooltip: {
+            backgroundColor: "rgba(32, 43, 109, 0.9)",
+            padding: 12,
+            titleFont: {
+              size: 14,
+              weight: "700",
+              family: "Verdana, sans-serif",
+            },
+            bodyFont: {
+              size: 13,
+              weight: "500",
+              family: "Verdana, sans-serif",
+            },
+            borderColor: "#27ae60",
+            borderWidth: 2,
+            displayColors: false,
+            callbacks: {
+              label: function (context) {
+                const value = context.parsed.y || context.parsed.x;
+                return `Fuel Quantity: ${value.toFixed(2)} L`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            display: true,
+            grid: {
+              color: "rgba(232, 236, 255, 0.5)",
+              drawBorder: false,
+            },
+            ticks: {
+              font: {
+                size: 12,
+                weight: "500",
+                family: "Verdana, sans-serif",
+              },
+              color: "#64748b",
+            },
+            title: {
+              display: true,
+              text: "Sites",
+              font: {
+                size: 13,
+                weight: "700",
+                family: "Verdana, sans-serif",
+              },
+              color: "#202b6d",
+            },
+          },
+          y: {
+            display: true,
+            grid: {
+              color: "rgba(232, 236, 255, 0.5)",
+              drawBorder: false,
+            },
+            ticks: {
+              font: {
+                size: 12,
+                weight: "500",
+                family: "Verdana, sans-serif",
+              },
+              color: "#64748b",
+              callback: function (value) {
+                return value.toFixed(0) + " L";
+              },
+            },
+            title: {
+              display: true,
+              text: "Fuel Quantity (Liters)",
+              font: {
+                size: 13,
+                weight: "700",
+                family: "Verdana, sans-serif",
+              },
+              color: "#202b6d",
+            },
+          },
+        },
+      },
+    });
+  }
+}
+
 export {};
