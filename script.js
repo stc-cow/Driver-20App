@@ -3089,7 +3089,7 @@ function generateFuelingChart() {
   updateFuelingChart();
 }
 
-window.updateFuelingChart = function updateFuelingChart() {
+globalThis.updateFuelingChart = function updateFuelingChart() {
   if (!window.fuelingChartData || window.fuelingChartData.length === 0) return;
 
   const limitSelect = document.getElementById("chartLimitSelect");
@@ -3100,7 +3100,7 @@ window.updateFuelingChart = function updateFuelingChart() {
   const ctx = document.getElementById("fuelingChart");
   if (!ctx) {
     // Retry after a short delay
-    setTimeout(() => window.updateFuelingChart(), 100);
+    setTimeout(() => globalThis.updateFuelingChart(), 100);
     return;
   }
 
