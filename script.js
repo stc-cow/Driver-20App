@@ -2901,6 +2901,7 @@ function generateAnalysis3() {
   }
 
   document.getElementById("analysis3NoData").style.display = "none";
+  window.analysis3Data = analysisRows;
   displayAnalysisTable("analysis3", analysisRows);
 }
 
