@@ -2487,6 +2487,7 @@ async function loadAnalysisData() {
     generateAnalysis1();
     generateAnalysis2();
     generateAnalysis3();
+    generateFuelingChart();
 
     showAnalysisLoading(false);
   } catch (error) {
