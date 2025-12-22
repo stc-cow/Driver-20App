@@ -2792,25 +2792,38 @@ body {
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 10px 10px 0 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
+  position: relative;
+}
+
+.analysis-tab-btn::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #27ae60 0%, var(--aces-primary) 100%);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
 }
 
 .analysis-tab-btn:hover {
   color: var(--aces-primary);
-  border-color: var(--aces-primary);
-  background: white;
+  border-color: #c8e6c9;
+  background: linear-gradient(135deg, #fafbff 0%, #f5f8ff 100%);
 }
 
 .analysis-tab-btn.active {
   color: white;
-  background: linear-gradient(135deg, var(--aces-primary) 0%, #27ae60 100%);
+  background: linear-gradient(135deg, #27ae60 0%, var(--aces-primary) 100%);
   border-color: transparent;
   border-bottom-color: transparent;
-  box-shadow: 0 4px 12px rgba(32, 43, 109, 0.15);
+  box-shadow: 0 6px 20px rgba(39, 174, 96, 0.25);
 }
 
 @media (max-width: 768px) {
