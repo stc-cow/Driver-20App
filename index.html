@@ -693,6 +693,158 @@
               Data Not Available
             </div>
           </div>
+
+          <!-- Discrepancy Analysis Section -->
+          <div
+            id="discrepancyAnalysis"
+            class="analysis-tab-content"
+            style="display: none"
+          >
+            <h3>🔍 Fuel Discrepancy Analysis (Duplicated Sites Only)</h3>
+            <div class="discrepancy-config">
+              <label for="toleranceInput">Tolerance (%):</label>
+              <input
+                type="number"
+                id="toleranceInput"
+                class="tolerance-input"
+                min="0"
+                max="100"
+                step="5"
+                value="10"
+              />
+              <button
+                class="apply-tolerance-btn"
+                onclick="applyDiscrepancyTolerance()"
+              >
+                Apply & Refresh
+              </button>
+            </div>
+
+            <div class="discrepancy-tabs">
+              <button
+                class="discrepancy-tab-btn active"
+                onclick="switchDiscrepancyTab('discrepancyTable')"
+              >
+                Discrepancy Analysis
+              </button>
+              <button
+                class="discrepancy-tab-btn"
+                onclick="switchDiscrepancyTab('riskSummaryTable')"
+              >
+                Risk Summary
+              </button>
+            </div>
+
+            <!-- Discrepancy Analysis Table -->
+            <div id="discrepancyTable" class="discrepancy-tab-pane active">
+              <div class="analysis-controls">
+                <input
+                  type="text"
+                  id="discrepancyFilter"
+                  class="analysis-filter-input"
+                  placeholder="Filter by Site Name..."
+                  onkeyup="filterDiscrepancyTable()"
+                />
+                <select
+                  id="discrepancyStatusFilter"
+                  class="analysis-filter-select"
+                  onchange="filterDiscrepancyTable()"
+                >
+                  <option value="">All Status</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Over-Fueling">Over-Fueling</option>
+                  <option value="Under-Fueling">Under-Fueling</option>
+                  <option value="Schedule Discrepancy">Schedule Discrepancy</option>
+                  <option value="Data Mismatch">Data Mismatch</option>
+                </select>
+              </div>
+              <div class="analysis-table-wrapper">
+                <table class="analysis-table" id="discrepancyDetailTable">
+                  <thead>
+                    <tr>
+                      <th>Site Name</th>
+                      <th>Last Planned Date</th>
+                      <th>Actual Fuel Date</th>
+                      <th>Span (Days)</th>
+                      <th>Expected Consumption</th>
+                      <th>Actual Fuel Added</th>
+                      <th>Variance</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="discrepancyTableBody"></tbody>
+                </table>
+              </div>
+              <div
+                id="discrepancyLoading"
+                class="analysis-loading"
+                style="display: none"
+              >
+                Analyzing data...
+              </div>
+              <div
+                id="discrepancyNoData"
+                class="analysis-no-data"
+                style="display: none"
+              >
+                No duplicated sites found or insufficient data
+              </div>
+            </div>
+
+            <!-- Risk Summary Table -->
+            <div
+              id="riskSummaryTable"
+              class="discrepancy-tab-pane"
+              style="display: none"
+            >
+              <div class="analysis-controls">
+                <input
+                  type="text"
+                  id="riskFilter"
+                  class="analysis-filter-input"
+                  placeholder="Filter by Site Name..."
+                  onkeyup="filterRiskSummaryTable()"
+                />
+                <select
+                  id="riskTypeFilter"
+                  class="analysis-filter-select"
+                  onchange="filterRiskSummaryTable()"
+                >
+                  <option value="">All Risk Types</option>
+                  <option value="Over-Fueling">Over-Fueling</option>
+                  <option value="Under-Fueling">Under-Fueling</option>
+                  <option value="Date Mismatch">Date Mismatch</option>
+                  <option value="Data Issue">Data Issue</option>
+                </select>
+              </div>
+              <div class="analysis-table-wrapper">
+                <table class="analysis-table" id="riskSummaryTableDetail">
+                  <thead>
+                    <tr>
+                      <th>Site Name</th>
+                      <th>Issue Type</th>
+                      <th>Root Cause Hint</th>
+                    </tr>
+                  </thead>
+                  <tbody id="riskSummaryTableBody"></tbody>
+                </table>
+              </div>
+              <div
+                id="riskLoading"
+                class="analysis-loading"
+                style="display: none"
+              >
+                Analyzing data...
+              </div>
+              <div
+                id="riskNoData"
+                class="analysis-no-data"
+                style="display: none"
+              >
+                No risk issues detected
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
