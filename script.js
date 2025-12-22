@@ -2906,9 +2906,6 @@ function displayAnalysisTable(analysisId, rows) {
   const tbody = document.getElementById(`${analysisId}Body`);
   tbody.innerHTML = "";
 
-  // Store original rows for filtering/sorting
-  window[`${analysisId}Data`] = rows;
-
   rows.forEach((row) => {
     const tr = document.createElement("tr");
 
