@@ -2457,7 +2457,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-async function handleAnalysisLogin() {
+globalThis.handleAnalysisLogin = async function handleAnalysisLogin() {
   const username = document.getElementById("analysisUsername").value.trim();
   const password = document.getElementById("analysisPassword").value;
   const errorMsg = document.getElementById("analysisAuthError");
@@ -2493,6 +2493,7 @@ async function handleAnalysisLogin() {
     document.getElementById("analysisPassword").value = "";
   }
 }
+window.handleAnalysisLogin = globalThis.handleAnalysisLogin;
 
 async function loadAnalysisData() {
   try {
