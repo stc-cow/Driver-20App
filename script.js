@@ -2405,6 +2405,34 @@ document.addEventListener("DOMContentLoaded", () => {
       closeAnalysisModal();
     }
   });
+
+  // Add event listeners for analysis filters
+  const filterInputs = [
+    "analysis1Filter",
+    "analysis2Filter",
+    "analysis3Filter",
+  ];
+  const filterSelects = ["analysis1Status", "analysis2Status"];
+
+  filterInputs.forEach((id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener("input", () => {
+        const analysisId = id.replace("Filter", "");
+        applyAnalysisFilters(analysisId);
+      });
+    }
+  });
+
+  filterSelects.forEach((id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener("change", () => {
+        const analysisId = id.replace("Status", "");
+        applyAnalysisFilters(analysisId);
+      });
+    }
+  });
 });
 
 async function handleAnalysisLogin() {
