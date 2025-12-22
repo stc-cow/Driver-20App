@@ -2878,3 +2878,109 @@ body {
     align-items: flex-start;
   }
 }
+
+/* Discrepancy Analysis Styles */
+.discrepancy-config {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f3e5f5 0%, #ede7f6 100%);
+  border-radius: 12px;
+  border: 2px solid #e1bee7;
+  box-shadow: 0 2px 8px rgba(156, 39, 176, 0.08);
+}
+
+.discrepancy-config label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #6a1b9a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tolerance-input {
+  padding: 9px 12px;
+  border: 2px solid #e1bee7;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: Verdana, sans-serif;
+  background: white;
+  color: #6a1b9a;
+  font-weight: 600;
+  width: 80px;
+  cursor: text;
+  transition: all 0.3s ease;
+}
+
+.tolerance-input:hover {
+  border-color: #ba68c8;
+}
+
+.tolerance-input:focus {
+  outline: none;
+  border-color: #ba68c8;
+  box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.15);
+}
+
+.apply-tolerance-btn {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #ba68c8 0%, #9c27b0 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(156, 39, 176, 0.2);
+}
+
+.apply-tolerance-btn:hover {
+  background: linear-gradient(135deg, #ce93d8 0%, #ba68c8 100%);
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
+}
+
+.apply-tolerance-btn:active {
+  transform: scale(0.98);
+}
+
+.discrepancy-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #e8ecff;
+}
+
+.discrepancy-tab-btn {
+  padding: 12px 18px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  position: relative;
+  bottom: -2px;
+}
+
+.discrepancy-tab-btn:hover {
+  color: #9c27b0;
+}
+
+.discrepancy-tab-btn.active {
+  color: white;
+  background: linear-gradient(135deg, #ba68c8 0%, #9c27b0 100%);
+  border-radius: 8px 8px 0 0;
+}
+
+.discrepancy-tab-pane {
+  display: none;
+}
+
+.discrepancy-tab-pane.active {
+  display: block;
+}
