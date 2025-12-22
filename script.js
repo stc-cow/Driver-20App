@@ -2358,8 +2358,10 @@ const ANALYSIS_CREDENTIALS = {
 };
 
 // URLs for analysis data sources
-const INVOICE_ARCHIVE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1289106706&single=true&output=csv";
-const ENERGY_DASHBOARD_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1149576218&single=true&output=csv";
+const INVOICE_ARCHIVE_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1289106706&single=true&output=csv";
+const ENERGY_DASHBOARD_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1149576218&single=true&output=csv";
 
 let analysisAuthSession = null;
 let analysisData = {
@@ -2487,7 +2489,7 @@ window.handleAnalysisLogin = async function handleAnalysisLogin() {
     errorMsg.style.display = "block";
     document.getElementById("analysisPassword").value = "";
   }
-}
+};
 
 async function loadAnalysisData() {
   try {
@@ -2657,7 +2659,7 @@ function parseInvoiceArchiveCSV(csvText) {
   const data = [];
 
   const siteNameIndex = headerLower.findIndex(
-    (h) => h === "sitename" || h === "site name" || h === "site_name"
+    (h) => h === "sitename" || h === "site name" || h === "site_name",
   );
   const qtyIndex = headerLower.findIndex(
     (h) =>
@@ -2666,7 +2668,7 @@ function parseInvoiceArchiveCSV(csvText) {
       h === "qty" ||
       h === "quantity" ||
       h === "lastfuelingqty" ||
-      h === "lastfuelingquantity"
+      h === "lastfuelingquantity",
   );
   const invoiceDateIndex = headerLower.findIndex(
     (h) =>
@@ -2675,7 +2677,7 @@ function parseInvoiceArchiveCSV(csvText) {
       h === "planneddate" ||
       h === "planned date" ||
       h === "lastfuelingdate" ||
-      h === "last fueling date"
+      h === "last fueling date",
   );
 
   for (let i = 1; i < lines.length; i++) {
@@ -2713,7 +2715,7 @@ function parseEnergyDashboardCSV(csvText) {
   const data = [];
 
   const siteNameIndex = headerLower.findIndex(
-    (h) => h === "sitename" || h === "site name" || h === "site_name"
+    (h) => h === "sitename" || h === "site name" || h === "site_name",
   );
 
   // Column AD index calculation - AD is the 30th column (A=0, B=1, ..., AD=29)
@@ -2722,7 +2724,7 @@ function parseEnergyDashboardCSV(csvText) {
     (h) =>
       h.includes("fuel consumption") ||
       h.includes("consumption") ||
-      h.includes("column ad")
+      h.includes("column ad"),
   );
 
   const consumptionIndex =
@@ -2796,10 +2798,7 @@ function generateAnalysis1() {
       const consumption = siteConsumptionMap[siteName] || 0;
       const totalFuel = invoiceInfo.totalQuantity;
       const variance = totalFuel - consumption;
-      const status =
-        variance > consumption * 0.1
-          ? "High Fueling"
-          : "Normal";
+      const status = variance > consumption * 0.1 ? "High Fueling" : "Normal";
 
       analysisRows.push({
         sitename: invoiceInfo.originalName,
@@ -2864,10 +2863,9 @@ function generateAnalysis2() {
     }
 
     const dayDifference = Math.round(
-      (invoiceDate - plannedDate) / (1000 * 60 * 60 * 24)
+      (invoiceDate - plannedDate) / (1000 * 60 * 60 * 24),
     );
-    const status =
-      Math.abs(dayDifference) <= 2 ? "OK" : "Discrepancy";
+    const status = Math.abs(dayDifference) <= 2 ? "OK" : "Discrepancy";
 
     analysisRows.push({
       sitename: planInfo.originalName,
@@ -2982,7 +2980,12 @@ window.switchAnalysisTab = function switchAnalysisTab(tabId) {
 
   // Activate corresponding button
   const buttons = document.querySelectorAll(".analysis-tab-btn");
-  const tabIndex = ["analysis1", "analysis2", "analysis3", "analysisChart"].indexOf(tabId);
+  const tabIndex = [
+    "analysis1",
+    "analysis2",
+    "analysis3",
+    "analysisChart",
+  ].indexOf(tabId);
   if (tabIndex >= 0 && buttons[tabIndex]) {
     buttons[tabIndex].classList.add("active");
   }
@@ -3025,13 +3028,19 @@ function applyAnalysisFilters(analysisId) {
   if (filterInput && filterInput.value.trim()) {
     const searchTerm = filterInput.value.trim().toLowerCase();
     filteredData = filteredData.filter((row) =>
-      row.sitename.toLowerCase().includes(searchTerm)
+      row.sitename.toLowerCase().includes(searchTerm),
     );
   }
 
   // Apply status filter (only for analysis1 and analysis2)
-  if (filterSelect && filterSelect.value && (analysisId === "analysis1" || analysisId === "analysis2")) {
-    filteredData = filteredData.filter((row) => row.status === filterSelect.value);
+  if (
+    filterSelect &&
+    filterSelect.value &&
+    (analysisId === "analysis1" || analysisId === "analysis2")
+  ) {
+    filteredData = filteredData.filter(
+      (row) => row.status === filterSelect.value,
+    );
   }
 
   displayAnalysisTable(analysisId, filteredData);
@@ -3115,15 +3124,15 @@ window.updateFuelingChart = function updateFuelingChart() {
       // Yellow to Orange
       const localRatio = (ratio - 0.33) / 0.33;
       const r = 255;
-      const g = Math.round(179 - (107 * localRatio));
-      const b = Math.round(0 + (53 * localRatio));
+      const g = Math.round(179 - 107 * localRatio);
+      const b = Math.round(0 + 53 * localRatio);
       return `rgba(${r}, ${g}, ${b}, 0.85)`;
     } else {
       // Orange to Red
       const localRatio = (ratio - 0.66) / 0.34;
-      const r = Math.round(255 - (31 * localRatio));
-      const g = Math.round(72 - (72 * localRatio));
-      const b = Math.round(53 + (15 * localRatio));
+      const r = Math.round(255 - 31 * localRatio);
+      const g = Math.round(72 - 72 * localRatio);
+      const b = Math.round(53 + 15 * localRatio);
       return `rgba(${r}, ${g}, ${b}, 0.85)`;
     }
   });
@@ -3132,7 +3141,8 @@ window.updateFuelingChart = function updateFuelingChart() {
     fuelingChartInstance.data.labels = labels;
     fuelingChartInstance.data.datasets[0].data = data;
     fuelingChartInstance.data.datasets[0].backgroundColor = colors;
-    fuelingChartInstance.options.indexAxis = window.innerWidth < 768 ? "y" : "x";
+    fuelingChartInstance.options.indexAxis =
+      window.innerWidth < 768 ? "y" : "x";
     fuelingChartInstance.update();
   } else {
     fuelingChartInstance = new Chart(ctx, {
@@ -3252,6 +3262,6 @@ window.updateFuelingChart = function updateFuelingChart() {
       },
     });
   }
-}
+};
 
 export {};
