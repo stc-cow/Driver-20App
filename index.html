@@ -429,7 +429,10 @@
     <div id="analysisModal" class="modal analysis-modal" style="display: none">
       <div class="modal-content analysis-modal-content">
         <div class="modal-header analysis-modal-header">
-          <h2>📊 CER Fueling Analysis</h2>
+          <div class="modal-header-content">
+            <h2>📊 CER Fueling Analysis</h2>
+            <p class="modal-header-subtitle">Data-driven insights for fuel management</p>
+          </div>
           <button class="modal-close" onclick="closeAnalysisModal()">×</button>
         </div>
         <div class="modal-body analysis-modal-body">
@@ -442,6 +445,9 @@
             </button>
             <button class="analysis-tab-btn" onclick="switchAnalysisTab('analysis3')">
               Site Summary
+            </button>
+            <button class="analysis-tab-btn" onclick="switchAnalysisTab('analysisChart')">
+              📈 Top Fueling Sites
             </button>
           </div>
 
