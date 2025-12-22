@@ -544,6 +544,28 @@
             <div id="analysis3Loading" class="analysis-loading" style="display: none">Loading data...</div>
             <div id="analysis3NoData" class="analysis-no-data" style="display: none">Data Not Available</div>
           </div>
+
+          <!-- Chart: Top Fueling Sites -->
+          <div id="analysisChart" class="analysis-tab-content" style="display: none">
+            <h3>📈 Top Fueling Sites (Highest to Lowest)</h3>
+            <div class="chart-controls">
+              <label for="chartLimitSelect">Show Top:</label>
+              <select id="chartLimitSelect" class="chart-limit-select" onchange="updateFuelingChart()">
+                <option value="10">Top 10</option>
+                <option value="15">Top 15</option>
+                <option value="20">Top 20</option>
+                <option value="999">All Sites</option>
+              </select>
+            </div>
+            <div class="fueling-chart-container">
+              <canvas id="fuelingChart"></canvas>
+            </div>
+            <div class="chart-legend">
+              <p class="chart-legend-text">📌 Chart shows the top fueling sites ranked by total fuel quantity added, from highest to lowest consumption.</p>
+            </div>
+            <div id="analysisChartLoading" class="analysis-loading" style="display: none">Loading chart...</div>
+            <div id="analysisChartNoData" class="analysis-no-data" style="display: none">Data Not Available</div>
+          </div>
         </div>
       </div>
     </div>
