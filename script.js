@@ -2863,6 +2863,7 @@ function generateAnalysis2() {
   }
 
   document.getElementById("analysis2NoData").style.display = "none";
+  window.analysis2Data = analysisRows;
   displayAnalysisTable("analysis2", analysisRows);
 }
 
