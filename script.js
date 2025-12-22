@@ -388,14 +388,14 @@ async function fetchCSV() {
 
   // Try CORS proxies
   for (let i = 0; i < CORS_PROXIES.length; i++) {
-    try {
-      let proxyUrl;
-      if (CORS_PROXIES[i].includes("?")) {
-        proxyUrl = CORS_PROXIES[i] + CSV_URL;
-      } else {
-        proxyUrl = CORS_PROXIES[i] + encodeURIComponent(CSV_URL);
-      }
+    let proxyUrl;
+    if (CORS_PROXIES[i].includes("?")) {
+      proxyUrl = CORS_PROXIES[i] + CSV_URL;
+    } else {
+      proxyUrl = CORS_PROXIES[i] + encodeURIComponent(CSV_URL);
+    }
 
+    try {
       const fetchPromise = fetch(proxyUrl, {
         method: "GET",
         headers: {
@@ -404,29 +404,28 @@ async function fetchCSV() {
           Pragma: "no-cache",
           Expires: "0",
         },
-      }).catch(() => Promise.reject(new Error("fetch_failed")));
+      });
 
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error("proxy_timeout")), 3000);
       });
 
-      try {
-        const response = await Promise.race([fetchPromise, timeoutPromise]);
+      const response = await Promise.race([fetchPromise, timeoutPromise]).catch(
+        (error) => {
+          return null;
+        },
+      );
 
-        if (response.ok) {
-          const csvText = await response.text();
+      if (response && response.ok) {
+        const csvText = await response.text();
 
-          if (csvText.trim()) {
-            const parsed = parseCSV(csvText);
-            return parsed;
-          }
+        if (csvText.trim()) {
+          const parsed = parseCSV(csvText);
+          return parsed;
         }
-      } catch (raceError) {
-        // Continue to next proxy on timeout or network error
-        continue;
       }
     } catch (proxyError) {
-      // CORS proxy error, try next proxy
+      // Continue to next proxy on error
       continue;
     }
   }
@@ -441,15 +440,19 @@ async function fetchCSV() {
         Pragma: "no-cache",
         Expires: "0",
       },
-    }).catch(() => Promise.reject(new Error("direct_fetch_failed")));
+    });
 
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error("direct_timeout")), 3000);
     });
 
-    const response = await Promise.race([fetchPromise, timeoutPromise]);
+    const response = await Promise.race([fetchPromise, timeoutPromise]).catch(
+      (error) => {
+        return null;
+      },
+    );
 
-    if (response.ok) {
+    if (response && response.ok) {
       const csvText = await response.text();
       if (csvText.trim()) {
         const parsed = parseCSV(csvText);
