@@ -2537,10 +2537,20 @@ body {
 
 .analysis-tab-content {
   display: none;
+  animation: fadeIn 0.3s ease;
 }
 
 .analysis-tab-content.active {
   display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .analysis-tab-content h3 {
