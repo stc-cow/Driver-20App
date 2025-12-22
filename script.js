@@ -2962,7 +2962,7 @@ function displayAnalysisTable(analysisId, rows) {
   });
 }
 
-globalThis.switchAnalysisTab = function switchAnalysisTab(tabId) {
+window.switchAnalysisTab = function switchAnalysisTab(tabId) {
   // Hide all tabs
   document.querySelectorAll(".analysis-tab-content").forEach((tab) => {
     tab.style.display = "none";
