@@ -2968,7 +2968,7 @@ function displayAnalysisTable(analysisId, rows) {
   });
 }
 
-window.switchAnalysisTab = function switchAnalysisTab(tabId) {
+globalThis.switchAnalysisTab = function switchAnalysisTab(tabId) {
   // Hide all tabs
   document.querySelectorAll(".analysis-tab-content").forEach((tab) => {
     tab.style.display = "none";
@@ -3000,6 +3000,7 @@ window.switchAnalysisTab = function switchAnalysisTab(tabId) {
     }, 100);
   }
 };
+window.switchAnalysisTab = globalThis.switchAnalysisTab;
 
 window.sortAnalysisTable = function sortAnalysisTable(analysisId, column) {
   const data = window[`${analysisId}Data`];
