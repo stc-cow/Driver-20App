@@ -2529,6 +2529,7 @@ async function loadAnalysisData() {
     generateAnalysis2();
     generateAnalysis3();
     generateFuelingChart();
+    analyzeDiscrepancies();
 
     showAnalysisLoading(false);
   } catch (error) {
