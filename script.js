@@ -396,7 +396,7 @@ async function fetchCSV() {
         proxyUrl = CORS_PROXIES[i] + encodeURIComponent(CSV_URL);
       }
 
-      const response = await fetch(proxyUrl, {
+      const fetchPromise = fetch(proxyUrl, {
         method: "GET",
         headers: {
           Accept: "text/plain",
@@ -406,22 +406,34 @@ async function fetchCSV() {
         },
       });
 
-      if (response.ok) {
-        const csvText = await response.text();
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("proxy_timeout")), 3000);
+      });
 
-        if (csvText.trim()) {
-          const parsed = parseCSV(csvText);
-          return parsed;
+      try {
+        const response = await Promise.race([fetchPromise, timeoutPromise]);
+
+        if (response.ok) {
+          const csvText = await response.text();
+
+          if (csvText.trim()) {
+            const parsed = parseCSV(csvText);
+            return parsed;
+          }
         }
+      } catch (raceError) {
+        // Continue to next proxy on timeout or network error
+        continue;
       }
     } catch (proxyError) {
       // CORS proxy error, try next proxy
+      continue;
     }
   }
 
   // Last resort: try direct Google Sheets fetch
   try {
-    const response = await fetch(CSV_URL, {
+    const fetchPromise = fetch(CSV_URL, {
       method: "GET",
       mode: "cors",
       headers: {
@@ -431,6 +443,12 @@ async function fetchCSV() {
       },
     });
 
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error("direct_timeout")), 3000);
+    });
+
+    const response = await Promise.race([fetchPromise, timeoutPromise]);
+
     if (response.ok) {
       const csvText = await response.text();
       if (csvText.trim()) {
@@ -438,7 +456,9 @@ async function fetchCSV() {
         return parsed;
       }
     }
-  } catch (error) {}
+  } catch (error) {
+    // Silent fail on direct fetch
+  }
 
   return [];
 }
