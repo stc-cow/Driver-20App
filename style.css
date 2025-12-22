@@ -2719,22 +2719,28 @@ body {
 }
 
 .chart-limit-select {
-  padding: 8px 12px;
-  border: 2px solid #e8ecff;
+  padding: 9px 14px;
+  border: 2px solid #c8e6c9;
   border-radius: 8px;
   font-size: 13px;
   font-family: Verdana, sans-serif;
   background: white;
-  color: var(--aces-primary);
+  color: #27ae60;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(39, 174, 96, 0.1);
+}
+
+.chart-limit-select:hover {
+  border-color: #27ae60;
+  background: #f1f8e9;
 }
 
 .chart-limit-select:focus {
   outline: none;
-  border-color: var(--aces-primary);
-  box-shadow: 0 0 0 3px rgba(32, 43, 109, 0.1);
+  border-color: #27ae60;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.15);
 }
 
 .fueling-chart-container {
