@@ -3253,6 +3253,5 @@ window.updateFuelingChart = function updateFuelingChart() {
     });
   }
 }
-window.updateFuelingChart = globalThis.updateFuelingChart;
 
 export {};
