@@ -2474,11 +2474,30 @@ body {
   align-items: center;
 }
 
+.modal-header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .analysis-modal-header h2 {
   margin: 0;
-  color: var(--aces-primary);
-  font-size: 20px;
-  font-weight: 800;
+  background: linear-gradient(135deg, var(--aces-primary) 0%, #27ae60 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+.modal-header-subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .analysis-modal-body {
