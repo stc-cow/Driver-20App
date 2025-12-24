@@ -3406,8 +3406,7 @@ function parseDateDMY(dateStr) {
 }
 
 window.analyzeDiscrepancies = function analyzeDiscrepancies() {
-  const CONSUMPTION_PER_DAY = 116;
-  const RUNTIME_BUFFER = 2;
+  const DAILY_CONSUMPTION = 116;
 
   if (
     !analysisData.invoiceArchive ||
@@ -3420,52 +3419,48 @@ window.analyzeDiscrepancies = function analyzeDiscrepancies() {
     return;
   }
 
-  // Step 1: Group invoices by site name
-  const siteGroups = {};
+  // Step 1: Group records by site with proper date parsing
+  const sitesMap = {};
   analysisData.invoiceArchive.forEach((invoice) => {
     const siteName = invoice.sitename || "";
-    if (!siteName.trim()) return;
+    const dateStr = invoice.fuelingdate || invoice.lastfuelingdate || "";
+    
+    if (!siteName.trim() || !dateStr.trim()) return;
 
-    if (!siteGroups[siteName]) {
-      siteGroups[siteName] = [];
+    const date = parseDateDMY(dateStr);
+    const qty = parseFloat(invoice.fuelquantity || invoice.lastfuelingqty || 0);
+
+    if (!date || qty <= 0) return;
+
+    if (!sitesMap[siteName]) {
+      sitesMap[siteName] = [];
     }
-    siteGroups[siteName].push(invoice);
+    sitesMap[siteName].push({
+      siteName: siteName,
+      date: date,
+      qty: qty,
+      raw: invoice,
+    });
   });
 
-  // Step 2: Keep only duplicated sites and sort by LastFuelingDate ASC (oldest first)
-  const duplicatedSites = Object.entries(siteGroups)
-    .filter(([_, invoices]) => invoices.length > 1)
-    .map(([siteName, invoices]) => ({
-      siteName,
-      invoices: invoices.sort(
-        (a, b) =>
-          new Date(a.fuelingdate || a.lastfuelingdate || 0) -
-          new Date(b.fuelingdate || b.lastfuelingdate || 0),
-      ),
-    }));
-
-  if (duplicatedSites.length === 0) {
-    document.getElementById("discrepancyNoData").style.display = "block";
-    document.getElementById("discrepancyLoading").style.display = "none";
-    document.getElementById("riskNoData").style.display = "block";
-    document.getElementById("riskLoading").style.display = "none";
-    return;
-  }
-
-  // Step 3: Analyze each duplicated site
+  // Step 2: Analyze each site
   const discrepancies = [];
   const riskSummary = [];
 
-  duplicatedSites.forEach(({ siteName, invoices }) => {
-    // Find corresponding Energy Dashboard record
+  Object.keys(sitesMap).forEach((siteName) => {
+    const records = sitesMap[siteName]
+      .filter((r) => r.date && r.qty > 0)
+      .sort((a, b) => a.date - b.date);
+
+    // Ignore non-duplicated sites
+    if (records.length < 2) return;
+
+    // Find corresponding Energy Dashboard record for OFF-AIR protection
     const energyDashboardSite = analysisData.energyDashboard.find(
       (site) =>
         site.sitename && site.sitename.toUpperCase() === siteName.toUpperCase(),
     );
 
-    const tankCapacity = energyDashboardSite
-      ? parseFloat(energyDashboardSite.tankcapacity || 0)
-      : 0;
     const siteStatus = energyDashboardSite
       ? (energyDashboardSite.status || "").toUpperCase()
       : "";
@@ -3480,92 +3475,65 @@ window.analyzeDiscrepancies = function analyzeDiscrepancies() {
       return;
     }
 
-    // Step 4: Analyze each consecutive pair (i-1 vs i), sorted ASC (oldest first)
-    for (let i = 1; i < invoices.length; i++) {
-      const prevInvoice = invoices[i - 1];
-      const currInvoice = invoices[i];
+    let siteIsTheft = false;
+    let siteIsEarly = false;
 
-      const prevDate = new Date(
-        prevInvoice.fuelingdate || prevInvoice.lastfuelingdate || 0,
-      );
-      const currDate = new Date(
-        currInvoice.fuelingdate || currInvoice.lastfuelingdate || 0,
-      );
+    // Step 3: Analyze each consecutive pair (i-1 vs i)
+    for (let i = 1; i < records.length; i++) {
+      const prev = records[i - 1];
+      const curr = records[i];
 
-      if (isNaN(prevDate.getTime()) || isNaN(currDate.getTime())) {
+      const gapDays = Math.floor(
+        (curr.date - prev.date) / (1000 * 60 * 60 * 24),
+      );
+      const expectedRuntimeDays = prev.qty / DAILY_CONSUMPTION;
+
+      // NORMAL CONDITION: If gap >= runtime - 2, skip this pair (it's OK)
+      if (gapDays >= expectedRuntimeDays - 2) {
         continue;
       }
 
-      // Get fuel quantities from PREVIOUS invoice (what was added before)
-      const prevTotalQty = parseFloat(
-        prevInvoice.fuelquantity || prevInvoice.lastfuelingqty || 0,
-      );
-      const currTotalQty = parseFloat(
-        currInvoice.fuelquantity || currInvoice.lastfuelingqty || 0,
-      );
+      // EARLY REFUEL: Gap is less than expected runtime minus buffer
+      siteIsEarly = true;
 
-      if (isNaN(prevTotalQty) || prevTotalQty <= 0) {
-        continue;
+      // IMPOSSIBLE CONSUMPTION -> THEFT: Expected usage exceeds available fuel
+      if (gapDays * DAILY_CONSUMPTION > prev.qty) {
+        siteIsTheft = true;
       }
 
-      // Safety Check: Current TotalQTY should not exceed tank capacity by 5%
-      if (tankCapacity > 0 && currTotalQty > tankCapacity * 1.05) {
-        continue;
-      }
-
-      // Fuel Runtime Logic:
-      // FuelRuntimeDays = TotalQTY(previous) / 116
-      const fuelRuntimeDays = prevTotalQty / CONSUMPTION_PER_DAY;
-
-      // ActualGapDays = DATEDIFF(LastFuelingDate(current), LastFuelingDate(previous))
-      const actualGapDays = Math.round(
-        (currDate - prevDate) / (1000 * 60 * 60 * 24),
-      );
-
-      if (actualGapDays <= 0) {
-        continue;
-      }
-
-      // Decision Logic
-      let pairStatus = "Normal";
-      let rootCauseHint = "Fuel cycle aligns with consumption";
-      const expectedUsed = actualGapDays * CONSUMPTION_PER_DAY;
-
-      // CHECK 1: Impossible Consumption (Theft/Leak)
-      // IF ExpectedUsed > TotalQTY(previous) THEN TheftFlag = TRUE
-      if (expectedUsed > prevTotalQty) {
-        pairStatus = "Theft";
-        rootCauseHint = `Fuel consumption (${expectedUsed.toFixed(2)} L in ${actualGapDays} days) exceeds previous fueling quantity (${prevTotalQty.toFixed(2)} L) - Impossible consumption detected`;
-      }
-      // CHECK 2: Early Refuel (Suspicious)
-      // IF ActualGapDays < FuelRuntimeDays − 2 THEN EarlyRefuel = TRUE
-      else if (actualGapDays < fuelRuntimeDays - RUNTIME_BUFFER) {
-        pairStatus = "Early Refuel";
-        rootCauseHint = `Refueling after ${actualGapDays} days, but fuel should last ~${fuelRuntimeDays.toFixed(1)} days. Refueled ${(fuelRuntimeDays - actualGapDays).toFixed(1)} days early`;
-      }
-      // DEFAULT: NORMAL
-      // IF ActualGapDays >= FuelRuntimeDays − 2 THEN Status = NORMAL
-
-      // Add to discrepancies
+      // Add pair-level discrepancy record
+      const expectedUsed = gapDays * DAILY_CONSUMPTION;
       discrepancies.push({
         sitename: siteName,
-        planneddate: prevDate.toISOString().split("T")[0],
-        actualdate: currDate.toISOString().split("T")[0],
-        span: actualGapDays,
+        planneddate: prev.date.toISOString().split("T")[0],
+        actualdate: curr.date.toISOString().split("T")[0],
+        span: gapDays,
         expectedconsumption: expectedUsed.toFixed(2),
-        actualfueladded: prevTotalQty.toFixed(2),
-        variance: ((expectedUsed - prevTotalQty) / prevTotalQty * 100).toFixed(2) + "%",
-        status: pairStatus,
+        actualfueladded: prev.qty.toFixed(2),
+        variance: ((expectedUsed - prev.qty) / prev.qty * 100).toFixed(2) + "%",
+        status: siteIsTheft ? "Theft" : siteIsEarly ? "Early Refuel" : "Normal",
       });
+    }
 
-      // Add to risk summary if not normal (avoid duplicates)
-      if (pairStatus !== "Normal" && !riskSummary.some(r => r.sitename === siteName && r.issuetype === pairStatus)) {
-        riskSummary.push({
-          sitename: siteName,
-          issuetype: pairStatus,
-          rootcausehint: rootCauseHint,
-        });
-      }
+    // WORST STATUS WINS for the site
+    let siteStatus_ = "Normal";
+    let rootCauseHint = "All fuel cycles align with consumption";
+
+    if (siteIsTheft) {
+      siteStatus_ = "Theft";
+      rootCauseHint = "Impossible fuel consumption detected across one or more cycles";
+    } else if (siteIsEarly) {
+      siteStatus_ = "Early Refuel";
+      rootCauseHint = "Site refueled earlier than expected in one or more cycles";
+    }
+
+    // Add site-level risk summary if not normal
+    if (siteStatus_ !== "Normal") {
+      riskSummary.push({
+        sitename: siteName,
+        issuetype: siteStatus_,
+        rootcausehint: rootCauseHint,
+      });
     }
   });
 
