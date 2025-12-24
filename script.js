@@ -2759,33 +2759,70 @@ function parseEnergyDashboardCSV(csvText) {
   );
 
   // Column mappings (0-indexed)
-  // AD = 29 (Fuel Consumption per day)
-  // AE = 30 (Last Fueling Date - planned)
-  // AH = 33 (Last Total Quantity)
-  // AI = 34 (Span - days between fueling cycles)
+  // AG = 32 (Before Fueling Qty - quantity before refueling)
+  // AH = 33 (Tank Capacity)
+  // J = 9 (COW Status)
 
-  const fuelConsumptionIndex =
+  const statusIndex = headerLower.findIndex(
+    (h) =>
+      h === "cowstatus" ||
+      h === "cow status" ||
+      h === "status" ||
+      h === "j" ||
+      h.includes("column j"),
+  ) >= 0
+    ? headerLower.findIndex(
+        (h) =>
+          h === "cowstatus" ||
+          h === "cow status" ||
+          h === "status" ||
+          h === "j" ||
+          h.includes("column j"),
+      )
+    : 9;
+
+  const beforeFuelingQtyIndex =
     headerLower.findIndex(
       (h) =>
-        h.includes("fuel consumption") ||
-        h.includes("consumption per day") ||
-        h === "ad" ||
-        h.includes("column ad"),
+        h.includes("before fueling") ||
+        h.includes("before refueling") ||
+        h.includes("qty before") ||
+        h === "ag" ||
+        h.includes("column ag"),
     ) >= 0
       ? headerLower.findIndex(
           (h) =>
-            h.includes("fuel consumption") ||
-            h.includes("consumption per day") ||
-            h === "ad" ||
-            h.includes("column ad"),
+            h.includes("before fueling") ||
+            h.includes("before refueling") ||
+            h.includes("qty before") ||
+            h === "ag" ||
+            h.includes("column ag"),
         )
-      : 29;
+      : 32;
+
+  const tankCapacityIndex =
+    headerLower.findIndex(
+      (h) =>
+        h.includes("tank capacity") ||
+        h.includes("tank quantity") ||
+        h === "ah" ||
+        h.includes("column ah"),
+    ) >= 0
+      ? headerLower.findIndex(
+          (h) =>
+            h.includes("tank capacity") ||
+            h.includes("tank quantity") ||
+            h === "ah" ||
+            h.includes("column ah"),
+        )
+      : 33;
 
   const lastFuelingDateIndex =
     headerLower.findIndex(
       (h) =>
         h.includes("last fueling date") ||
         h.includes("planned") ||
+        h.includes("fueling date") ||
         h === "ae" ||
         h.includes("column ae"),
     ) >= 0
@@ -2793,44 +2830,11 @@ function parseEnergyDashboardCSV(csvText) {
           (h) =>
             h.includes("last fueling date") ||
             h.includes("planned") ||
+            h.includes("fueling date") ||
             h === "ae" ||
             h.includes("column ae"),
         )
       : 30;
-
-  const lastTotalQuantityIndex =
-    headerLower.findIndex(
-      (h) =>
-        h.includes("last total quantity") ||
-        h.includes("tank quantity") ||
-        h === "ah" ||
-        h.includes("column ah"),
-    ) >= 0
-      ? headerLower.findIndex(
-          (h) =>
-            h.includes("last total quantity") ||
-            h.includes("tank quantity") ||
-            h === "ah" ||
-            h.includes("column ah"),
-        )
-      : 33;
-
-  const spanIndex =
-    headerLower.findIndex(
-      (h) =>
-        h.includes("span") ||
-        h.includes("days between") ||
-        h === "ai" ||
-        h.includes("column ai"),
-    ) >= 0
-      ? headerLower.findIndex(
-          (h) =>
-            h.includes("span") ||
-            h.includes("days between") ||
-            h === "ai" ||
-            h.includes("column ai"),
-        )
-      : 34;
 
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i];
@@ -2839,31 +2843,31 @@ function parseEnergyDashboardCSV(csvText) {
     const values = parseCSVLine(line);
     const sitename =
       siteNameIndex >= 0 ? (values[siteNameIndex] || "").trim() : "";
-    const consumption =
-      fuelConsumptionIndex >= 0
-        ? (values[fuelConsumptionIndex] || "").trim()
+    const status =
+      statusIndex >= 0 ? (values[statusIndex] || "").trim().toUpperCase() : "";
+    const beforeFuelingQty =
+      beforeFuelingQtyIndex >= 0
+        ? (values[beforeFuelingQtyIndex] || "").trim()
+        : "";
+    const tankCapacity =
+      tankCapacityIndex >= 0
+        ? (values[tankCapacityIndex] || "").trim()
         : "";
     const lastFuelingDate =
       lastFuelingDateIndex >= 0
         ? (values[lastFuelingDateIndex] || "").trim()
         : "";
-    const lastTotalQuantity =
-      lastTotalQuantityIndex >= 0
-        ? (values[lastTotalQuantityIndex] || "").trim()
-        : "";
-    const span = spanIndex >= 0 ? (values[spanIndex] || "").trim() : "";
 
     if (sitename) {
-      const consumptionValue = parseFloat(consumption);
-      const quantityValue = parseFloat(lastTotalQuantity);
-      const spanValue = parseInt(span, 10);
+      const beforeQtyValue = parseFloat(beforeFuelingQty);
+      const tankCapacityValue = parseFloat(tankCapacity);
 
       data.push({
         sitename: sitename,
-        fuelconsumption: !isNaN(consumptionValue) ? consumptionValue : 0,
+        status: status || "",
+        beforefuelingqty: !isNaN(beforeQtyValue) ? beforeQtyValue : 0,
+        tankcapacity: !isNaN(tankCapacityValue) ? tankCapacityValue : 0,
         lastfuelingdate: lastFuelingDate || "",
-        lasttotalquantity: !isNaN(quantityValue) ? quantityValue : 0,
-        span: !isNaN(spanValue) ? spanValue : 0,
       });
     }
   }
@@ -3391,6 +3395,7 @@ window.discrepancyAnalysisData = { discrepancies: [], riskSummary: [] };
 
 window.analyzeDiscrepancies = function analyzeDiscrepancies() {
   const tolerance = window.discrepancyAnalysisTolerance || 10;
+  const CONSUMPTION_PER_DAY = 116;
 
   if (
     !analysisData.invoiceArchive ||
@@ -3440,15 +3445,7 @@ window.analyzeDiscrepancies = function analyzeDiscrepancies() {
   const riskSummary = [];
 
   duplicatedSites.forEach(({ siteName, invoices }) => {
-    if (invoices.length === 0) return;
-
-    // Get latest fueling record
-    const latestInvoice = invoices[0];
-    const actualFuelingDate =
-      latestInvoice.fuelingdate || latestInvoice.lastfuelingdate || "N/A";
-    const actualFuelAdded = parseFloat(
-      latestInvoice.fuelquantity || latestInvoice.lastfuelingqty || 0,
-    );
+    if (invoices.length < 2) return;
 
     // Find corresponding Energy Dashboard record
     const energyDashboardSite = analysisData.energyDashboard.find(
@@ -3456,104 +3453,114 @@ window.analyzeDiscrepancies = function analyzeDiscrepancies() {
         site.sitename && site.sitename.toUpperCase() === siteName.toUpperCase(),
     );
 
-    let plannedDate = "N/A";
-    let expectedConsumption = null;
-    let span = null;
-    let lastTotalQuantity = null;
-    let status = "Data Mismatch";
-    let variance = "N/A";
-    let rootCauseHint = "Missing Energy Dashboard data";
+    if (!energyDashboardSite) return;
 
-    if (energyDashboardSite) {
-      // Get AE (Last Fueling Date - planned)
-      plannedDate = energyDashboardSite.lastfuelingdate || "N/A";
+    const tankCapacity = parseFloat(energyDashboardSite.tankcapacity || 0);
+    const beforeFuelingQty = parseFloat(
+      energyDashboardSite.beforefuelingqty || 0,
+    );
 
-      // Get AD (Fuel Consumption per day) and AI (Span) from Energy Dashboard
-      const fuelConsumptionPerDay = parseFloat(
-        energyDashboardSite.fuelconsumption || 0,
+    // Tank Capacity Validation: Exclude records where BeforeQTY > TankCapacity * 1.05
+    if (beforeFuelingQty > tankCapacity * 1.05) {
+      riskSummary.push({
+        sitename: siteName,
+        issuetype: "Data Issue",
+        rootcausehint: `Before fueling qty (${beforeFuelingQty.toFixed(2)} L) exceeds tank capacity (${tankCapacity.toFixed(2)} L)`,
+      });
+      return;
+    }
+
+    // OFF-AIR Protection: Check if site is ON-AIR
+    const siteStatus = energyDashboardSite.status || "";
+    if (siteStatus !== "ON-AIR" && siteStatus !== "IN PROGRESS") {
+      riskSummary.push({
+        sitename: siteName,
+        issuetype: "Data Issue",
+        rootcausehint: `Site status is ${siteStatus} (not ON-AIR)`,
+      });
+      return;
+    }
+
+    // Analyze consecutive fueling events (current vs previous)
+    for (let i = 0; i < invoices.length - 1; i++) {
+      const currentInvoice = invoices[i];
+      const previousInvoice = invoices[i + 1];
+
+      const currentDate = new Date(
+        currentInvoice.fuelingdate || currentInvoice.lastfuelingdate || 0,
       );
-      span = parseInt(energyDashboardSite.span || 0);
-      lastTotalQuantity = parseFloat(
-        energyDashboardSite.lasttotalquantity || 0,
+      const previousDate = new Date(
+        previousInvoice.fuelingdate || previousInvoice.lastfuelingdate || 0,
       );
 
       if (
-        !isNaN(fuelConsumptionPerDay) &&
-        !isNaN(span) &&
-        span > 0 &&
-        fuelConsumptionPerDay > 0
+        isNaN(currentDate.getTime()) ||
+        isNaN(previousDate.getTime())
       ) {
-        // Calculate expected consumption
-        expectedConsumption = fuelConsumptionPerDay * span;
-
-        if (expectedConsumption > 0) {
-          // Calculate variance
-          const variancePercentage = (
-            ((actualFuelAdded - expectedConsumption) / expectedConsumption) *
-            100
-          ).toFixed(2);
-          variance = `${variancePercentage}%`;
-
-          // Determine status based on tolerance
-          if (
-            actualFuelAdded >= expectedConsumption * (1 - tolerance / 100) &&
-            actualFuelAdded <= expectedConsumption * (1 + tolerance / 100)
-          ) {
-            status = "Normal";
-            rootCauseHint = "Fuel added aligns with consumption";
-          } else if (
-            actualFuelAdded >
-            expectedConsumption * (1 + tolerance / 100)
-          ) {
-            status = "Over-Fueling";
-            rootCauseHint = `Fuel added (${actualFuelAdded.toFixed(2)} L) exceeds expected consumption (${expectedConsumption.toFixed(2)} L) by more than ${tolerance}%`;
-          } else {
-            status = "Under-Fueling";
-            rootCauseHint = `Fuel added (${actualFuelAdded.toFixed(2)} L) is less than expected consumption (${expectedConsumption.toFixed(2)} L) by more than ${tolerance}%`;
-          }
-        }
+        continue;
       }
 
-      // Check date discrepancy
-      if (plannedDate !== "N/A" && actualFuelingDate !== "N/A") {
-        const planned = new Date(plannedDate);
-        const actual = new Date(actualFuelingDate);
+      // Calculate days gap between consecutive fueling events
+      const daysGap = Math.round(
+        (currentDate - previousDate) / (1000 * 60 * 60 * 24),
+      );
 
-        if (!isNaN(planned.getTime()) && !isNaN(actual.getTime())) {
-          const dayDifference = Math.abs(
-            Math.round((actual - planned) / (1000 * 60 * 60 * 24)),
-          );
+      if (daysGap <= 0) continue;
 
-          if (dayDifference > 2) {
-            status = "Schedule Discrepancy";
-            rootCauseHint = `Fueling occurred ${dayDifference} days from planned date`;
-          }
-        }
+      // Expected Consumption = DaysGap * 116 (constant consumption per day)
+      const expectedConsumption = daysGap * CONSUMPTION_PER_DAY;
+
+      // Actual Fuel Added = TotalQTY(current) - BeforeQTY(current)
+      const actualFuelAdded = parseFloat(
+        currentInvoice.fuelquantity || currentInvoice.lastfuelingqty || 0,
+      );
+
+      if (isNaN(actualFuelAdded) || actualFuelAdded <= 0) {
+        continue;
       }
-    }
 
-    // Add to discrepancies list
-    discrepancies.push({
-      sitename: siteName,
-      planneddate: plannedDate,
-      actualdate: actualFuelingDate,
-      span: span !== null ? span : "N/A",
-      expectedconsumption:
-        expectedConsumption !== null
-          ? expectedConsumption.toFixed(2)
-          : "Invalid Data",
-      actualfueladded: actualFuelAdded.toFixed(2),
-      variance: variance,
-      status: status,
-    });
+      // Calculate variance
+      const varianceAmount = actualFuelAdded - expectedConsumption;
+      const variancePercentage = (
+        (varianceAmount / expectedConsumption) *
+        100
+      ).toFixed(2);
 
-    // Add to risk summary if status is not normal
-    if (status !== "Normal") {
-      riskSummary.push({
+      // Determine status based on tolerance
+      let status = "Normal";
+      let rootCauseHint = "Fuel added aligns with consumption";
+
+      const lowerBound = expectedConsumption * (1 - tolerance / 100);
+      const upperBound = expectedConsumption * (1 + tolerance / 100);
+
+      if (actualFuelAdded < lowerBound) {
+        status = "Under-Fueling";
+        rootCauseHint = `Fuel added (${actualFuelAdded.toFixed(2)} L) is ${Math.abs(variancePercentage)}% below expected (${expectedConsumption.toFixed(2)} L) for ${daysGap} day gap`;
+      } else if (actualFuelAdded > upperBound) {
+        status = "Over-Fueling";
+        rootCauseHint = `Fuel added (${actualFuelAdded.toFixed(2)} L) is ${variancePercentage}% above expected (${expectedConsumption.toFixed(2)} L) for ${daysGap} day gap`;
+      }
+
+      // Add to discrepancies list
+      discrepancies.push({
         sitename: siteName,
-        issuetype: status,
-        rootcausehint: rootCauseHint,
+        planneddate: previousDate.toISOString().split("T")[0],
+        actualdate: currentDate.toISOString().split("T")[0],
+        span: daysGap,
+        expectedconsumption: expectedConsumption.toFixed(2),
+        actualfueladded: actualFuelAdded.toFixed(2),
+        variance: `${variancePercentage}%`,
+        status: status,
       });
+
+      // Add to risk summary if status is not normal
+      if (status !== "Normal") {
+        riskSummary.push({
+          sitename: siteName,
+          issuetype: status,
+          rootcausehint: rootCauseHint,
+        });
+      }
     }
   });
 
