@@ -3393,6 +3393,18 @@ window.updateFuelingChart = function updateFuelingChart() {
 window.discrepancyAnalysisTolerance = 10; // Default tolerance percentage
 window.discrepancyAnalysisData = { discrepancies: [], riskSummary: [] };
 
+function parseDateDMY(dateStr) {
+  if (!dateStr) return null;
+  const parts = dateStr.trim().split("/");
+  if (parts.length !== 3) return null;
+  const day = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10);
+  const year = parseInt(parts[2], 10);
+  if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+  const date = new Date(year, month - 1, day);
+  return isNaN(date.getTime()) ? null : date;
+}
+
 window.analyzeDiscrepancies = function analyzeDiscrepancies() {
   const CONSUMPTION_PER_DAY = 116;
   const RUNTIME_BUFFER = 2;
