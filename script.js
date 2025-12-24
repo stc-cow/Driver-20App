@@ -2763,23 +2763,24 @@ function parseEnergyDashboardCSV(csvText) {
   // AH = 33 (Tank Capacity)
   // J = 9 (COW Status)
 
-  const statusIndex = headerLower.findIndex(
-    (h) =>
-      h === "cowstatus" ||
-      h === "cow status" ||
-      h === "status" ||
-      h === "j" ||
-      h.includes("column j"),
-  ) >= 0
-    ? headerLower.findIndex(
-        (h) =>
-          h === "cowstatus" ||
-          h === "cow status" ||
-          h === "status" ||
-          h === "j" ||
-          h.includes("column j"),
-      )
-    : 9;
+  const statusIndex =
+    headerLower.findIndex(
+      (h) =>
+        h === "cowstatus" ||
+        h === "cow status" ||
+        h === "status" ||
+        h === "j" ||
+        h.includes("column j"),
+    ) >= 0
+      ? headerLower.findIndex(
+          (h) =>
+            h === "cowstatus" ||
+            h === "cow status" ||
+            h === "status" ||
+            h === "j" ||
+            h.includes("column j"),
+        )
+      : 9;
 
   const beforeFuelingQtyIndex =
     headerLower.findIndex(
@@ -2850,9 +2851,7 @@ function parseEnergyDashboardCSV(csvText) {
         ? (values[beforeFuelingQtyIndex] || "").trim()
         : "";
     const tankCapacity =
-      tankCapacityIndex >= 0
-        ? (values[tankCapacityIndex] || "").trim()
-        : "";
+      tankCapacityIndex >= 0 ? (values[tankCapacityIndex] || "").trim() : "";
     const lastFuelingDate =
       lastFuelingDateIndex >= 0
         ? (values[lastFuelingDateIndex] || "").trim()
@@ -3424,7 +3423,7 @@ window.analyzeDiscrepancies = function analyzeDiscrepancies() {
   analysisData.invoiceArchive.forEach((invoice) => {
     const siteName = invoice.sitename || "";
     const dateStr = invoice.fuelingdate || invoice.lastfuelingdate || "";
-    
+
     if (!siteName.trim() || !dateStr.trim()) return;
 
     const date = parseDateDMY(dateStr);
@@ -3510,7 +3509,8 @@ window.analyzeDiscrepancies = function analyzeDiscrepancies() {
         span: gapDays,
         expectedconsumption: expectedUsed.toFixed(2),
         actualfueladded: prev.qty.toFixed(2),
-        variance: ((expectedUsed - prev.qty) / prev.qty * 100).toFixed(2) + "%",
+        variance:
+          (((expectedUsed - prev.qty) / prev.qty) * 100).toFixed(2) + "%",
         status: siteIsTheft ? "Theft" : siteIsEarly ? "Early Refuel" : "Normal",
       });
     }
@@ -3521,10 +3521,12 @@ window.analyzeDiscrepancies = function analyzeDiscrepancies() {
 
     if (siteIsTheft) {
       siteStatus_ = "Theft";
-      rootCauseHint = "Impossible fuel consumption detected across one or more cycles";
+      rootCauseHint =
+        "Impossible fuel consumption detected across one or more cycles";
     } else if (siteIsEarly) {
       siteStatus_ = "Early Refuel";
-      rootCauseHint = "Site refueled earlier than expected in one or more cycles";
+      rootCauseHint =
+        "Site refueled earlier than expected in one or more cycles";
     }
 
     // Add site-level risk summary if not normal
