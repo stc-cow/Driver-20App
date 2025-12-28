@@ -1710,15 +1710,15 @@ async function backgroundSyncData() {
       return;
     }
 
-    // Silently fetch latest CSV data
+    // Silently fetch latest CSV data with shorter timeout
     let rawData = [];
     try {
       rawData = await Promise.race([
         fetchCSV(),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("CSV fetch timeout")), 4000),
+          setTimeout(() => reject(new Error("CSV fetch timeout")), 5000),
         ),
-      ]);
+      ]).catch(() => []);
     } catch (csvErr) {
       return;
     }
