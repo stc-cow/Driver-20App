@@ -351,34 +351,45 @@ async function fetchCSV() {
   // Try API endpoint first (for servers with backend like Fly.dev)
   if (!isStaticHosting) {
     try {
-      const fetchPromise = fetch(CSV_API_URL, {
-        method: "GET",
-        headers: {
-          Accept: "text/csv",
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
-      });
-
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("timeout")), 3000);
-      });
-
+      let fetchPromise;
       try {
-        const response = await Promise.race([fetchPromise, timeoutPromise]);
+        fetchPromise = fetch(CSV_API_URL, {
+          method: "GET",
+          headers: {
+            Accept: "text/csv",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        });
+      } catch (fetchErr) {
+        // Fetch creation failed, skip to next method
+      }
 
-        if (response.ok) {
-          const csvText = await response.text();
-          if (csvText.trim()) {
-            const parsed = parseCSV(csvText);
-            return parsed;
+      if (fetchPromise) {
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error("timeout")), 3000);
+        });
+
+        try {
+          const response = await Promise.race([
+            fetchPromise.catch(() => null),
+            timeoutPromise,
+          ]).catch(() => null);
+
+          if (response && response.ok) {
+            try {
+              const csvText = await response.text();
+              if (csvText.trim()) {
+                const parsed = parseCSV(csvText);
+                return parsed;
+              }
+            } catch (textErr) {
+              // Silent fail
+            }
           }
-        }
-      } catch (fetchError) {
-        // Silently ignore timeout and fetch failures
-        if (fetchError.message !== "timeout") {
-          console.debug("API fetch failed:", fetchError.message);
+        } catch (fetchError) {
+          // Silently ignore timeout and fetch failures
         }
       }
     } catch (error) {
