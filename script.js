@@ -2658,7 +2658,10 @@ async function fetchEnergyDashboardData() {
     return await Promise.race([
       fetchEnergyDashboardWithProxies(csvUrl, CORS_PROXIES),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Energy dashboard fetch timeout")), 10000),
+        setTimeout(
+          () => reject(new Error("Energy dashboard fetch timeout")),
+          10000,
+        ),
       ),
     ]).catch(() => []);
   } catch (error) {
@@ -2668,7 +2671,6 @@ async function fetchEnergyDashboardData() {
 
 async function fetchEnergyDashboardWithProxies(csvUrl, CORS_PROXIES) {
   try {
-
     for (let i = 0; i < CORS_PROXIES.length; i++) {
       try {
         let proxyUrl;
