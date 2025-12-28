@@ -775,6 +775,44 @@ body {
   color: #333;
 }
 
+.modal-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.modal-control-btn {
+  width: 36px;
+  height: 36px;
+  padding: 6px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.modal-control-btn:hover {
+  background-color: rgba(32, 43, 109, 0.08);
+  color: var(--aces-primary);
+}
+
+.analysis-modal-expanded .analysis-modal-content {
+  max-width: 100vw;
+  max-height: 100vh;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+.analysis-modal-expanded .analysis-modal-body {
+  padding: 24px;
+}
+
 .modal-body {
   padding: 20px;
   max-height: 60vh;
