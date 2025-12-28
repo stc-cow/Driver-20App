@@ -351,46 +351,39 @@ async function fetchCSV() {
   // Try API endpoint first (for servers with backend like Fly.dev)
   if (!isStaticHosting) {
     try {
-      let fetchPromise;
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("timeout")), 3000);
+      });
+
+      const fetchPromise = fetch(CSV_API_URL, {
+        method: "GET",
+        headers: {
+          Accept: "text/csv",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }).catch(() => null);
+
       try {
-        fetchPromise = fetch(CSV_API_URL, {
-          method: "GET",
-          headers: {
-            Accept: "text/csv",
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            Pragma: "no-cache",
-            Expires: "0",
-          },
-        });
-      } catch (fetchErr) {
-        // Fetch creation failed, skip to next method
-      }
+        const response = await Promise.race([
+          fetchPromise,
+          timeoutPromise,
+        ]).catch(() => null);
 
-      if (fetchPromise) {
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error("timeout")), 3000);
-        });
-
-        try {
-          const response = await Promise.race([
-            fetchPromise.catch(() => null),
-            timeoutPromise,
-          ]).catch(() => null);
-
-          if (response && response.ok) {
-            try {
-              const csvText = await response.text();
-              if (csvText.trim()) {
-                const parsed = parseCSV(csvText);
-                return parsed;
-              }
-            } catch (textErr) {
-              // Silent fail
+        if (response && response.ok) {
+          try {
+            const csvText = await response.text();
+            if (csvText.trim()) {
+              const parsed = parseCSV(csvText);
+              return parsed;
             }
+          } catch (textErr) {
+            // Silent fail
           }
-        } catch (fetchError) {
-          // Silently ignore timeout and fetch failures
         }
+      } catch (fetchError) {
+        // Silently ignore timeout and fetch failures
       }
     } catch (error) {
       // API endpoint not available, try alternatives
