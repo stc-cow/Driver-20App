@@ -2453,11 +2453,32 @@ window.closeAnalysisAuthModal = function closeAnalysisAuthModal() {
   }
 };
 
+window.expandAnalysisModal = function expandAnalysisModal() {
+  const modal = document.getElementById("analysisModal");
+  if (modal) {
+    modal.classList.add("analysis-modal-expanded");
+    document.getElementById("analysisExpandBtn").style.display = "none";
+    document.getElementById("analysisMinimizeBtn").style.display = "block";
+  }
+};
+
+window.minimizeAnalysisModal = function minimizeAnalysisModal() {
+  const modal = document.getElementById("analysisModal");
+  if (modal) {
+    modal.classList.remove("analysis-modal-expanded");
+    document.getElementById("analysisExpandBtn").style.display = "block";
+    document.getElementById("analysisMinimizeBtn").style.display = "none";
+  }
+};
+
 window.closeAnalysisModal = function closeAnalysisModal() {
   const modal = document.getElementById("analysisModal");
   if (modal) {
     modal.style.display = "none";
+    modal.classList.remove("analysis-modal-expanded");
   }
+  document.getElementById("analysisExpandBtn").style.display = "block";
+  document.getElementById("analysisMinimizeBtn").style.display = "none";
   analysisAuthSession = null;
   if (fuelingChartInstance) {
     fuelingChartInstance.destroy();
