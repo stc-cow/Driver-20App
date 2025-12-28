@@ -2708,7 +2708,6 @@ async function fetchEnergyDashboardWithProxies(csvUrl, CORS_PROXIES) {
 
     return [];
   } catch (error) {
-    console.error("Error fetching energy dashboard:", error);
     return [];
   }
 }
