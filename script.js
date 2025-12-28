@@ -2624,6 +2624,21 @@ async function fetchEnergyDashboardData() {
       "https://api.codetabs.com/v1/proxy?quest=",
     ];
 
+    // Wrap entire function with timeout
+    return await Promise.race([
+      fetchEnergyDashboardWithProxies(csvUrl, CORS_PROXIES),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Energy dashboard fetch timeout")), 10000),
+      ),
+    ]).catch(() => []);
+  } catch (error) {
+    return [];
+  }
+}
+
+async function fetchEnergyDashboardWithProxies(csvUrl, CORS_PROXIES) {
+  try {
+
     for (let i = 0; i < CORS_PROXIES.length; i++) {
       try {
         let proxyUrl;
