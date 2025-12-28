@@ -404,16 +404,14 @@ async function fetchCSV() {
           Pragma: "no-cache",
           Expires: "0",
         },
-      });
+      }).catch(() => null);
 
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error("proxy_timeout")), 3000);
       });
 
       const response = await Promise.race([fetchPromise, timeoutPromise]).catch(
-        (error) => {
-          return null;
-        },
+        () => null,
       );
 
       if (response && response.ok) {
