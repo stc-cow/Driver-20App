@@ -2633,7 +2633,7 @@ async function fetchEnergyDashboardData() {
           proxyUrl = CORS_PROXIES[i] + encodeURIComponent(csvUrl);
         }
 
-        const response = await fetch(proxyUrl, {
+        const fetchPromise = fetch(proxyUrl, {
           method: "GET",
           headers: {
             Accept: "text/plain",
@@ -2641,9 +2641,17 @@ async function fetchEnergyDashboardData() {
             Pragma: "no-cache",
             Expires: "0",
           },
+        }).catch(() => null);
+
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error("proxy_timeout")), 3000);
         });
 
-        if (response.ok) {
+        const response = await Promise.race([fetchPromise, timeoutPromise]).catch(
+          () => null,
+        );
+
+        if (response && response.ok) {
           const csvText = await response.text();
           if (csvText.trim()) {
             return parseEnergyDashboardCSV(csvText);
@@ -2655,7 +2663,7 @@ async function fetchEnergyDashboardData() {
     }
 
     try {
-      const response = await fetch(csvUrl, {
+      const fetchPromise = fetch(csvUrl, {
         method: "GET",
         mode: "cors",
         headers: {
@@ -2663,16 +2671,24 @@ async function fetchEnergyDashboardData() {
           Pragma: "no-cache",
           Expires: "0",
         },
+      }).catch(() => null);
+
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("direct_timeout")), 3000);
       });
 
-      if (response.ok) {
+      const response = await Promise.race([fetchPromise, timeoutPromise]).catch(
+        () => null,
+      );
+
+      if (response && response.ok) {
         const csvText = await response.text();
         if (csvText.trim()) {
           return parseEnergyDashboardCSV(csvText);
         }
       }
     } catch (error) {
-      console.error("Direct fetch failed:", error);
+      // Silent fail
     }
 
     return [];
