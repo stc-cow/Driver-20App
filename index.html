@@ -449,7 +449,19 @@
               Data-driven insights for fuel management
             </p>
           </div>
-          <button class="modal-close" onclick="closeAnalysisModal()">×</button>
+          <div class="modal-controls">
+            <button class="modal-control-btn" id="analysisExpandBtn" onclick="expandAnalysisModal()" title="Expand">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+              </svg>
+            </button>
+            <button class="modal-control-btn" id="analysisMinimizeBtn" onclick="minimizeAnalysisModal()" title="Minimize" style="display: none;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 13h8m-4-8v8"></path>
+              </svg>
+            </button>
+            <button class="modal-close" onclick="closeAnalysisModal()">×</button>
+          </div>
         </div>
         <div class="modal-body analysis-modal-body">
           <div class="analysis-tabs">
