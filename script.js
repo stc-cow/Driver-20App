@@ -445,27 +445,22 @@ async function fetchCSV() {
 
   // Last resort: try direct Google Sheets fetch
   try {
-    let fetchPromise;
-    try {
-      fetchPromise = fetch(CSV_URL, {
-        method: "GET",
-        mode: "cors",
-        headers: {
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
-      });
-    } catch (fetchErr) {
-      return [];
-    }
-
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error("direct_timeout")), 3000);
     });
 
+    const fetchPromise = fetch(CSV_URL, {
+      method: "GET",
+      mode: "cors",
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    }).catch(() => null);
+
     const response = await Promise.race([
-      fetchPromise.catch(() => null),
+      fetchPromise,
       timeoutPromise,
     ]).catch(() => null);
 
