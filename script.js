@@ -396,30 +396,39 @@ async function fetchCSV() {
     }
 
     try {
-      const fetchPromise = fetch(proxyUrl, {
-        method: "GET",
-        headers: {
-          Accept: "text/plain",
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
-      }).catch(() => null);
+      let fetchPromise;
+      try {
+        fetchPromise = fetch(proxyUrl, {
+          method: "GET",
+          headers: {
+            Accept: "text/plain",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        });
+      } catch (fetchErr) {
+        continue;
+      }
 
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error("proxy_timeout")), 3000);
       });
 
-      const response = await Promise.race([fetchPromise, timeoutPromise]).catch(
-        () => null,
-      );
+      const response = await Promise.race([
+        fetchPromise.catch(() => null),
+        timeoutPromise,
+      ]).catch(() => null);
 
       if (response && response.ok) {
-        const csvText = await response.text();
-
-        if (csvText.trim()) {
-          const parsed = parseCSV(csvText);
-          return parsed;
+        try {
+          const csvText = await response.text();
+          if (csvText.trim()) {
+            const parsed = parseCSV(csvText);
+            return parsed;
+          }
+        } catch (textErr) {
+          continue;
         }
       }
     } catch (proxyError) {
