@@ -119,6 +119,20 @@ setInterval(() => {
 // END CONSOLE LOCK
 // ==========================================
 
+// Suppress unhandled fetch rejections
+window.addEventListener("unhandledrejection", (event) => {
+  if (
+    event.reason &&
+    (event.reason.message === "Failed to fetch" ||
+      event.reason.message === "timeout" ||
+      event.reason.message === "proxy_timeout" ||
+      event.reason.message === "direct_timeout" ||
+      event.reason.message === "CSV fetch timeout")
+  ) {
+    event.preventDefault();
+  }
+});
+
 // Extract username from URL params
 const urlParams = new URLSearchParams(window.location.search);
 let urlUsername = urlParams.get("username") || "Guest";
