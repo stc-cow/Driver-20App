@@ -1921,6 +1921,23 @@ body {
     padding: 16px;
   }
 
+  .table-header-container {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .status-card .table-header-container h3 {
+    font-size: 12px;
+    margin-bottom: 0;
+  }
+
+  .table-screenshot-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+    width: 100%;
+  }
+
   .status-card h3 {
     font-size: 12px;
     margin-bottom: 12px;
