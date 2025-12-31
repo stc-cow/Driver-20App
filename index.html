@@ -224,7 +224,16 @@
 
         <div class="cards-container">
           <div class="status-card overdue-card">
-            <h3>Due (Overdue)</h3>
+            <div class="table-header-container">
+              <h3>Due (Overdue)</h3>
+              <button
+                class="table-screenshot-btn"
+                onclick="downloadTableScreenshot('overdueTableBody', 'Overdue')"
+                title="Download table as image"
+              >
+                📸 Screenshot
+              </button>
+            </div>
             <table class="sites-table">
               <thead>
                 <tr>
