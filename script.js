@@ -437,9 +437,10 @@ async function fetchCSV() {
           },
         }).catch(() => null);
 
-        const response = await Promise.race([fetchPromise, timeoutPromise]).catch(
-          () => null,
-        );
+        const response = await Promise.race([
+          fetchPromise,
+          timeoutPromise,
+        ]).catch(() => null);
 
         if (response && response.ok) {
           try {
