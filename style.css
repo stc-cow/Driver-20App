@@ -1191,7 +1191,7 @@ body {
   margin-bottom: 16px;
 }
 
-.table-header-container h3 {
+.status-card .table-header-container h3 {
   margin: 0;
   font-size: 13px;
   font-weight: 800;
