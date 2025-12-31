@@ -1888,38 +1888,51 @@ window.downloadTableScreenshot = async function downloadTableScreenshot(
     `;
 
     // Style the cloned table for better appearance
-    const theadRows = tableClone.querySelectorAll("thead tr");
-    theadRows.forEach((row) => {
-      row.style.cssText = `
+    const thead = tableClone.querySelector("thead");
+    if (thead) {
+      thead.style.cssText = `
+        display: table-header-group;
         background: linear-gradient(135deg, #202b6d 0%, #1a1f4d 100%);
         color: white;
       `;
-      const ths = row.querySelectorAll("th");
-      ths.forEach((th) => {
-        th.style.cssText = `
-          padding: 12px 8px;
-          text-align: left;
-          font-weight: 600;
-          border: 1px solid #ddd;
+      const theadRows = thead.querySelectorAll("tr");
+      theadRows.forEach((row) => {
+        row.style.cssText = `
+          background: linear-gradient(135deg, #202b6d 0%, #1a1f4d 100%);
+          color: white;
         `;
+        const ths = row.querySelectorAll("th");
+        ths.forEach((th) => {
+          th.style.cssText = `
+            padding: 14px 12px;
+            text-align: center;
+            font-weight: 600;
+            border: 1px solid #1a1f4d;
+            color: white;
+            background: linear-gradient(135deg, #202b6d 0%, #1a1f4d 100%);
+          `;
+        });
       });
-    });
+    }
 
-    const tbodyRows = tableClone.querySelectorAll("tbody tr");
-    tbodyRows.forEach((row, index) => {
-      row.style.cssText = `
-        background: ${index % 2 === 0 ? "#f9fbff" : "white"};
-        border-bottom: 1px solid #e2e8f0;
-      `;
-      const tds = row.querySelectorAll("td");
-      tds.forEach((td) => {
-        td.style.cssText = `
-          padding: 10px 8px;
-          text-align: left;
-          border: 1px solid #e2e8f0;
+    const tbody = tableClone.querySelector("tbody");
+    if (tbody) {
+      const tbodyRows = tbody.querySelectorAll("tr");
+      tbodyRows.forEach((row, index) => {
+        row.style.cssText = `
+          background: ${index % 2 === 0 ? "#f9fbff" : "white"};
+          border-bottom: 1px solid #e2e8f0;
         `;
+        const tds = row.querySelectorAll("td");
+        tds.forEach((td) => {
+          td.style.cssText = `
+            padding: 12px 10px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+          `;
+        });
       });
-    });
+    }
 
     container.appendChild(tableClone);
     document.body.appendChild(container);
