@@ -377,17 +377,17 @@ async function fetchCSV() {
         setTimeout(() => reject(new Error("timeout")), 3000);
       });
 
-      const fetchPromise = fetch(CSV_API_URL, {
-        method: "GET",
-        headers: {
-          Accept: "text/csv",
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
-      }).catch(() => null);
-
       try {
+        const fetchPromise = fetch(CSV_API_URL, {
+          method: "GET",
+          headers: {
+            Accept: "text/csv",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        }).catch(() => null);
+
         const response = await Promise.race([
           fetchPromise,
           timeoutPromise,
