@@ -247,7 +247,16 @@
           </div>
 
           <div class="status-card today-card">
-            <h3>Today Schedule</h3>
+            <div class="table-header-container">
+              <h3>Today Schedule</h3>
+              <button
+                class="table-screenshot-btn"
+                onclick="downloadTableScreenshot('todayTableBody', 'Today')"
+                title="Download table as image"
+              >
+                📸 Screenshot
+              </button>
+            </div>
             <table class="sites-table">
               <thead>
                 <tr>
