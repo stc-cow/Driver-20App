@@ -121,13 +121,19 @@ setInterval(() => {
 
 // Suppress unhandled fetch rejections
 window.addEventListener("unhandledrejection", (event) => {
+  const reason = event.reason;
+  const reasonStr = String(reason || "").toLowerCase();
+  const messageStr = (reason && reason.message ? String(reason.message) : "").toLowerCase();
+
   if (
-    event.reason &&
-    (event.reason.message === "Failed to fetch" ||
-      event.reason.message === "timeout" ||
-      event.reason.message === "proxy_timeout" ||
-      event.reason.message === "direct_timeout" ||
-      event.reason.message === "CSV fetch timeout")
+    reasonStr.includes("failed to fetch") ||
+    messageStr.includes("failed to fetch") ||
+    messageStr.includes("timeout") ||
+    reasonStr.includes("timeout") ||
+    messageStr === "timeout" ||
+    messageStr === "proxy_timeout" ||
+    messageStr === "direct_timeout" ||
+    messageStr === "csv fetch timeout"
   ) {
     event.preventDefault();
   }
