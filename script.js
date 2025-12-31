@@ -123,7 +123,9 @@ setInterval(() => {
 window.addEventListener("unhandledrejection", (event) => {
   const reason = event.reason;
   const reasonStr = String(reason || "").toLowerCase();
-  const messageStr = (reason && reason.message ? String(reason.message) : "").toLowerCase();
+  const messageStr = (
+    reason && reason.message ? String(reason.message) : ""
+  ).toLowerCase();
 
   if (
     reasonStr.includes("failed to fetch") ||
@@ -434,10 +436,9 @@ async function fetchCSV() {
         },
       }).catch(() => null);
 
-      const response = await Promise.race([
-        fetchPromise,
-        timeoutPromise,
-      ]).catch(() => null);
+      const response = await Promise.race([fetchPromise, timeoutPromise]).catch(
+        () => null,
+      );
 
       if (response && response.ok) {
         try {
@@ -472,10 +473,9 @@ async function fetchCSV() {
       },
     }).catch(() => null);
 
-    const response = await Promise.race([
-      fetchPromise,
-      timeoutPromise,
-    ]).catch(() => null);
+    const response = await Promise.race([fetchPromise, timeoutPromise]).catch(
+      () => null,
+    );
 
     if (response && response.ok) {
       try {
