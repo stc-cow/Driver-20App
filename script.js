@@ -468,30 +468,35 @@ async function fetchCSV() {
       setTimeout(() => reject(new Error("direct_timeout")), 3000);
     });
 
-    const fetchPromise = fetch(CSV_URL, {
-      method: "GET",
-      mode: "cors",
-      headers: {
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-    }).catch(() => null);
+    try {
+      const fetchPromise = fetch(CSV_URL, {
+        method: "GET",
+        mode: "cors",
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }).catch(() => null);
 
-    const response = await Promise.race([fetchPromise, timeoutPromise]).catch(
-      () => null,
-    );
+      const response = await Promise.race([fetchPromise, timeoutPromise]).catch(
+        () => null,
+      );
 
-    if (response && response.ok) {
-      try {
-        const csvText = await response.text();
-        if (csvText.trim()) {
-          const parsed = parseCSV(csvText);
-          return parsed;
+      if (response && response.ok) {
+        try {
+          const csvText = await response.text();
+          if (csvText.trim()) {
+            const parsed = parseCSV(csvText);
+            return parsed;
+          }
+        } catch (textErr) {
+          return [];
         }
-      } catch (textErr) {
-        return [];
       }
+    } catch (fetchErr) {
+      // Catch fetch errors silently
+      return [];
     }
   } catch (error) {
     // Silent fail on direct fetch
