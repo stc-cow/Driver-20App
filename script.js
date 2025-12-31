@@ -1846,6 +1846,126 @@ function hasDataChanged(oldData, newData) {
   return false;
 }
 
+// Screenshot Export Functions
+window.downloadTableScreenshot = async function downloadTableScreenshot(
+  tableBodyId,
+  tableName,
+) {
+  try {
+    const tableBody = document.getElementById(tableBodyId);
+    if (!tableBody) {
+      alert("Table not found");
+      return;
+    }
+
+    // Get the parent table element
+    const table = tableBody.closest(".sites-table");
+    if (!table) {
+      alert("Could not find table element");
+      return;
+    }
+
+    // Create a container to hold the table for screenshot
+    const container = document.createElement("div");
+    container.style.cssText = `
+      position: fixed;
+      left: -9999px;
+      top: -9999px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      max-width: 900px;
+    `;
+
+    // Clone the entire table (including headers)
+    const tableClone = table.cloneNode(true);
+    tableClone.style.cssText = `
+      width: 100%;
+      border-collapse: collapse;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+    `;
+
+    // Style the cloned table for better appearance
+    const theadRows = tableClone.querySelectorAll("thead tr");
+    theadRows.forEach((row) => {
+      row.style.cssText = `
+        background: linear-gradient(135deg, #202b6d 0%, #1a1f4d 100%);
+        color: white;
+      `;
+      const ths = row.querySelectorAll("th");
+      ths.forEach((th) => {
+        th.style.cssText = `
+          padding: 12px 8px;
+          text-align: left;
+          font-weight: 600;
+          border: 1px solid #ddd;
+        `;
+      });
+    });
+
+    const tbodyRows = tableClone.querySelectorAll("tbody tr");
+    tbodyRows.forEach((row, index) => {
+      row.style.cssText = `
+        background: ${index % 2 === 0 ? "#f9fbff" : "white"};
+        border-bottom: 1px solid #e2e8f0;
+      `;
+      const tds = row.querySelectorAll("td");
+      tds.forEach((td) => {
+        td.style.cssText = `
+          padding: 10px 8px;
+          text-align: left;
+          border: 1px solid #e2e8f0;
+        `;
+      });
+    });
+
+    container.appendChild(tableClone);
+    document.body.appendChild(container);
+
+    // Capture the table as image
+    const canvas = await html2canvas(container, {
+      allowTaint: true,
+      useCORS: true,
+      scale: 2,
+      backgroundColor: "#ffffff",
+    });
+
+    // Generate filename with date and table name
+    const now = new Date();
+    const dateStr = now
+      .toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      })
+      .replace(/\//g, "-");
+    const timeStr = now
+      .toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })
+      .replace(/:/g, "-");
+    const filename = `${tableName}_${dateStr}_${timeStr}.png`;
+
+    // Download the image
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Clean up
+    document.body.removeChild(container);
+  } catch (error) {
+    alert("Failed to download screenshot. Please try again.");
+  }
+};
+
 // Invoicing Module Functions
 let invoiceData = [];
 let filteredInvoiceData = [];
