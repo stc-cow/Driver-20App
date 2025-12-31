@@ -426,30 +426,35 @@ async function fetchCSV() {
         setTimeout(() => reject(new Error("proxy_timeout")), 3000);
       });
 
-      const fetchPromise = fetch(proxyUrl, {
-        method: "GET",
-        headers: {
-          Accept: "text/plain",
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
-      }).catch(() => null);
+      try {
+        const fetchPromise = fetch(proxyUrl, {
+          method: "GET",
+          headers: {
+            Accept: "text/plain",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        }).catch(() => null);
 
-      const response = await Promise.race([fetchPromise, timeoutPromise]).catch(
-        () => null,
-      );
+        const response = await Promise.race([fetchPromise, timeoutPromise]).catch(
+          () => null,
+        );
 
-      if (response && response.ok) {
-        try {
-          const csvText = await response.text();
-          if (csvText.trim()) {
-            const parsed = parseCSV(csvText);
-            return parsed;
+        if (response && response.ok) {
+          try {
+            const csvText = await response.text();
+            if (csvText.trim()) {
+              const parsed = parseCSV(csvText);
+              return parsed;
+            }
+          } catch (textErr) {
+            continue;
           }
-        } catch (textErr) {
-          continue;
         }
+      } catch (fetchErr) {
+        // Catch fetch errors silently and continue to next proxy
+        continue;
       }
     } catch (proxyError) {
       // Continue to next proxy on error
