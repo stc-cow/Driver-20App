@@ -2250,7 +2250,8 @@ body {
 }
 
 .date-input,
-.region-select {
+.region-select,
+.site-search-input {
   padding: 10px 12px;
   border: 2px solid #e8ecff;
   border-radius: 8px;
@@ -2262,7 +2263,8 @@ body {
 }
 
 .date-input:focus,
-.region-select:focus {
+.region-select:focus,
+.site-search-input:focus {
   outline: none;
   border-color: var(--aces-primary);
   box-shadow: 0 0 0 3px rgba(32, 43, 109, 0.1);
