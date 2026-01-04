@@ -480,15 +480,20 @@ async function fetchCSV() {
     });
 
     try {
-      const fetchPromise = fetch(CSV_URL, {
-        method: "GET",
-        mode: "cors",
-        headers: {
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
-      }).catch(() => null);
+      let fetchPromise;
+      try {
+        fetchPromise = fetch(CSV_URL, {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        });
+      } catch (err) {
+        fetchPromise = Promise.reject(err);
+      }
 
       const response = await Promise.race([fetchPromise, timeoutPromise]).catch(
         () => null,
