@@ -2362,6 +2362,10 @@ window.applyInvoiceFilters = function applyInvoiceFilters() {
   const startDate = document.getElementById("invoiceStartDate").value;
   const endDate = document.getElementById("invoiceEndDate").value;
   const region = document.getElementById("invoiceRegion").value;
+  const siteName = document
+    .getElementById("invoiceSiteName")
+    .value.toLowerCase()
+    .trim();
 
   console.log(
     "Applying filters - Start:",
@@ -2370,6 +2374,8 @@ window.applyInvoiceFilters = function applyInvoiceFilters() {
     endDate,
     "Region:",
     region,
+    "Site Name:",
+    siteName,
   );
   console.log("Total invoice data rows:", invoiceData.length);
 
@@ -2384,6 +2390,13 @@ window.applyInvoiceFilters = function applyInvoiceFilters() {
   }
 
   filteredInvoiceData = invoiceData.filter((row) => {
+    // Apply site name filter if provided
+    if (siteName && siteName !== "") {
+      if (!row.sitename.toLowerCase().includes(siteName)) {
+        return false;
+      }
+    }
+
     // Apply region filter if selected
     if (region && region !== "") {
       const rowRegion = row.region.toLowerCase();
