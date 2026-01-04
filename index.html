@@ -320,6 +320,16 @@
                 <option value="East">East</option>
               </select>
             </div>
+            <div class="filter-group">
+              <label for="invoiceSiteName">Site Name:</label>
+              <input
+                type="text"
+                id="invoiceSiteName"
+                class="site-search-input"
+                placeholder="Search by site name..."
+                onkeyup="applyInvoiceFilters()"
+              />
+            </div>
             <button class="apply-filter-btn" onclick="applyInvoiceFilters()">
               Apply Filters
             </button>
