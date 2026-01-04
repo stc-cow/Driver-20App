@@ -1992,6 +1992,7 @@ window.showInvoiceModal = async function showInvoiceModal() {
     }
 
     modal.style.display = "flex";
+    document.getElementById("invoiceSiteName").value = "";
     await loadInvoiceData();
     window.applyInvoiceFilters();
   } catch (error) {
