@@ -2224,10 +2224,15 @@ async function loadInvoiceData() {
     try {
       console.log("Trying direct fetch (no proxy)");
 
-      const fetchPromise = fetch(INVOICE_CSV_URL, {
-        method: "GET",
-        mode: "cors",
-      });
+      let fetchPromise;
+      try {
+        fetchPromise = fetch(INVOICE_CSV_URL, {
+          method: "GET",
+          mode: "cors",
+        });
+      } catch (err) {
+        fetchPromise = Promise.reject(err);
+      }
 
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error("timeout")), 8000);
