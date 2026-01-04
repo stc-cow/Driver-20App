@@ -378,15 +378,20 @@ async function fetchCSV() {
       });
 
       try {
-        const fetchPromise = fetch(CSV_API_URL, {
-          method: "GET",
-          headers: {
-            Accept: "text/csv",
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            Pragma: "no-cache",
-            Expires: "0",
-          },
-        }).catch(() => null);
+        let fetchPromise;
+        try {
+          fetchPromise = fetch(CSV_API_URL, {
+            method: "GET",
+            headers: {
+              Accept: "text/csv",
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
+              Expires: "0",
+            },
+          });
+        } catch (err) {
+          fetchPromise = Promise.reject(err);
+        }
 
         const response = await Promise.race([
           fetchPromise,
