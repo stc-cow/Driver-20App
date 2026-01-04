@@ -2180,12 +2180,17 @@ async function loadInvoiceData() {
         console.log("Trying proxy:", CORS_PROXIES[i]);
 
         try {
-          const fetchPromise = fetch(proxyUrl, {
-            method: "GET",
-            headers: {
-              Accept: "text/plain",
-            },
-          });
+          let fetchPromise;
+          try {
+            fetchPromise = fetch(proxyUrl, {
+              method: "GET",
+              headers: {
+                Accept: "text/plain",
+              },
+            });
+          } catch (err) {
+            fetchPromise = Promise.reject(err);
+          }
 
           const timeoutPromise = new Promise((_, reject) => {
             setTimeout(() => reject(new Error("timeout")), 8000);
