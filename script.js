@@ -138,17 +138,34 @@ window.fetch = function (...args) {
   }
 };
 
-// Override console.error to suppress "Failed to fetch" messages
+// Override console methods to suppress "Failed to fetch" messages
+const suppressFetchError = (...args) => {
+  const message = args.map((arg) => String(arg)).join(" ");
+  return message.includes("Failed to fetch");
+};
+
 const originalError = console.error;
 console.error = function (...args) {
-  // Check if this is a "Failed to fetch" error
-  const message = args.map((arg) => String(arg)).join(" ");
-  if (message.includes("Failed to fetch")) {
-    // Silently ignore this error - it's expected due to CORS proxy rotation
+  if (suppressFetchError(...args)) {
     return;
   }
-  // Call the original console.error for other errors
   originalError.apply(console, args);
+};
+
+const originalWarn = console.warn;
+console.warn = function (...args) {
+  if (suppressFetchError(...args)) {
+    return;
+  }
+  originalWarn.apply(console, args);
+};
+
+const originalTrace = console.trace;
+console.trace = function (...args) {
+  if (suppressFetchError(...args)) {
+    return;
+  }
+  originalTrace.apply(console, args);
 };
 
 // Aggressive global error suppression
