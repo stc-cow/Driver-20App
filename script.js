@@ -1383,9 +1383,12 @@ window.zoomToSite = function zoomToSite(sitename) {
 
 async function loadDashboard() {
   try {
+    console.log("[loadDashboard] Starting dashboard load...");
     const rawData = await fetchCSV();
+    console.log("[loadDashboard] fetchCSV returned", rawData?.length || 0, "rows");
 
     sitesData = filterAndValidateSites(rawData);
+    console.log("[loadDashboard] After filtering, sitesData has", sitesData?.length || 0, "sites");
 
     // Update UI regardless of migration success
     try {
@@ -1393,8 +1396,13 @@ async function loadDashboard() {
       populateDueTable(sitesData);
       addMarkersToMap(sitesData);
       updateEventCards(sitesData);
-    } catch (uiErr) {}
-  } catch (error) {}
+      console.log("[loadDashboard] Dashboard UI updated successfully");
+    } catch (uiErr) {
+      console.error("[loadDashboard] Error updating UI:", uiErr.message);
+    }
+  } catch (error) {
+    console.error("[loadDashboard] Error in loadDashboard:", error.message);
+  }
 }
 
 function formatFuelDate(fuelDate) {
