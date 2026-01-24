@@ -484,10 +484,47 @@ async function safeFetch(url, options = {}) {
   }
 }
 
+function normalizeRecordKeys(record) {
+  if (!record || typeof record !== "object") return {};
+  return Object.keys(record).reduce((acc, key) => {
+    acc[key.toLowerCase()] =
+      record[key] === null || record[key] === undefined
+        ? ""
+        : String(record[key]).trim();
+    return acc;
+  }, {});
+}
+
+function parseCsvOrJson(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return [];
+
+  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      const records = Array.isArray(parsed)
+        ? parsed
+        : Array.isArray(parsed?.data)
+          ? parsed.data
+          : Array.isArray(parsed?.records)
+            ? parsed.records
+            : [];
+
+      if (records.length > 0) {
+        return records.map(normalizeRecordKeys);
+      }
+    } catch (error) {
+      console.warn("[parseCsvOrJson] JSON parse failed:", error.message);
+    }
+  }
+
+  return parseCSV(text);
+}
+
 async function fetchCSV() {
   const baseURL =
     "https://script.google.com/macros/s/AKfycbxU7WENKAEkhJnBvCPbcGqiwZbUr5ZTT93Gfpw6AmiP7lPYfGUobDpOZh1qvppYgF3RVw/exec";
-  const CSV_URL = baseURL + "&t=" + Date.now();
+  const CSV_URL = `${baseURL}?t=${Date.now()}`;
   const CORS_PROXIES = [
     "https://corsproxy.io/?",
     "https://api.codetabs.com/v1/proxy?quest=",
@@ -496,9 +533,7 @@ async function fetchCSV() {
   console.log("[fetchCSV] Starting CSV fetch...");
 
   // Check if API endpoint is available (not static hosting like GitHub Pages)
-  const isStaticHosting =
-    window.location.hostname.includes("github.io") ||
-    window.location.hostname === "localhost";
+  const isStaticHosting = window.location.hostname.includes("github.io");
 
   console.log(
     "[fetchCSV] isStaticHosting:",
@@ -542,7 +577,7 @@ async function fetchCSV() {
           try {
             const csvText = await response.text();
             if (csvText.trim()) {
-              const parsed = parseCSV(csvText);
+              const parsed = parseCsvOrJson(csvText);
               return parsed;
             }
           } catch (textErr) {
@@ -609,7 +644,7 @@ async function fetchCSV() {
               csvText.length,
             );
             if (csvText.trim()) {
-              const parsed = parseCSV(csvText);
+              const parsed = parseCsvOrJson(csvText);
               console.log(
                 `[fetchCSV] Parsed ${parsed.length} rows from proxy ${i + 1}`,
               );
@@ -677,7 +712,7 @@ async function fetchCSV() {
             csvText.length,
           );
           if (csvText.trim()) {
-            const parsed = parseCSV(csvText);
+            const parsed = parseCsvOrJson(csvText);
             console.log(
               "[fetchCSV] Parsed",
               parsed.length,
@@ -768,6 +803,15 @@ function parseCSVLine(line) {
 
   result.push(current);
   return result;
+}
+
+function getRecordValue(record, keys) {
+  for (const key of keys) {
+    if (record[key] !== undefined && record[key] !== null) {
+      return record[key];
+    }
+  }
+  return "";
 }
 
 function filterAndValidateSites(rawData) {
@@ -2424,7 +2468,8 @@ async function loadInvoiceData() {
               const csvText = await response.text();
               console.log("CSV fetched successfully, length:", csvText.length);
               if (csvText.trim()) {
-                invoiceData = parseInvoiceCSV(csvText);
+                const parsedRows = parseCsvOrJson(csvText);
+                invoiceData = parseInvoiceRecords(parsedRows);
                 console.log("Invoice data loaded:", invoiceData.length, "rows");
                 return;
               }
@@ -2469,7 +2514,8 @@ async function loadInvoiceData() {
           const csvText = await response.text();
           console.log("CSV fetched directly, length:", csvText.length);
           if (csvText.trim()) {
-            invoiceData = parseInvoiceCSV(csvText);
+            const parsedRows = parseCsvOrJson(csvText);
+            invoiceData = parseInvoiceRecords(parsedRows);
             console.log("Invoice data loaded:", invoiceData.length, "rows");
             return;
           }
@@ -2605,6 +2651,64 @@ function parseInvoiceCSV(csvText) {
     console.log("Rows with dates by month:", monthCounts);
     console.log("Rows with missing dates:", noDateCount);
   }
+  return data;
+}
+
+function parseInvoiceRecords(records) {
+  const data = [];
+  const normalizedRecords = records.map(normalizeRecordKeys);
+
+  normalizedRecords.forEach((record) => {
+    const sitename = getRecordValue(record, [
+      "sitename",
+      "site name",
+      "site_name",
+    ]).trim();
+    const region = getRecordValue(record, ["region"]).trim();
+    const lastfuelingdate = getRecordValue(record, [
+      "lastfuelingdate",
+      "last fueling date",
+      "last_fueling_date",
+    ]).trim();
+    const lastfuelingqty = getRecordValue(record, [
+      "lastfuelingqty",
+      "lastfuelingquantity",
+      "last fueling qty",
+      "last fueling quantity",
+    ]).trim();
+
+    if (sitename && lastfuelingdate && lastfuelingqty) {
+      const parsedDate = parseDateToString(lastfuelingdate);
+      const quantity = parseFloat(lastfuelingqty);
+
+      if (parsedDate && !isNaN(quantity) && quantity > 0) {
+        data.push({
+          sitename,
+          region,
+          lastfuelingdate,
+          lastfuelingquantity: quantity,
+        });
+      }
+    }
+  });
+
+  console.log("Parsed invoice data:", data.length, "rows");
+  if (data.length > 0) {
+    console.log("First row:", data[0]);
+    console.log("Last row:", data[data.length - 1]);
+
+    const maxToLog = Math.min(20, data.length);
+    console.log(`First ${maxToLog} rows with dates:`);
+    for (let i = 0; i < maxToLog; i++) {
+      const row = data[i];
+      console.log(
+        `  [${i}] ${row.sitename} | Date: "${row.lastfuelingdate}" | Qty: ${row.lastfuelingquantity}`,
+      );
+    }
+  } else {
+    console.warn("No valid invoice rows parsed!");
+  }
+
   return data;
 }
 
