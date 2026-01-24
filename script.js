@@ -408,7 +408,12 @@ async function fetchCSV() {
     window.location.hostname.includes("github.io") ||
     window.location.hostname === "localhost";
 
-  console.log("[fetchCSV] isStaticHosting:", isStaticHosting, "hostname:", window.location.hostname);
+  console.log(
+    "[fetchCSV] isStaticHosting:",
+    isStaticHosting,
+    "hostname:",
+    window.location.hostname,
+  );
 
   // Try API endpoint first (for servers with backend like Fly.dev)
   if (!isStaticHosting) {
@@ -467,7 +472,10 @@ async function fetchCSV() {
       proxyUrl = CORS_PROXIES[i] + encodeURIComponent(CSV_URL);
     }
 
-    console.log(`[fetchCSV] Attempting proxy ${i + 1}/${CORS_PROXIES.length}:`, CORS_PROXIES[i]);
+    console.log(
+      `[fetchCSV] Attempting proxy ${i + 1}/${CORS_PROXIES.length}:`,
+      CORS_PROXIES[i],
+    );
 
     try {
       const timeoutPromise = new Promise((_, reject) => {
@@ -498,18 +506,29 @@ async function fetchCSV() {
         if (response && response.ok) {
           try {
             const csvText = await response.text();
-            console.log(`[fetchCSV] Proxy ${i + 1} returned data, length:`, csvText.length);
+            console.log(
+              `[fetchCSV] Proxy ${i + 1} returned data, length:`,
+              csvText.length,
+            );
             if (csvText.trim()) {
               const parsed = parseCSV(csvText);
-              console.log(`[fetchCSV] Parsed ${parsed.length} rows from proxy ${i + 1}`);
+              console.log(
+                `[fetchCSV] Parsed ${parsed.length} rows from proxy ${i + 1}`,
+              );
               return parsed;
             }
           } catch (textErr) {
-            console.warn(`[fetchCSV] Error parsing text from proxy ${i + 1}:`, textErr.message);
+            console.warn(
+              `[fetchCSV] Error parsing text from proxy ${i + 1}:`,
+              textErr.message,
+            );
             continue;
           }
         } else {
-          console.log(`[fetchCSV] Proxy ${i + 1} failed - response:`, response?.status);
+          console.log(
+            `[fetchCSV] Proxy ${i + 1} failed - response:`,
+            response?.status,
+          );
         }
       } catch (fetchErr) {
         // Catch fetch errors silently and continue to next proxy
@@ -552,18 +571,31 @@ async function fetchCSV() {
       if (response && response.ok) {
         try {
           const csvText = await response.text();
-          console.log("[fetchCSV] Direct fetch successful, data length:", csvText.length);
+          console.log(
+            "[fetchCSV] Direct fetch successful, data length:",
+            csvText.length,
+          );
           if (csvText.trim()) {
             const parsed = parseCSV(csvText);
-            console.log("[fetchCSV] Parsed", parsed.length, "rows from direct fetch");
+            console.log(
+              "[fetchCSV] Parsed",
+              parsed.length,
+              "rows from direct fetch",
+            );
             return parsed;
           }
         } catch (textErr) {
-          console.error("[fetchCSV] Error parsing direct fetch:", textErr.message);
+          console.error(
+            "[fetchCSV] Error parsing direct fetch:",
+            textErr.message,
+          );
           return [];
         }
       } else {
-        console.log("[fetchCSV] Direct fetch failed - status:", response?.status);
+        console.log(
+          "[fetchCSV] Direct fetch failed - status:",
+          response?.status,
+        );
       }
     } catch (fetchErr) {
       // Catch fetch errors silently
@@ -1385,10 +1417,18 @@ async function loadDashboard() {
   try {
     console.log("[loadDashboard] Starting dashboard load...");
     const rawData = await fetchCSV();
-    console.log("[loadDashboard] fetchCSV returned", rawData?.length || 0, "rows");
+    console.log(
+      "[loadDashboard] fetchCSV returned",
+      rawData?.length || 0,
+      "rows",
+    );
 
     sitesData = filterAndValidateSites(rawData);
-    console.log("[loadDashboard] After filtering, sitesData has", sitesData?.length || 0, "sites");
+    console.log(
+      "[loadDashboard] After filtering, sitesData has",
+      sitesData?.length || 0,
+      "sites",
+    );
 
     // Update UI regardless of migration success
     try {
