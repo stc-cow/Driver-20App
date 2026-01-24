@@ -106,56 +106,39 @@ document.addEventListener("keydown", (e) => {
 // Suppress "Failed to fetch" errors that occur due to CORS proxy rotation and network instability
 // These errors are expected and handled by the try-catch blocks in fetchCSV
 
-// Store original fetch to wrap it
-const originalFetch = window.fetch;
-
-// Override fetch to suppress "Failed to fetch" errors
-window.fetch = function(...args) {
-  try {
-    const promise = originalFetch.apply(this, args);
-    // Add a catch handler to suppress failed fetch errors
-    return promise.catch((err) => {
-      if (err && err.message && err.message.includes("Failed to fetch")) {
-        // Silently suppress and return a rejected promise that won't throw
-        return Promise.reject(err);
-      }
-      throw err;
-    });
-  } catch (err) {
-    // Catch synchronous errors during fetch initialization
-    if (err && err.message && err.message.includes("Failed to fetch")) {
-      // Return a rejected promise that's properly caught
-      return Promise.reject(err);
-    }
-    throw err;
+// Override console.error to suppress "Failed to fetch" messages
+const originalError = console.error;
+console.error = function(...args) {
+  // Check if this is a "Failed to fetch" error
+  const message = args.map(arg => String(arg)).join(' ');
+  if (message.includes("Failed to fetch")) {
+    // Silently ignore this error - it's expected due to CORS proxy rotation
+    return;
   }
+  // Call the original console.error for other errors
+  originalError.apply(console, args);
 };
 
-// Global error handler to suppress fetch errors
+// Aggressive global error suppression
 window.addEventListener("error", (event) => {
-  // Suppress "Failed to fetch" errors from script.js
   if (event.message && event.message.includes("Failed to fetch")) {
     event.preventDefault();
     return true;
   }
 });
 
-// Handle unhandled promise rejections from fetch failures
+// Suppress unhandled promise rejections from fetch failures
 window.addEventListener("unhandledrejection", (event) => {
-  // Suppress "Failed to fetch" errors in promise chains
-  if (
-    event.reason &&
-    typeof event.reason === "object" &&
-    event.reason.message &&
-    event.reason.message.includes("Failed to fetch")
-  ) {
-    event.preventDefault();
+  const reason = event.reason;
+  let isFetchError = false;
+
+  if (reason && typeof reason === "object" && reason.message) {
+    isFetchError = reason.message.includes("Failed to fetch");
+  } else if (typeof reason === "string") {
+    isFetchError = reason.includes("Failed to fetch");
   }
-  // Also suppress if reason is a string
-  else if (
-    typeof event.reason === "string" &&
-    event.reason.includes("Failed to fetch")
-  ) {
+
+  if (isFetchError) {
     event.preventDefault();
   }
 });
