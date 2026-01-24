@@ -583,6 +583,9 @@ async function fetchCSV() {
             Pragma: "no-cache",
             Expires: "0",
           },
+        }).catch((err) => {
+          // Immediately catch to prevent unhandled rejection
+          return Promise.reject(err);
         });
       } catch (err) {
         fetchPromise = Promise.reject(err);
