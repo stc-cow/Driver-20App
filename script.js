@@ -108,9 +108,9 @@ document.addEventListener("keydown", (e) => {
 
 // Override console.error to suppress "Failed to fetch" messages
 const originalError = console.error;
-console.error = function(...args) {
+console.error = function (...args) {
   // Check if this is a "Failed to fetch" error
-  const message = args.map(arg => String(arg)).join(' ');
+  const message = args.map((arg) => String(arg)).join(" ");
   if (message.includes("Failed to fetch")) {
     // Silently ignore this error - it's expected due to CORS proxy rotation
     return;
@@ -1910,17 +1910,19 @@ async function backgroundSyncData() {
         new Promise((_, reject) =>
           setTimeout(() => reject(new Error("CSV fetch timeout")), 5000),
         ),
-      ])
-        .catch((err) => {
-          // Log for debugging but don't throw
-          if (err && err.message && !err.message.includes("Failed to fetch")) {
-            console.debug("[backgroundSyncData] Fetch error:", err.message);
-          }
-          return [];
-        });
+      ]).catch((err) => {
+        // Log for debugging but don't throw
+        if (err && err.message && !err.message.includes("Failed to fetch")) {
+          console.debug("[backgroundSyncData] Fetch error:", err.message);
+        }
+        return [];
+      });
     } catch (csvErr) {
       // Catch any errors and silently return
-      console.debug("[backgroundSyncData] CSV fetch exception:", csvErr?.message);
+      console.debug(
+        "[backgroundSyncData] CSV fetch exception:",
+        csvErr?.message,
+      );
       return;
     }
 
