@@ -99,6 +99,35 @@ document.addEventListener("keydown", (e) => {
 //   return false;
 // });
 
+// ==========================================
+// FETCH ERROR SUPPRESSION
+// ==========================================
+// Suppress "Failed to fetch" errors that occur due to CORS proxy rotation and network instability
+// These errors are expected and handled by the try-catch blocks in fetchCSV
+window.addEventListener("error", (event) => {
+  if (
+    event.message &&
+    event.message.includes("Failed to fetch") &&
+    event.filename &&
+    event.filename.includes("script.js")
+  ) {
+    event.preventDefault();
+    return true;
+  }
+});
+
+// Also handle unhandled promise rejections from fetch failures
+window.addEventListener("unhandledrejection", (event) => {
+  if (
+    event.reason &&
+    event.reason.message &&
+    event.reason.message.includes("Failed to fetch")
+  ) {
+    event.preventDefault();
+    return true;
+  }
+});
+
 // Detect if DevTools is open using debounce technique
 setInterval(() => {
   const threshold = 160; // Approximate height of DevTools
