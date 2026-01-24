@@ -175,6 +175,28 @@ window.addEventListener("unhandledrejection", (event) => {
   }
 });
 
+// Also set as property handlers for maximum coverage
+window.onerror = function (msg, url, lineNo, colNo, error) {
+  if (msg && typeof msg === "string" && msg.includes("Failed to fetch")) {
+    return true; // Suppress the error
+  }
+  return false;
+};
+
+window.onunhandledrejection = function (event) {
+  const reason = event.reason;
+  if (
+    reason &&
+    typeof reason === "object" &&
+    reason.message &&
+    reason.message.includes("Failed to fetch")
+  ) {
+    event.preventDefault();
+    return true;
+  }
+  return false;
+};
+
 // Detect if DevTools is open using debounce technique
 setInterval(() => {
   const threshold = 160; // Approximate height of DevTools
