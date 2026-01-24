@@ -104,27 +104,33 @@ document.addEventListener("keydown", (e) => {
 // ==========================================
 // Suppress "Failed to fetch" errors that occur due to CORS proxy rotation and network instability
 // These errors are expected and handled by the try-catch blocks in fetchCSV
+
+// Global error handler to suppress fetch errors
 window.addEventListener("error", (event) => {
-  if (
-    event.message &&
-    event.message.includes("Failed to fetch") &&
-    event.filename &&
-    event.filename.includes("script.js")
-  ) {
+  // Suppress "Failed to fetch" errors from script.js
+  if (event.message && event.message.includes("Failed to fetch")) {
     event.preventDefault();
     return true;
   }
 });
 
-// Also handle unhandled promise rejections from fetch failures
+// Handle unhandled promise rejections from fetch failures
 window.addEventListener("unhandledrejection", (event) => {
+  // Suppress "Failed to fetch" errors in promise chains
   if (
     event.reason &&
+    typeof event.reason === "object" &&
     event.reason.message &&
     event.reason.message.includes("Failed to fetch")
   ) {
     event.preventDefault();
-    return true;
+  }
+  // Also suppress if reason is a string
+  else if (
+    typeof event.reason === "string" &&
+    event.reason.includes("Failed to fetch")
+  ) {
+    event.preventDefault();
   }
 });
 
