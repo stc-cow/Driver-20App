@@ -486,7 +486,7 @@ async function safeFetch(url, options = {}) {
 
 async function fetchCSV() {
   const baseURL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1149576218&single=true&output=csv";
+    "https://script.google.com/macros/s/AKfycbxU7WENKAEkhJnBvCPbcGqiwZbUr5ZTT93Gfpw6AmiP7lPYfGUobDpOZh1qvppYgF3RVw/exec";
   const CSV_URL = baseURL + "&t=" + Date.now();
   const CORS_PROXIES = [
     "https://corsproxy.io/?",
