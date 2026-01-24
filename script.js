@@ -2374,6 +2374,9 @@ async function loadInvoiceData() {
         fetchPromise = fetch(INVOICE_CSV_URL, {
           method: "GET",
           mode: "cors",
+        }).catch((err) => {
+          // Immediately catch to prevent unhandled rejection
+          return Promise.reject(err);
         });
       } catch (err) {
         fetchPromise = Promise.reject(err);
