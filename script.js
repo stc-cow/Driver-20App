@@ -27,19 +27,20 @@ const VVVIP_SITES_LIST = [
 // ==========================================
 
 // Disable all console methods
-if (window.location.hostname !== "localhost") {
-  const noop = () => {};
-  console.log = noop;
-  console.error = noop;
-  console.warn = noop;
-  console.info = noop;
-  console.debug = noop;
-  console.trace = noop;
-  console.group = noop;
-  console.groupEnd = noop;
-  console.time = noop;
-  console.timeEnd = noop;
-}
+// TEMPORARILY DISABLED FOR DEBUGGING
+// if (window.location.hostname !== "localhost") {
+//   const noop = () => {};
+//   console.log = noop;
+//   console.error = noop;
+//   console.warn = noop;
+//   console.info = noop;
+//   console.debug = noop;
+//   console.trace = noop;
+//   console.group = noop;
+//   console.groupEnd = noop;
+//   console.time = noop;
+//   console.timeEnd = noop;
+// }
 
 // Detect and block DevTools keyboard shortcuts
 document.addEventListener("keydown", (e) => {
