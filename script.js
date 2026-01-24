@@ -498,16 +498,22 @@ async function fetchCSV() {
         if (response && response.ok) {
           try {
             const csvText = await response.text();
+            console.log(`[fetchCSV] Proxy ${i + 1} returned data, length:`, csvText.length);
             if (csvText.trim()) {
               const parsed = parseCSV(csvText);
+              console.log(`[fetchCSV] Parsed ${parsed.length} rows from proxy ${i + 1}`);
               return parsed;
             }
           } catch (textErr) {
+            console.warn(`[fetchCSV] Error parsing text from proxy ${i + 1}:`, textErr.message);
             continue;
           }
+        } else {
+          console.log(`[fetchCSV] Proxy ${i + 1} failed - response:`, response?.status);
         }
       } catch (fetchErr) {
         // Catch fetch errors silently and continue to next proxy
+        console.warn(`[fetchCSV] Proxy ${i + 1} error:`, fetchErr.message);
         continue;
       }
     } catch (proxyError) {
