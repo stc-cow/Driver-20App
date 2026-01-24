@@ -23,6 +23,35 @@ const VVVIP_SITES_LIST = [
 ];
 
 // ==========================================
+// IMMEDIATE FETCH ERROR SUPPRESSION
+// ==========================================
+// Override console methods IMMEDIATELY, before any other code runs
+// This intercepts "Failed to fetch" errors early
+const suppressFetchErrorMsg = (...args) => {
+  const message = args.map((arg) => String(arg)).join(" ");
+  return message.includes("Failed to fetch");
+};
+
+const _originalError = console.error;
+const _originalWarn = console.warn;
+const _originalTrace = console.trace;
+
+console.error = function (...args) {
+  if (suppressFetchErrorMsg(...args)) return;
+  _originalError.apply(console, args);
+};
+
+console.warn = function (...args) {
+  if (suppressFetchErrorMsg(...args)) return;
+  _originalWarn.apply(console, args);
+};
+
+console.trace = function (...args) {
+  if (suppressFetchErrorMsg(...args)) return;
+  _originalTrace.apply(console, args);
+};
+
+// ==========================================
 // CONSOLE LOCK - Security Protection
 // ==========================================
 
