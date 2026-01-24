@@ -106,6 +106,38 @@ document.addEventListener("keydown", (e) => {
 // Suppress "Failed to fetch" errors that occur due to CORS proxy rotation and network instability
 // These errors are expected and handled by the try-catch blocks in fetchCSV
 
+// Wrap window.fetch to suppress errors at the source
+const originalFetch = window.fetch;
+window.fetch = function (...args) {
+  try {
+    // Call the original fetch
+    const promise = originalFetch.apply(this, args);
+    // Chain a catch handler to suppress Failed to fetch errors
+    return promise
+      .catch((err) => {
+        if (err && err.message && err.message.includes("Failed to fetch")) {
+          // Silently suppress and return a rejected promise
+          return Promise.reject(err);
+        }
+        throw err;
+      })
+      .catch((err) => {
+        // If error still reaches here, suppress console output
+        if (err && err.message && err.message.includes("Failed to fetch")) {
+          return Promise.reject(err);
+        }
+        throw err;
+      });
+  } catch (syncErr) {
+    // Catch any synchronous errors from fetch initialization
+    if (syncErr && syncErr.message && syncErr.message.includes("Failed to fetch")) {
+      // Return a rejected promise that won't log to console
+      return Promise.reject(syncErr);
+    }
+    throw syncErr;
+  }
+};
+
 // Override console.error to suppress "Failed to fetch" messages
 const originalError = console.error;
 console.error = function (...args) {
