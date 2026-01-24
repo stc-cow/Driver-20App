@@ -458,6 +458,7 @@ async function fetchCSV() {
   }
 
   // Try CORS proxies
+  console.log("[fetchCSV] Trying CORS proxies...");
   for (let i = 0; i < CORS_PROXIES.length; i++) {
     let proxyUrl;
     if (CORS_PROXIES[i].includes("?")) {
@@ -465,6 +466,8 @@ async function fetchCSV() {
     } else {
       proxyUrl = CORS_PROXIES[i] + encodeURIComponent(CSV_URL);
     }
+
+    console.log(`[fetchCSV] Attempting proxy ${i + 1}/${CORS_PROXIES.length}:`, CORS_PROXIES[i]);
 
     try {
       const timeoutPromise = new Promise((_, reject) => {
