@@ -523,6 +523,7 @@ async function fetchCSV() {
   }
 
   // Last resort: try direct Google Sheets fetch
+  console.log("[fetchCSV] Trying direct Google Sheets fetch (no proxy)...");
   try {
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error("direct_timeout")), 3000);
@@ -551,22 +552,30 @@ async function fetchCSV() {
       if (response && response.ok) {
         try {
           const csvText = await response.text();
+          console.log("[fetchCSV] Direct fetch successful, data length:", csvText.length);
           if (csvText.trim()) {
             const parsed = parseCSV(csvText);
+            console.log("[fetchCSV] Parsed", parsed.length, "rows from direct fetch");
             return parsed;
           }
         } catch (textErr) {
+          console.error("[fetchCSV] Error parsing direct fetch:", textErr.message);
           return [];
         }
+      } else {
+        console.log("[fetchCSV] Direct fetch failed - status:", response?.status);
       }
     } catch (fetchErr) {
       // Catch fetch errors silently
+      console.warn("[fetchCSV] Direct fetch error:", fetchErr.message);
       return [];
     }
   } catch (error) {
     // Silent fail on direct fetch
+    console.error("[fetchCSV] Outer direct fetch error:", error.message);
   }
 
+  console.warn("[fetchCSV] All fetch attempts failed, returning empty array");
   return [];
 }
 
