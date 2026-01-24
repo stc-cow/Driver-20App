@@ -2329,6 +2329,9 @@ async function loadInvoiceData() {
               headers: {
                 Accept: "text/plain",
               },
+            }).catch((err) => {
+              // Immediately catch to prevent unhandled rejection
+              return Promise.reject(err);
             });
           } catch (err) {
             fetchPromise = Promise.reject(err);
