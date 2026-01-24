@@ -496,9 +496,7 @@ async function fetchCSV() {
   console.log("[fetchCSV] Starting CSV fetch...");
 
   // Check if API endpoint is available (not static hosting like GitHub Pages)
-  const isStaticHosting =
-    window.location.hostname.includes("github.io") ||
-    window.location.hostname === "localhost";
+  const isStaticHosting = window.location.hostname.includes("github.io");
 
   console.log(
     "[fetchCSV] isStaticHosting:",
