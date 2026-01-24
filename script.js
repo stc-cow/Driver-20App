@@ -167,36 +167,6 @@ window.fetch = function (...args) {
   }
 };
 
-// Override console methods to suppress "Failed to fetch" messages
-const suppressFetchError = (...args) => {
-  const message = args.map((arg) => String(arg)).join(" ");
-  return message.includes("Failed to fetch");
-};
-
-const originalError = console.error;
-console.error = function (...args) {
-  if (suppressFetchError(...args)) {
-    return;
-  }
-  originalError.apply(console, args);
-};
-
-const originalWarn = console.warn;
-console.warn = function (...args) {
-  if (suppressFetchError(...args)) {
-    return;
-  }
-  originalWarn.apply(console, args);
-};
-
-const originalTrace = console.trace;
-console.trace = function (...args) {
-  if (suppressFetchError(...args)) {
-    return;
-  }
-  originalTrace.apply(console, args);
-};
-
 // Aggressive global error suppression
 window.addEventListener("error", (event) => {
   if (event.message && event.message.includes("Failed to fetch")) {
