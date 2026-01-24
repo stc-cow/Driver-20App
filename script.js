@@ -159,7 +159,11 @@ window.fetch = function (...args) {
       });
   } catch (syncErr) {
     // Catch any synchronous errors from fetch initialization
-    if (syncErr && syncErr.message && syncErr.message.includes("Failed to fetch")) {
+    if (
+      syncErr &&
+      syncErr.message &&
+      syncErr.message.includes("Failed to fetch")
+    ) {
       // Return a rejected promise that won't log to console
       return Promise.reject(syncErr);
     }
