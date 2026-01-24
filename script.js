@@ -401,10 +401,14 @@ async function fetchCSV() {
     "https://api.codetabs.com/v1/proxy?quest=",
   ];
 
+  console.log("[fetchCSV] Starting CSV fetch...");
+
   // Check if API endpoint is available (not static hosting like GitHub Pages)
   const isStaticHosting =
     window.location.hostname.includes("github.io") ||
     window.location.hostname === "localhost";
+
+  console.log("[fetchCSV] isStaticHosting:", isStaticHosting, "hostname:", window.location.hostname);
 
   // Try API endpoint first (for servers with backend like Fly.dev)
   if (!isStaticHosting) {
