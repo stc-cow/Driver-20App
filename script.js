@@ -1891,8 +1891,17 @@ async function backgroundSyncData() {
         new Promise((_, reject) =>
           setTimeout(() => reject(new Error("CSV fetch timeout")), 5000),
         ),
-      ]).catch(() => []);
+      ])
+        .catch((err) => {
+          // Log for debugging but don't throw
+          if (err && err.message && !err.message.includes("Failed to fetch")) {
+            console.debug("[backgroundSyncData] Fetch error:", err.message);
+          }
+          return [];
+        });
     } catch (csvErr) {
+      // Catch any errors and silently return
+      console.debug("[backgroundSyncData] CSV fetch exception:", csvErr?.message);
       return;
     }
 
