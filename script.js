@@ -1,7 +1,7 @@
 const API_BASE = window.location.origin;
 const CSV_API_URL = `${API_BASE}/api/fetch-csv`;
 const INVOICE_CSV_URL =
-  "https://script.google.com/macros/s/AKfycbxRRMaF55yQIUFlqASHlV5zeK9shCCMIXJqvt9mXzPz/exec";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1289106706&single=true&output=csv";
 
 const ACES_ACCESS_CODE = "ACES2025";
 
@@ -503,8 +503,8 @@ function parseCsvOrJson(text) {
 
 async function fetchCSV() {
   const baseURL =
-    "https://script.google.com/macros/s/AKfycbxU7WENKAEkhJnBvCPbcGqiwZbUr5ZTT93Gfpw6AmiP7lPYfGUobDpOZh1qvppYgF3RVw/exec";
-  const CSV_URL = `${baseURL}?t=${Date.now()}`;
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1149576218&single=true&output=csv";
+  const CSV_URL = `${baseURL}&t=${Date.now()}`;
   const CORS_PROXIES = [
     "https://corsproxy.io/?",
     "https://api.codetabs.com/v1/proxy?quest=",
@@ -2914,9 +2914,9 @@ const ANALYSIS_CREDENTIALS = {
 
 // URLs for analysis data sources
 const INVOICE_ARCHIVE_URL =
-  "https://script.google.com/macros/s/AKfycbxU7WENKAEkhJnBvCPbcGqiwZbUr5ZTT93Gfpw6AmiP7lPYfGUobDpOZh1qvppYgF3RVw/exec";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1289106706&single=true&output=csv";
 const ENERGY_DASHBOARD_URL =
-  "https://script.google.com/macros/s/AKfycbxU7WENKAEkhJnBvCPbcGqiwZbUr5ZTT93Gfpw6AmiP7lPYfGUobDpOZh1qvppYgF3RVw/exec";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1149576218&single=true&output=csv";
 
 let analysisAuthSession = null;
 let analysisData = {
@@ -3097,7 +3097,7 @@ async function loadAnalysisData() {
 
 async function fetchInvoiceArchiveData() {
   try {
-    const csvUrl = INVOICE_ARCHIVE_URL + "&t=" + Date.now();
+    const csvUrl = INVOICE_ARCHIVE_URL + (INVOICE_ARCHIVE_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
     const CORS_PROXIES = [
       "https://corsproxy.io/?",
       "https://api.codetabs.com/v1/proxy?quest=",
@@ -3163,7 +3163,7 @@ async function fetchInvoiceArchiveData() {
 
 async function fetchEnergyDashboardData() {
   try {
-    const csvUrl = ENERGY_DASHBOARD_URL + "&t=" + Date.now();
+    const csvUrl = ENERGY_DASHBOARD_URL + (ENERGY_DASHBOARD_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
     const CORS_PROXIES = [
       "https://corsproxy.io/?",
       "https://api.codetabs.com/v1/proxy?quest=",
