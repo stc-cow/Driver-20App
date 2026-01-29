@@ -3,7 +3,7 @@ name: Deploy Vite App to GitHub Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["pulse-works"]
+    branches: ["pulse-garden", "pulse-works"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -33,11 +33,16 @@ jobs:
         with:
           node-version: "18"
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+
       - name: Install dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Build with Vite
-        run: npm run build
+        run: pnpm run build
         env:
           VITE_BASE_PATH: /new_central_plan/
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}

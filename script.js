@@ -1,7 +1,7 @@
 const API_BASE = window.location.origin;
 const CSV_API_URL = `${API_BASE}/api/fetch-csv`;
 const INVOICE_CSV_URL =
-  "https://script.google.com/macros/s/AKfycbxU7WENKAEkhJnBvCPbcGqiwZbUr5ZTT93Gfpw6AmiP7lPYfGUobDpOZh1qvppYgF3RVw/exec";
+  "https://script.google.com/macros/s/AKfycbxRRMaF55yQIUFlqASHlV5zeK9shCCMIXJqvt9mXzPz/exec";
 
 const ACES_ACCESS_CODE = "ACES2025";
 
@@ -523,7 +523,7 @@ function parseCsvOrJson(text) {
 
 async function fetchCSV() {
   const baseURL =
-    "https://script.google.com/macros/s/AKfycbxU7WENKAEkhJnBvCPbcGqiwZbUr5ZTT93Gfpw6AmiP7lPYfGUobDpOZh1qvppYgF3RVw/exec";
+    "https://script.google.com/macros/s/AKfycbxRRMaF55yQIUFlqASHlV5zeK9shCCMIXJqvt9mXzPz/exec";
   const CSV_URL = `${baseURL}?t=${Date.now()}`;
   const CORS_PROXIES = [
     "https://corsproxy.io/?",
