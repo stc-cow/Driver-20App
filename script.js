@@ -523,7 +523,7 @@ function parseCsvOrJson(text) {
 
 async function fetchCSV() {
   const baseURL =
-    "https://script.google.com/macros/s/AKfycbxRRMaF55yQIUFlqASHlV5zeK9shCCMIXJqvt9mXzPz/exec";
+    "https://script.google.com/macros/s/AKfycbxU7WENKAEkhJnBvCPbcGqiwZbUr5ZTT93Gfpw6AmiP7lPYfGUobDpOZh1qvppYgF3RVw/exec";
   const CSV_URL = `${baseURL}?t=${Date.now()}`;
   const CORS_PROXIES = [
     "https://corsproxy.io/?",
