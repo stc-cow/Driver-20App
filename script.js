@@ -3097,7 +3097,11 @@ async function loadAnalysisData() {
 
 async function fetchInvoiceArchiveData() {
   try {
-    const csvUrl = INVOICE_ARCHIVE_URL + (INVOICE_ARCHIVE_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
+    const csvUrl =
+      INVOICE_ARCHIVE_URL +
+      (INVOICE_ARCHIVE_URL.includes("?") ? "&" : "?") +
+      "t=" +
+      Date.now();
     const CORS_PROXIES = [
       "https://corsproxy.io/?",
       "https://api.codetabs.com/v1/proxy?quest=",
@@ -3163,7 +3167,11 @@ async function fetchInvoiceArchiveData() {
 
 async function fetchEnergyDashboardData() {
   try {
-    const csvUrl = ENERGY_DASHBOARD_URL + (ENERGY_DASHBOARD_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
+    const csvUrl =
+      ENERGY_DASHBOARD_URL +
+      (ENERGY_DASHBOARD_URL.includes("?") ? "&" : "?") +
+      "t=" +
+      Date.now();
     const CORS_PROXIES = [
       "https://corsproxy.io/?",
       "https://api.codetabs.com/v1/proxy?quest=",
