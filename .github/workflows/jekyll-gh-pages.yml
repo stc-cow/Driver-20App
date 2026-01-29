@@ -42,7 +42,7 @@ jobs:
         run: pnpm install
 
       - name: Build with Vite
-        run: npm run build
+        run: pnpm run build
         env:
           VITE_BASE_PATH: /new_central_plan/
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
