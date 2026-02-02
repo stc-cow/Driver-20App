@@ -173,7 +173,8 @@ window.fetch = function (...args) {
       });
   } catch (syncErr) {
     // Catch any synchronous errors from fetch initialization
-    const message = syncErr && syncErr.message ? syncErr.message : String(syncErr);
+    const message =
+      syncErr && syncErr.message ? syncErr.message : String(syncErr);
     if (
       message.includes("Failed to fetch") ||
       message.includes("NetworkError") ||
