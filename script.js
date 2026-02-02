@@ -29,7 +29,11 @@ const VVVIP_SITES_LIST = [
 // This intercepts "Failed to fetch" errors early
 const suppressFetchErrorMsg = (...args) => {
   const message = args.map((arg) => String(arg)).join(" ");
-  return message.includes("Failed to fetch");
+  return (
+    message.includes("Failed to fetch") ||
+    message.includes("NetworkError") ||
+    message.includes("Network request failed")
+  );
 };
 
 const _originalError = console.error;
@@ -141,10 +145,15 @@ window.fetch = function (...args) {
   try {
     // Call the original fetch
     const promise = originalFetch.apply(this, args);
-    // Chain a catch handler to suppress Failed to fetch errors
+    // Chain a catch handler to suppress Failed to fetch and NetworkError errors
     return promise
       .catch((err) => {
-        if (err && err.message && err.message.includes("Failed to fetch")) {
+        const message = err && err.message ? err.message : String(err);
+        if (
+          message.includes("Failed to fetch") ||
+          message.includes("NetworkError") ||
+          message.includes("Network request failed")
+        ) {
           // Silently suppress and return a rejected promise
           return Promise.reject(err);
         }
@@ -152,17 +161,23 @@ window.fetch = function (...args) {
       })
       .catch((err) => {
         // If error still reaches here, suppress console output
-        if (err && err.message && err.message.includes("Failed to fetch")) {
+        const message = err && err.message ? err.message : String(err);
+        if (
+          message.includes("Failed to fetch") ||
+          message.includes("NetworkError") ||
+          message.includes("Network request failed")
+        ) {
           return Promise.reject(err);
         }
         throw err;
       });
   } catch (syncErr) {
     // Catch any synchronous errors from fetch initialization
+    const message = syncErr && syncErr.message ? syncErr.message : String(syncErr);
     if (
-      syncErr &&
-      syncErr.message &&
-      syncErr.message.includes("Failed to fetch")
+      message.includes("Failed to fetch") ||
+      message.includes("NetworkError") ||
+      message.includes("Network request failed")
     ) {
       // Return a rejected promise that won't log to console
       return Promise.reject(syncErr);
@@ -173,7 +188,12 @@ window.fetch = function (...args) {
 
 // Aggressive global error suppression
 window.addEventListener("error", (event) => {
-  if (event.message && event.message.includes("Failed to fetch")) {
+  const message = event.message ? String(event.message) : "";
+  if (
+    message.includes("Failed to fetch") ||
+    message.includes("NetworkError") ||
+    message.includes("Network request failed")
+  ) {
     event.preventDefault();
     return true;
   }
@@ -185,9 +205,17 @@ window.addEventListener("unhandledrejection", (event) => {
   let isFetchError = false;
 
   if (reason && typeof reason === "object" && reason.message) {
-    isFetchError = reason.message.includes("Failed to fetch");
+    const message = String(reason.message);
+    isFetchError =
+      message.includes("Failed to fetch") ||
+      message.includes("NetworkError") ||
+      message.includes("Network request failed");
   } else if (typeof reason === "string") {
-    isFetchError = reason.includes("Failed to fetch");
+    const message = String(reason);
+    isFetchError =
+      message.includes("Failed to fetch") ||
+      message.includes("NetworkError") ||
+      message.includes("Network request failed");
   }
 
   if (isFetchError) {
@@ -197,22 +225,30 @@ window.addEventListener("unhandledrejection", (event) => {
 
 // Also set as property handlers for maximum coverage
 window.onerror = function (msg, url, lineNo, colNo, error) {
-  if (msg && typeof msg === "string" && msg.includes("Failed to fetch")) {
-    return true; // Suppress the error
+  if (msg && typeof msg === "string") {
+    if (
+      msg.includes("Failed to fetch") ||
+      msg.includes("NetworkError") ||
+      msg.includes("Network request failed")
+    ) {
+      return true; // Suppress the error
+    }
   }
   return false;
 };
 
 window.onunhandledrejection = function (event) {
   const reason = event.reason;
-  if (
-    reason &&
-    typeof reason === "object" &&
-    reason.message &&
-    reason.message.includes("Failed to fetch")
-  ) {
-    event.preventDefault();
-    return true;
+  if (reason && typeof reason === "object" && reason.message) {
+    const message = String(reason.message);
+    if (
+      message.includes("Failed to fetch") ||
+      message.includes("NetworkError") ||
+      message.includes("Network request failed")
+    ) {
+      event.preventDefault();
+      return true;
+    }
   }
   return false;
 };
@@ -248,6 +284,10 @@ window.addEventListener("unhandledrejection", (event) => {
   if (
     reasonStr.includes("failed to fetch") ||
     messageStr.includes("failed to fetch") ||
+    messageStr.includes("networkerror") ||
+    messageStr.includes("network request failed") ||
+    reasonStr.includes("networkerror") ||
+    reasonStr.includes("network request failed") ||
     messageStr.includes("timeout") ||
     reasonStr.includes("timeout") ||
     messageStr === "timeout" ||
