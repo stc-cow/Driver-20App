@@ -682,8 +682,8 @@ async function fetchCSV() {
     }
   }
 
-  // Last resort: try direct Google Sheets fetch
-  console.log("[fetchCSV] Trying direct Google Sheets fetch (no proxy)...");
+  // Last resort: try direct Google Sheets fetch with minimal headers (no preflight)
+  console.log("[fetchCSV] Trying direct Google Sheets fetch (minimal headers)...");
   try {
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error("direct_timeout")), 3000);
@@ -692,14 +692,11 @@ async function fetchCSV() {
     try {
       let fetchPromise;
       try {
+        // Use minimal headers to avoid CORS preflight - Google Sheets blocks certain headers
         fetchPromise = fetch(CSV_URL, {
           method: "GET",
           mode: "cors",
-          headers: {
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            Pragma: "no-cache",
-            Expires: "0",
-          },
+          // Only include headers that won't trigger CORS preflight restrictions
         }).catch((err) => {
           // Immediately catch to prevent unhandled rejection
           return Promise.reject(err);
