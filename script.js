@@ -692,13 +692,11 @@ async function fetchCSV() {
     try {
       let fetchPromise;
       try {
-        // Use only CORS-safe headers - Google Sheets rejects Expires/Pragma headers
+        // No custom headers - simple request won't trigger CORS preflight
+        // Google Sheets CSV export is publicly accessible
         fetchPromise = fetch(CSV_URL, {
           method: "GET",
           mode: "cors",
-          headers: {
-            Accept: "text/csv",
-          },
         }).catch((err) => {
           // Immediately catch to prevent unhandled rejection
           return Promise.reject(err);
