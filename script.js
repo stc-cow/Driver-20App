@@ -683,7 +683,9 @@ async function fetchCSV() {
   }
 
   // Last resort: try direct Google Sheets fetch with minimal headers (no preflight)
-  console.log("[fetchCSV] Trying direct Google Sheets fetch (minimal headers)...");
+  console.log(
+    "[fetchCSV] Trying direct Google Sheets fetch (minimal headers)...",
+  );
   try {
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error("direct_timeout")), 3000);
