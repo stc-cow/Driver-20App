@@ -554,7 +554,7 @@ async function fetchCSV() {
   if (!isStaticHosting) {
     try {
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("timeout")), 3000);
+        setTimeout(() => reject(new Error("timeout")), 8000);
       });
 
       try {
@@ -617,7 +617,7 @@ async function fetchCSV() {
 
     try {
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("proxy_timeout")), 3000);
+        setTimeout(() => reject(new Error("proxy_timeout")), 8000);
       });
 
       try {
