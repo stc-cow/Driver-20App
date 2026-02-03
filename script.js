@@ -4230,5 +4230,3 @@ window.applyDiscrepancyTolerance = function applyDiscrepancyTolerance() {
   // Re-run analysis with new tolerance
   window.analyzeDiscrepancies();
 };
-
-export {};
