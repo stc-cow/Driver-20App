@@ -342,6 +342,7 @@ let currentPopupOverlay = null;
 let dashboardInitialized = false;
 let headerIntervalId = null;
 let refreshIntervalId = null;
+let syncInProgress = false;
 let selectedRegion = "CER";
 
 // Load dashboard on page load
@@ -354,6 +355,16 @@ window.addEventListener("beforeunload", () => {
   if (headerIntervalId) clearInterval(headerIntervalId);
   if (refreshIntervalId) clearInterval(refreshIntervalId);
   pulsingIntervals.forEach((interval) => clearInterval(interval));
+});
+
+window.addEventListener("focus", () => {
+  if (dashboardInitialized) backgroundSyncData();
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && dashboardInitialized) {
+    backgroundSyncData();
+  }
 });
 
 async function initializeApp() {
@@ -458,7 +469,7 @@ async function startDashboardAsync() {
     if (refreshIntervalId) clearInterval(refreshIntervalId);
     refreshIntervalId = setInterval(() => {
       backgroundSyncData();
-    }, 30000);
+    }, 20000);
 
     const searchInput = document.getElementById("searchInput");
     if (searchInput) {
@@ -1835,61 +1846,39 @@ function startDashboard() {
 }
 
 async function backgroundSyncData() {
+  if (syncInProgress || !navigator.onLine) return;
+
+  syncInProgress = true;
   try {
-    // Check network connectivity before syncing
-    if (!navigator.onLine) {
-      return;
-    }
+    const rawData = await Promise.race([
+      fetchCSV(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("CSV fetch timeout")), 15000),
+      ),
+    ]).catch((error) => {
+      console.debug("[backgroundSyncData] Sync skipped:", error.message);
+      return [];
+    });
 
-    // Silently fetch latest CSV data with shorter timeout
-    let rawData = [];
-    try {
-      rawData = await Promise.race([
-        fetchCSV(),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("CSV fetch timeout")), 5000),
-        ),
-      ]).catch((err) => {
-        // Log for debugging but don't throw
-        if (err && err.message && !err.message.includes("Failed to fetch")) {
-          console.debug("[backgroundSyncData] Fetch error:", err.message);
-        }
-        return [];
-      });
-    } catch (csvErr) {
-      // Catch any errors and silently return
-      console.debug(
-        "[backgroundSyncData] CSV fetch exception:",
-        csvErr?.message,
-      );
-      return;
-    }
+    if (!rawData.length) return;
 
-    if (rawData.length === 0) {
-      return;
-    }
-
-    // Filter and validate sites
     const newSitesData = filterAndValidateSites(rawData);
+    if (!hasDataChanged(sitesData, newSitesData)) return;
 
-    // Check if data has changed compared to current sitesData
-    const dataChanged = hasDataChanged(sitesData, newSitesData);
-
-    if (dataChanged) {
-      sitesData = newSitesData;
-
-      // Soft update: only update metrics and tables, not the map
-      try {
-        updateMetrics(sitesData);
-        populateDueTable(sitesData);
-        updateEventCards(sitesData);
-        addMarkersToMap(sitesData);
-      } catch (uiErr) {
-        // Silent fail - don't disrupt the application
-      }
-    }
+    sitesData = newSitesData;
+    updateMetrics(sitesData);
+    populateDueTable(sitesData);
+    updateEventCards(sitesData);
+    addMarkersToMap(sitesData);
+    console.log(
+      "[backgroundSyncData] Dashboard refreshed:",
+      sitesData.length,
+      "sites",
+    );
   } catch (error) {
-    // Silent fail - don't disrupt the application
+    console.debug("[backgroundSyncData] Refresh failed:", error.message);
+  } finally {
+    syncInProgress = false;
   }
 }
 
@@ -1928,7 +1917,13 @@ function hasDataChanged(oldData, newData) {
       oldSite.lastfuelingdate !== newSite.lastfuelingdate ||
       oldSite.cityname !== newSite.cityname ||
       oldSite.lastfuelingqty !== newSite.lastfuelingqty ||
-      oldSite.color !== newSite.color
+      oldSite.color !== newSite.color ||
+      oldSite.regionname !== newSite.regionname ||
+      oldSite.districtname !== newSite.districtname ||
+      oldSite.cowstatus !== newSite.cowstatus ||
+      oldSite.sitelabel !== newSite.sitelabel ||
+      oldSite.lat !== newSite.lat ||
+      oldSite.lng !== newSite.lng
     ) {
       return true;
     }
