@@ -402,7 +402,10 @@ async function handleLogin() {
   }
 
   // Validate credentials
-  if (username === "Bannaga" && password === "MSD@2026") {
+  if (
+    ["Bannaga", "khaleel"].includes(username) &&
+    password === "MSD@2026"
+  ) {
     try {
       // Hide error message
       loginError.style.display = "none";
