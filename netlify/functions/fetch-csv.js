@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 
 const CSV_URL =
-  "https://docs.google.com/spreadsheets/d/1uWbVwsJ6mgUl9WxJz-zbxMaiCW-dG3DI_9gvKkEca18/gviz/tq?tqx=out:csv&gid=1149576218";
+  "https://docs.google.com/spreadsheets/d/1uWbVwsJ6mgUl9WxJz-zbxMaiCW-dG3DI_9gvKkEca18/export?format=csv&gid=1149576218";
 
 exports.handler = async (event, context) => {
   try {
