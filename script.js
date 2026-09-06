@@ -530,7 +530,7 @@ async function safeFetch(url, options = {}) {
 
 async function fetchCSV() {
   const directSheetUrl =
-    "https://docs.google.com/spreadsheets/d/1uWbVwsJ6mgUl9WxJz-zbxMaiCW-dG3DI_9gvKkEca18/gviz/tq?tqx=out:csv&gid=1149576218&t=" +
+    "https://docs.google.com/spreadsheets/d/1uWbVwsJ6mgUl9WxJz-zbxMaiCW-dG3DI_9gvKkEca18/export?format=csv&gid=1149576218&t=" +
     Date.now();
 
   // Prefer the first-party API proxy on Netlify/Express.
