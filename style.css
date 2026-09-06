@@ -719,9 +719,9 @@ body {
   transform: translateY(-2px);
 }
 
-.access-permit-modal-content {
+.modal-content.access-permit-modal-content {
   width: 98vw;
-  max-width: none;
+  max-width: 98vw;
   height: 96vh;
   margin: 2vh auto;
   border-top: 4px solid #dc2626;
@@ -774,7 +774,7 @@ body {
 
 .access-permit-table {
   min-width: 100%;
-  width: max-content;
+  width: 100%;
   table-layout: auto;
 }
 
