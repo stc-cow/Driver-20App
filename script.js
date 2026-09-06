@@ -402,7 +402,7 @@ async function handleLogin() {
   }
 
   // Validate credentials
-  if (username === "Aces@MSD" && password === "ACES@2025") {
+  if (username === "Bannaga" && password === "MSD@2026") {
     try {
       // Hide error message
       loginError.style.display = "none";
