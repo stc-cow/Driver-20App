@@ -719,10 +719,6 @@ body {
   transform: translateY(-2px);
 }
 
-.access-permit-count {
-  display: block;
-}
-
 .access-permit-modal-content {
   width: min(96%, 1180px);
   max-width: 1180px;
@@ -759,7 +755,13 @@ body {
 }
 
 .access-permit-table {
-  min-width: 980px;
+  min-width: max-content;
+  width: 100%;
+}
+
+.access-permit-table th,
+.access-permit-table td {
+  white-space: nowrap;
 }
 
 .access-permit-table thead {
