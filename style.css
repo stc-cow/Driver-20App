@@ -720,10 +720,26 @@ body {
 }
 
 .access-permit-modal-content {
-  width: min(96%, 1180px);
-  max-width: 1180px;
-  margin: 3vh auto;
+  width: 98vw;
+  max-width: none;
+  height: 96vh;
+  margin: 2vh auto;
   border-top: 4px solid #dc2626;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.access-permit-modal-content .modal-header {
+  flex: 0 0 auto;
+}
+
+.access-permit-modal-content .modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .access-permit-subtitle {
@@ -748,15 +764,18 @@ body {
 }
 
 .access-permit-table-wrap {
-  max-height: 68vh;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
   overflow: auto;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
 }
 
 .access-permit-table {
-  min-width: max-content;
-  width: 100%;
+  min-width: 100%;
+  width: max-content;
+  table-layout: auto;
 }
 
 .access-permit-table th,
