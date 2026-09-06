@@ -709,6 +709,80 @@ body {
   transform: translateY(-2px);
 }
 
+.access-permit-card {
+  background: linear-gradient(135deg, #b91c1c 0%, #ef4444 100%);
+  color: white;
+}
+
+.access-permit-card:hover {
+  box-shadow: 0 4px 12px rgba(185, 28, 28, 0.35);
+  transform: translateY(-2px);
+}
+
+.access-permit-count {
+  display: block;
+}
+
+.access-permit-modal-content {
+  width: min(96%, 1180px);
+  max-width: 1180px;
+  margin: 3vh auto;
+  border-top: 4px solid #dc2626;
+}
+
+.access-permit-subtitle {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.access-permit-controls {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) 190px auto;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.access-permit-visible-count {
+  color: var(--aces-primary);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.access-permit-table-wrap {
+  max-height: 68vh;
+  overflow: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.access-permit-table {
+  min-width: 980px;
+}
+
+.access-permit-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.access-permit-table td {
+  vertical-align: top;
+}
+
+@media (max-width: 720px) {
+  .access-permit-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .event-cards {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+
 .modal {
   display: none;
   position: fixed;
