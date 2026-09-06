@@ -526,231 +526,41 @@ async function safeFetch(url, options = {}) {
 }
 
 async function fetchCSV() {
-  // Use Google Sheets CSV export (better CORS support than Google Apps Script)
-  const baseURL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0GkXnQMdKYZITuuMsAzeWDtGUqEJ3lWwqNdA67NewOsDOgqsZHKHECEEkea4nrukx4-DqxKmf62nC/pub?gid=1149576218&single=true&output=csv";
-  const CSV_URL = baseURL + "&t=" + Date.now();
-  const CORS_PROXIES = [
-    "https://corsproxy.io/?",
-    "https://api.codetabs.com/v1/proxy?quest=",
-    "https://allorigins.win/raw?url=",
-  ];
+  const directSheetUrl =
+    "https://docs.google.com/spreadsheets/d/1uWbVwsJ6mgUl9WxJz-zbxMaiCW-dG3DI_9gvKkEca18/gviz/tq?tqx=out:csv&gid=1149576218&t=" +
+    Date.now();
 
-  console.log("[fetchCSV] Starting CSV fetch...");
+  // Prefer the first-party API proxy on Netlify/Express.
+  // This avoids exposing operational data to third-party CORS proxy services.
+  const sources = [CSV_API_URL, directSheetUrl];
 
-  // Check if API endpoint is available (not static hosting like GitHub Pages)
-  const isStaticHosting =
-    window.location.hostname.includes("github.io") ||
-    window.location.hostname === "localhost";
+  for (const url of sources) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
 
-  console.log(
-    "[fetchCSV] isStaticHosting:",
-    isStaticHosting,
-    "hostname:",
-    window.location.hostname,
-  );
-
-  // Try API endpoint first (for servers with backend like Fly.dev)
-  if (!isStaticHosting) {
     try {
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("timeout")), 8000);
+      const response = await fetch(url, {
+        method: "GET",
+        headers: { Accept: "text/csv" },
+        cache: "no-store",
+        signal: controller.signal,
       });
 
-      try {
-        let fetchPromise;
-        try {
-          fetchPromise = fetch(CSV_API_URL, {
-            method: "GET",
-            headers: {
-              Accept: "text/csv",
-              "Cache-Control": "no-cache, no-store, must-revalidate",
-              Pragma: "no-cache",
-              Expires: "0",
-            },
-          }).catch((err) => {
-            // Immediately catch to prevent unhandled rejection
-            return Promise.reject(err);
-          });
-        } catch (err) {
-          fetchPromise = Promise.reject(err);
-        }
+      if (!response.ok) continue;
 
-        const response = await Promise.race([
-          fetchPromise,
-          timeoutPromise,
-        ]).catch(() => null);
-
-        if (response && response.ok) {
-          try {
-            const csvText = await response.text();
-            if (csvText.trim()) {
-              const parsed = parseCSV(csvText);
-              return parsed;
-            }
-          } catch (textErr) {
-            // Silent fail
-          }
-        }
-      } catch (fetchError) {
-        // Silently ignore timeout and fetch failures
+      const csvText = await response.text();
+      if (csvText.trim()) {
+        const parsed = parseCSV(csvText);
+        if (parsed.length) return parsed;
       }
     } catch (error) {
-      // API endpoint not available, try alternatives
+      console.warn("[fetchCSV] Source unavailable:", url, error.message);
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
-  // Try CORS proxies
-  console.log("[fetchCSV] Trying CORS proxies...");
-  for (let i = 0; i < CORS_PROXIES.length; i++) {
-    let proxyUrl;
-    if (CORS_PROXIES[i].includes("?")) {
-      proxyUrl = CORS_PROXIES[i] + CSV_URL;
-    } else {
-      proxyUrl = CORS_PROXIES[i] + encodeURIComponent(CSV_URL);
-    }
-
-    console.log(
-      `[fetchCSV] Attempting proxy ${i + 1}/${CORS_PROXIES.length}:`,
-      CORS_PROXIES[i],
-    );
-
-    try {
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("proxy_timeout")), 8000);
-      });
-
-      try {
-        let fetchPromise;
-        try {
-          fetchPromise = fetch(proxyUrl, {
-            method: "GET",
-            headers: {
-              Accept: "text/plain",
-              "Cache-Control": "no-cache, no-store, must-revalidate",
-              Pragma: "no-cache",
-              Expires: "0",
-            },
-          }).catch((err) => {
-            // Immediately catch to prevent unhandled rejection
-            return Promise.reject(err);
-          });
-        } catch (err) {
-          fetchPromise = Promise.reject(err);
-        }
-
-        const response = await Promise.race([
-          fetchPromise,
-          timeoutPromise,
-        ]).catch(() => null);
-
-        if (response && response.ok) {
-          try {
-            const csvText = await response.text();
-            console.log(
-              `[fetchCSV] Proxy ${i + 1} returned data, length:`,
-              csvText.length,
-            );
-            if (csvText.trim()) {
-              const parsed = parseCSV(csvText);
-              console.log(
-                `[fetchCSV] Parsed ${parsed.length} rows from proxy ${i + 1}`,
-              );
-              return parsed;
-            }
-          } catch (textErr) {
-            console.warn(
-              `[fetchCSV] Error parsing text from proxy ${i + 1}:`,
-              textErr.message,
-            );
-            continue;
-          }
-        } else {
-          console.log(
-            `[fetchCSV] Proxy ${i + 1} failed - response:`,
-            response?.status,
-          );
-        }
-      } catch (fetchErr) {
-        // Catch fetch errors silently and continue to next proxy
-        console.warn(`[fetchCSV] Proxy ${i + 1} error:`, fetchErr.message);
-        continue;
-      }
-    } catch (proxyError) {
-      // Continue to next proxy on error
-      continue;
-    }
-  }
-
-  // Last resort: try direct Google Sheets fetch with minimal headers (no preflight)
-  console.log(
-    "[fetchCSV] Trying direct Google Sheets fetch (minimal headers)...",
-  );
-  try {
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error("direct_timeout")), 10000);
-    });
-
-    try {
-      let fetchPromise;
-      try {
-        // No custom headers - simple request won't trigger CORS preflight
-        // Google Sheets CSV export is publicly accessible
-        fetchPromise = fetch(CSV_URL, {
-          method: "GET",
-          mode: "cors",
-        }).catch((err) => {
-          // Immediately catch to prevent unhandled rejection
-          return Promise.reject(err);
-        });
-      } catch (err) {
-        fetchPromise = Promise.reject(err);
-      }
-
-      const response = await Promise.race([fetchPromise, timeoutPromise]).catch(
-        () => null,
-      );
-
-      if (response && response.ok) {
-        try {
-          const csvText = await response.text();
-          console.log(
-            "[fetchCSV] Direct fetch successful, data length:",
-            csvText.length,
-          );
-          if (csvText.trim()) {
-            const parsed = parseCSV(csvText);
-            console.log(
-              "[fetchCSV] Parsed",
-              parsed.length,
-              "rows from direct fetch",
-            );
-            return parsed;
-          }
-        } catch (textErr) {
-          console.error(
-            "[fetchCSV] Error parsing direct fetch:",
-            textErr.message,
-          );
-          return [];
-        }
-      } else {
-        console.log(
-          "[fetchCSV] Direct fetch failed - status:",
-          response?.status,
-        );
-      }
-    } catch (fetchErr) {
-      // Catch fetch errors silently
-      console.warn("[fetchCSV] Direct fetch error:", fetchErr.message);
-      return [];
-    }
-  } catch (error) {
-    // Silent fail on direct fetch
-    console.error("[fetchCSV] Outer direct fetch error:", error.message);
-  }
-
-  console.warn("[fetchCSV] All fetch attempts failed, returning empty array");
+  console.warn("[fetchCSV] Google Sheet data is currently unavailable");
   return [];
 }
 
