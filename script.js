@@ -22,6 +22,899 @@ const VVVIP_SITES_LIST = [
   "COW552",
 ];
 
+const ACCESS_PERMIT_SITES = [
+  {
+    "site": "COW511",
+    "lat": "20.78241",
+    "lng": "45.79936",
+    "label": "VIP",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "ACES GRO",
+    "location": "ARMY Camp Al sulayiel"
+  },
+  {
+    "site": "COW768",
+    "lat": "24.29376",
+    "lng": "44.62865",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "ACES GRO",
+    "location": "Dowadmi Military Area"
+  },
+  {
+    "site": "CWH032",
+    "lat": "26.15298",
+    "lng": "45.3161",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "ACES GRO",
+    "location": "Majma Airbase"
+  },
+  {
+    "site": "CWH089",
+    "lat": "26.08612",
+    "lng": "45.29067",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "ACES GRO",
+    "location": "King Faisal Airforce   collage Majma"
+  },
+  {
+    "site": "CWN964",
+    "lat": "24.42661",
+    "lng": "46.58741",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "ACES GRO",
+    "location": "Dirab satellite   Station"
+  },
+  {
+    "site": "COW016",
+    "lat": "24.92901",
+    "lng": "46.38166",
+    "label": "VIP",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "ACES GRO",
+    "location": "MIlatary collage"
+  },
+  {
+    "site": "COW544",
+    "lat": "24.46718",
+    "lng": "46.67115",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "ACES GRO",
+    "location": "King Salman Air Base   Dirab"
+  },
+  {
+    "site": "COW600",
+    "lat": "24.86842",
+    "lng": "46.56649",
+    "label": "VIP",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "ACES GRO",
+    "location": "Salbouk Road Army   Camp"
+  },
+  {
+    "site": "COW725",
+    "lat": "24.89204",
+    "lng": "46.92105",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "ACES GRO",
+    "location": "Prince NaÃ¯f Military   Academy Dammam road"
+  },
+  {
+    "site": "COW729",
+    "lat": "24.66903",
+    "lng": "46.63062",
+    "label": "VIP",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "ACES GRO",
+    "location": "King Abdulaziz   conference palace /Ritz Hotel"
+  },
+  {
+    "site": "COW858",
+    "lat": "24.4828",
+    "lng": "46.6826",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "ACES GRO",
+    "location": "King Salman Air Base   Dirab"
+  },
+  {
+    "site": "COW861",
+    "lat": "24.4695",
+    "lng": "46.667",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "ACES GRO",
+    "location": "King Salman Air Base   Dirab"
+  },
+  {
+    "site": "COW776",
+    "lat": "24.97483",
+    "lng": "46.92809",
+    "label": "VIP",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "ACES GRO - stc access   permit",
+    "location": "Riyadh -Dammam road   Military Camp"
+  },
+  {
+    "site": "COW063",
+    "lat": "24.72755",
+    "lng": "46.58963",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "Diriah security   department",
+    "location": "DG2 - COWs   preparations"
+  },
+  {
+    "site": "COW735",
+    "lat": "24.73492",
+    "lng": "46.57745",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "Access from 8:00 AM   to 03:00 PM",
+    "location": "Dariya Season-2025"
+  },
+  {
+    "site": "COW541",
+    "lat": "24.77168",
+    "lng": "46.72872",
+    "label": "VIP",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "Access from 8:00 AM   to 03:00 PM",
+    "location": "Ministry of finance"
+  },
+  {
+    "site": "COW013",
+    "lat": "24.55672",
+    "lng": "46.28677",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "Qidiyah access permit",
+    "location": "Qiddiyah Area"
+  },
+  {
+    "site": "COW534",
+    "lat": "24.58758",
+    "lng": "46.35543",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "Qidiyah access permit",
+    "location": "Qiddiyah Area"
+  },
+  {
+    "site": "COW611",
+    "lat": "24.59889",
+    "lng": "46.30414",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "Qidiyah access permit",
+    "location": "Qiddiyah Area"
+  },
+  {
+    "site": "COW742",
+    "lat": "24.5304",
+    "lng": "46.40582",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "Qidiyah access permit",
+    "location": "Qiddiyah Area"
+  },
+  {
+    "site": "COW744",
+    "lat": "24.52423",
+    "lng": "46.41022",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "Qidiyah access permit",
+    "location": "Qiddiyah Area"
+  },
+  {
+    "site": "COW854",
+    "lat": "24.68526",
+    "lng": "46.63422",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "DQ Royal commission   and ACES GRO",
+    "location": "DQ Riyadh"
+  },
+  {
+    "site": "COW716",
+    "lat": "24.76892",
+    "lng": "46.64425",
+    "label": "VIP",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "KAFD Access permit",
+    "location": "FRONT OF Abdullah   FINANCIAL City EXIT-4"
+  },
+  {
+    "site": "COW621",
+    "lat": "24.42355",
+    "lng": "46.37908",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "WADI NISSAH - prince   Ahmed Bin Abdul-Aziz Farm"
+  },
+  {
+    "site": "COW779",
+    "lat": "24.87559",
+    "lng": "46.45432",
+    "label": "VIP",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "stc permit",
+    "location": "Al Amariya Alwaseel   Resort"
+  },
+  {
+    "site": "COW011",
+    "lat": "24.68431",
+    "lng": "46.48765",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "Dariya Bashayer"
+  },
+  {
+    "site": "COW518",
+    "lat": "25.17239",
+    "lng": "46.60499",
+    "label": "VVVIP",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "Prince Khalid Bin   Salman Camp Thumama"
+  },
+  {
+    "site": "COW529",
+    "lat": "25.3349",
+    "lng": "46.458",
+    "label": "VVVIP",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "Prince Khalid Bin   Salman Camp Thumama"
+  },
+  {
+    "site": "COW542",
+    "lat": "24.71627",
+    "lng": "46.09091",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "PRINCE NAIF CENTER   FOR SPECIAL OPERATION(DURMA)"
+  },
+  {
+    "site": "COW626",
+    "lat": "24.65346",
+    "lng": "45.59193",
+    "label": "VIP",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "jilha MOI"
+  },
+  {
+    "site": "COW739",
+    "lat": "24.70187",
+    "lng": "45.59598",
+    "label": "VIP",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "Jillah Farm"
+  },
+  {
+    "site": "COW749",
+    "lat": "24.65517",
+    "lng": "45.72723",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "Durma - ALGhaziz"
+  },
+  {
+    "site": "COW751",
+    "lat": "24.05838",
+    "lng": "47.55768",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "Prince Sultan   AirbaseÂ  al Kharaj"
+  },
+  {
+    "site": "COW773",
+    "lat": "20.14477",
+    "lng": "45.13062",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "Military Camp Wadi   Dawaseer"
+  },
+  {
+    "site": "COW510",
+    "lat": "24.9005",
+    "lng": "46.13521",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "Army Camp AL-HAYSYA /   SALBUK ROAD"
+  },
+  {
+    "site": "COW531",
+    "lat": "25.43686",
+    "lng": "46.26998",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "Thumama Camp for MOI"
+  },
+  {
+    "site": "COW535",
+    "lat": "25.33344",
+    "lng": "46.47846",
+    "label": "VVVIP",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "Prince Khalid Bin   Salman Camp Thumama"
+  },
+  {
+    "site": "COWA629",
+    "lat": "25.7374",
+    "lng": "44.76935",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "Al Ghath"
+  },
+  {
+    "site": "COW774",
+    "lat": "24.69286",
+    "lng": "45.61251",
+    "label": "VIP",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "Jillah Farm"
+  },
+  {
+    "site": "CWN963",
+    "lat": "24.90069",
+    "lng": "46.13858",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "stc permit",
+    "location": "Army Camp AL-HAYSYA /   SALBUK ROAD"
+  },
+  {
+    "site": "COW012",
+    "lat": "24.66504",
+    "lng": "46.65332",
+    "label": "VVVIP",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "stc permit",
+    "location": "Yamama Palace"
+  },
+  {
+    "site": "COW020",
+    "lat": "24.79591",
+    "lng": "46.54063",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "stc permit",
+    "location": "Al Amariyah"
+  },
+  {
+    "site": "COW632",
+    "lat": "24.66057",
+    "lng": "46.67427",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "stc permit",
+    "location": "MOD Riyadh"
+  },
+  {
+    "site": "COW820",
+    "lat": "24.79889",
+    "lng": "46.54004",
+    "label": "VVIP",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "stc permit",
+    "location": "Amariya camp"
+  },
+  {
+    "site": "CWS820",
+    "lat": "25.81326",
+    "lng": "43.0933",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Qassim",
+    "permit": "stc qassim permit",
+    "location": "Nabhaniah Qassim"
+  },
+  {
+    "site": "CWH194",
+    "lat": "26.32663",
+    "lng": "44.5814",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh District",
+    "permit": "ACES Technician",
+    "location": "Zulfi Camp"
+  },
+  {
+    "site": "COW656",
+    "lat": "26.58124",
+    "lng": "44.01241",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Qassim",
+    "permit": "ACES Technician",
+    "location": "Special force Office   Qassim"
+  },
+  {
+    "site": "COW054",
+    "lat": "24.71891",
+    "lng": "46.6441",
+    "label": "VIP",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "ACES GRO",
+    "location": "Replacement of ZRI737   in KACST"
+  },
+  {
+    "site": "COW057",
+    "lat": "24.86628",
+    "lng": "46.5586",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "ACES GRO",
+    "location": "Prince Nayef Security   City Camp of the Special Security Forces"
+  },
+  {
+    "site": "COW059",
+    "lat": "24.69574",
+    "lng": "46.58221",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "ACES GRO",
+    "location": "MISK City Riyadh"
+  },
+  {
+    "site": "COW740",
+    "lat": "24.84558",
+    "lng": "46.74006",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "ACES GRO",
+    "location": "MCIT ROSHAN Project   Riyadh"
+  },
+  {
+    "site": "COW769",
+    "lat": "24.85803",
+    "lng": "46.76889",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "ACES GRO",
+    "location": "Janadriya Railway   Station"
+  },
+  {
+    "site": "COW017",
+    "lat": "24.71957",
+    "lng": "46.60797",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "Diriah security   department",
+    "location": "Replacment for   ZRYA897"
+  },
+  {
+    "site": "COW775",
+    "lat": "24.72946",
+    "lng": "46.58517",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "Diriah security   department",
+    "location": "Dariyah 1 -  RITZ Residences"
+  },
+  {
+    "site": "COW741",
+    "lat": "24.71256",
+    "lng": "46.5969",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "Diriah security   department",
+    "location": "Dariyah  Gate Office (DC)"
+  },
+  {
+    "site": "COW747",
+    "lat": "24.77327",
+    "lng": "46.52689",
+    "label": "VVIP",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "Diriah security   department",
+    "location": "Dariya near Water Dam   area"
+  },
+  {
+    "site": "COW002",
+    "lat": "24.90233",
+    "lng": "46.52644",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "ACES GRO",
+    "location": "Salbuk are MOI   Medical City"
+  },
+  {
+    "site": "COW056",
+    "lat": "24.89381",
+    "lng": "46.53039",
+    "label": "Normal",
+    "region": "Central",
+    "district": "Riyadh City",
+    "permit": "ACES GRO",
+    "location": "MOI location"
+  },
+  {
+    "site": "CWH084",
+    "lat": "26.24154",
+    "lng": "50.12894",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "DAMMAM",
+    "permit": "Access need special   permission",
+    "location": "Need GRO"
+  },
+  {
+    "site": "CWH028",
+    "lat": "27.51617",
+    "lng": "48.36225",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "JUBAIL",
+    "permit": "Access need approval   from security only",
+    "location": ""
+  },
+  {
+    "site": "CWH041",
+    "lat": "27.50949",
+    "lng": "49.25296",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "JUBAIL",
+    "permit": "Access need special   permission",
+    "location": ""
+  },
+  {
+    "site": "COW516",
+    "lat": "27.82347",
+    "lng": "48.63208",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "JUBAIL",
+    "permit": "Access need special   permission",
+    "location": ""
+  },
+  {
+    "site": "COW528",
+    "lat": "27.9066",
+    "lng": "48.65835",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "JUBAIL",
+    "permit": "Access need special   permission",
+    "location": ""
+  },
+  {
+    "site": "CWH011",
+    "lat": "26.46702",
+    "lng": "50.06988",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "DAMMAM",
+    "permit": "Access need approval   from security only",
+    "location": ""
+  },
+  {
+    "site": "CWH045",
+    "lat": "30.88407",
+    "lng": "41.20339",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "NORTHERN BORDER",
+    "permit": "Access need approval   from security only",
+    "location": ""
+  },
+  {
+    "site": "CWH941",
+    "lat": "25.57033",
+    "lng": "49.14469",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "Al-AHSA",
+    "permit": "Access need approval   from security only",
+    "location": ""
+  },
+  {
+    "site": "CWS831",
+    "lat": "27.81378",
+    "lng": "48.66115",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "JUBAIL",
+    "permit": "Access need special   permission",
+    "location": "Need training from   Aramco Tanajib"
+  },
+  {
+    "site": "CWS836",
+    "lat": "27.7122",
+    "lng": "48.614600°",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "JUBAIL",
+    "permit": "Access need special   permission",
+    "location": ""
+  },
+  {
+    "site": "COW546",
+    "lat": "25.23472",
+    "lng": "48.1697",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "Al-AHSA",
+    "permit": "Access need STC   letter",
+    "location": ""
+  },
+  {
+    "site": "CWH076",
+    "lat": "30.07886",
+    "lng": "42.82277",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "NORTHERN BORDER",
+    "permit": "Access need approval   from security only",
+    "location": ""
+  },
+  {
+    "site": "CWN986",
+    "lat": "30.46544",
+    "lng": "42.64941",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "NORTHERN BORDER",
+    "permit": "Access need approval   from security only",
+    "location": ""
+  },
+  {
+    "site": "CWN058",
+    "lat": "26.96632",
+    "lng": "49.49818",
+    "label": "VIP",
+    "region": "EAST",
+    "district": "JUBAIL",
+    "permit": "Access need special   permission",
+    "location": "If truck need   operation card , car check"
+  },
+  {
+    "site": "COWJN1",
+    "lat": "29.00361",
+    "lng": "44.72298",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "NORTHERN BORDER",
+    "permit": "Access need approval   from security only",
+    "location": ""
+  },
+  {
+    "site": "CWH029",
+    "lat": "31.95475",
+    "lng": "39.00115",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "NORTHERN BORDER",
+    "permit": "Access need special   permission",
+    "location": "Need training and   healthy check"
+  },
+  {
+    "site": "CWH033",
+    "lat": "31.85839",
+    "lng": "39.04678",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "NORTHERN BORDER",
+    "permit": "Access need special   permission",
+    "location": "Need training and   healthy check"
+  },
+  {
+    "site": "COW750",
+    "lat": "22.60038",
+    "lng": "53.99867",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "Al-AHSA",
+    "permit": "Access need special   permission",
+    "location": ""
+  },
+  {
+    "site": "CWH030",
+    "lat": "27.81987",
+    "lng": "48.67242",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "JUBAIL",
+    "permit": "Access need special   permission",
+    "location": ""
+  },
+  {
+    "site": "CWS813",
+    "lat": "27.59266",
+    "lng": "48.93513",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "JUBAIL",
+    "permit": "Access need special   permission",
+    "location": ""
+  },
+  {
+    "site": "CWS818",
+    "lat": "27.53741",
+    "lng": "49.11724",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "JUBAIL",
+    "permit": "Access need special   permission",
+    "location": ""
+  },
+  {
+    "site": "COW655",
+    "lat": "26.2322",
+    "lng": "50.11099",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "DAMMAM",
+    "permit": "Access need special   permission",
+    "location": "Need GRO"
+  },
+  {
+    "site": "CWH031",
+    "lat": "27.34032",
+    "lng": "49.4875",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "JUBAIL",
+    "permit": "Access need special   permission",
+    "location": ""
+  },
+  {
+    "site": "COW601",
+    "lat": "22.43049",
+    "lng": "53.97636",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "Al-AHSA",
+    "permit": "Access need special   permission",
+    "location": ""
+  },
+  {
+    "site": "CWH012",
+    "lat": "24.96059",
+    "lng": "49.43982",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "Al-AHSA",
+    "permit": "Access need STC   letter",
+    "location": ""
+  },
+  {
+    "site": "COW641",
+    "lat": "26.29674",
+    "lng": "50.15904",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "DAMMAM",
+    "permit": "Access need special   permission",
+    "location": ""
+  },
+  {
+    "site": "CWN990",
+    "lat": "19.4774",
+    "lng": "53.23433",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "Al-AHSA",
+    "permit": "Access need special   permission",
+    "location": ""
+  },
+  {
+    "site": "COWzFADHILI2",
+    "lat": "27.10344",
+    "lng": "49071840",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "JUBAIL",
+    "permit": "Access need special   permission",
+    "location": ""
+  },
+  {
+    "site": "COWzFADHILI3",
+    "lat": "27.115396",
+    "lng": "49.076685",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "JUBAIL",
+    "permit": "Access need special   permission",
+    "location": ""
+  },
+  {
+    "site": "VCOWzSADARA1",
+    "lat": "26.94557",
+    "lng": "49.48744",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "JUBAIL",
+    "permit": "Access need special   permission",
+    "location": "Need training and   healthy check"
+  },
+  {
+    "site": "VCOWzSADARA2",
+    "lat": "26.92861",
+    "lng": "49.47487",
+    "label": "Normal",
+    "region": "EAST",
+    "district": "JUBAIL",
+    "permit": "Access need special   permission",
+    "location": "Need training and   healthy check"
+  }
+];
+
 // ==========================================
 // IMMEDIATE FETCH ERROR SUPPRESSION
 // ==========================================
@@ -1725,6 +2618,69 @@ function updateEventCards(sites) {
   document.getElementById("vvvipCount").textContent = vvvipSites.length;
 }
 
+window.renderAccessPermitTable = function renderAccessPermitTable() {
+  const tbody = document.getElementById("accessPermitTableBody");
+  const searchInput = document.getElementById("accessPermitSearch");
+  const regionSelect = document.getElementById("accessPermitRegion");
+  const count = document.getElementById("accessPermitVisibleCount");
+  if (!tbody) return;
+
+  const query = (searchInput?.value || "").trim().toLowerCase();
+  const region = regionSelect?.value || "All";
+
+  const filtered = ACCESS_PERMIT_SITES.filter((site) => {
+    const normalizedRegion = site.region.toLowerCase();
+    const matchesRegion =
+      region === "All" ||
+      normalizedRegion.includes(region.toLowerCase());
+    const haystack = [
+      site.site,
+      site.region,
+      site.district,
+      site.label,
+      site.permit,
+      site.location,
+    ].join(" ").toLowerCase();
+    return matchesRegion && (!query || haystack.includes(query));
+  });
+
+  tbody.innerHTML = "";
+  filtered.forEach((site) => {
+    const row = document.createElement("tr");
+    [site.site, site.region, site.district, site.label, site.permit, site.location || "—"].forEach(
+      (value) => {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        row.appendChild(cell);
+      },
+    );
+    tbody.appendChild(row);
+  });
+
+  if (!filtered.length) {
+    tbody.innerHTML =
+      '<tr><td colspan="6" style="text-align:center;color:#64748b;padding:24px;">No matching permit sites</td></tr>';
+  }
+
+  if (count) {
+    count.textContent = `${filtered.length} of ${ACCESS_PERMIT_SITES.length} sites`;
+  }
+};
+
+window.showAccessPermitModal = function showAccessPermitModal() {
+  const modal = document.getElementById("accessPermitModal");
+  if (!modal) return;
+  document.getElementById("accessPermitSearch").value = "";
+  document.getElementById("accessPermitRegion").value = "All";
+  window.renderAccessPermitTable();
+  modal.style.display = "block";
+};
+
+window.closeAccessPermitModal = function closeAccessPermitModal() {
+  const modal = document.getElementById("accessPermitModal");
+  if (modal) modal.style.display = "none";
+};
+
 window.showVVVIPModal = function showVVVIPModal() {
   const modal = document.getElementById("vvvipModal");
   const tbody = document.getElementById("vvvipTableBody");
@@ -1783,9 +2739,13 @@ window.closeVVVIPModal = function closeVVVIPModal() {
 
 window.addEventListener("click", (event) => {
   const vvvipModal = document.getElementById("vvvipModal");
+  const accessPermitModal = document.getElementById("accessPermitModal");
 
   if (event.target === vvvipModal) {
     closeVVVIPModal();
+  }
+  if (event.target === accessPermitModal) {
+    closeAccessPermitModal();
   }
 });
 
@@ -1805,11 +2765,8 @@ window.selectRegion = function selectRegion(region) {
 
   // Update event cards visibility based on region
   const eventCardsContainer = document.getElementById("eventCardsContainer");
-  if (region === "East") {
-    eventCardsContainer.style.display = "none";
-  } else {
-    eventCardsContainer.style.display = "flex";
-  }
+  // Keep BM permit focus available for both Central and East regions.
+  eventCardsContainer.style.display = "flex";
 
   // Reload dashboard with new region filter
   loadDashboard();
