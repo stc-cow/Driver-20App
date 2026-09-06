@@ -168,6 +168,14 @@
             <div class="event-card-label">Royal, MOI & Winter Camps</div>
             <div class="event-card-count" id="vvvipCount">0</div>
           </div>
+          <div
+            class="event-card access-permit-card"
+            onclick="showAccessPermitModal()"
+            title="BM access permit focus list"
+          >
+            <div class="event-card-label">Access Permit Required</div>
+            <div class="event-card-count access-permit-count" id="accessPermitCount">89</div>
+          </div>
         </div>
       </div>
       <div class="left-panel">
@@ -409,6 +417,55 @@
             </thead>
             <tbody id="vvvipTableBody"></tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- BM Access Permit Modal -->
+    <div id="accessPermitModal" class="modal">
+      <div class="modal-content access-permit-modal-content">
+        <div class="modal-header">
+          <div>
+            <h2>🔐 BM Access Permit Required Sites</h2>
+            <p class="access-permit-subtitle">Central and East Region focus list</p>
+          </div>
+          <button class="modal-close" onclick="closeAccessPermitModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="access-permit-controls">
+            <input
+              id="accessPermitSearch"
+              class="analysis-filter-input"
+              type="search"
+              placeholder="Search site, district, permit or location..."
+              oninput="renderAccessPermitTable()"
+            />
+            <select
+              id="accessPermitRegion"
+              class="analysis-filter-select"
+              onchange="renderAccessPermitTable()"
+            >
+              <option value="All">CR & ER</option>
+              <option value="Central">Central Region</option>
+              <option value="East">East Region</option>
+            </select>
+            <span id="accessPermitVisibleCount" class="access-permit-visible-count"></span>
+          </div>
+          <div class="access-permit-table-wrap">
+            <table class="vvvip-table access-permit-table">
+              <thead>
+                <tr>
+                  <th>Site</th>
+                  <th>Region</th>
+                  <th>District</th>
+                  <th>Site Label</th>
+                  <th>Access Permit Requirement</th>
+                  <th>Location / Notes</th>
+                </tr>
+              </thead>
+              <tbody id="accessPermitTableBody"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
