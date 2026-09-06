@@ -532,7 +532,12 @@ async function fetchCSV() {
 
   // Prefer the first-party API proxy on Netlify/Express.
   // This avoids exposing operational data to third-party CORS proxy services.
-  const sources = [CSV_API_URL, directSheetUrl];
+  const isStaticHosting =
+    window.location.hostname.endsWith("github.io") ||
+    window.location.hostname === "localhost";
+  const sources = isStaticHosting
+    ? [directSheetUrl]
+    : [CSV_API_URL, directSheetUrl];
 
   for (const url of sources) {
     const controller = new AbortController();
@@ -575,28 +580,36 @@ function escapeHTML(text) {
   return text.replace(/[&<>"']/g, (char) => map[char]);
 }
 
+function normalizeHeader(header) {
+  return String(header || "")
+    .replace(/^\uFEFF/, "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]/g, "");
+}
+
 function parseCSV(csvText) {
-  const lines = csvText.trim().split("\n");
-  if (lines.length === 0) return [];
+  const lines = csvText.replace(/\r/g, "").trim().split("\n");
+  if (lines.length < 2) return [];
 
-  const headers = lines[0].split(",").map((h) => h.trim());
-
+  const headers = parseCSVLine(lines[0]).map(normalizeHeader);
   const data = [];
 
   for (let i = 1; i < lines.length; i++) {
-    const line = lines[i];
-    if (!line.trim()) continue;
+    if (!lines[i].trim()) continue;
 
-    const values = parseCSVLine(line);
+    const values = parseCSVLine(lines[i]);
     const row = {};
 
     headers.forEach((header, index) => {
-      row[header.toLowerCase()] = values[index] ? values[index].trim() : "";
+      if (header) row[header] = String(values[index] || "").trim();
     });
 
     data.push(row);
   }
 
+  console.log("[parseCSV] Normalized headers:", headers);
   return data;
 }
 
@@ -608,7 +621,10 @@ function parseCSVLine(line) {
   for (let i = 0; i < line.length; i++) {
     const char = line[i];
 
-    if (char === '"') {
+    if (char === '"' && insideQuotes && line[i + 1] === '"') {
+      current += '"';
+      i++;
+    } else if (char === '"') {
       insideQuotes = !insideQuotes;
     } else if (char === "," && !insideQuotes) {
       result.push(current);
@@ -622,88 +638,67 @@ function parseCSVLine(line) {
   return result;
 }
 
+function getRowValue(row, aliases) {
+  for (const alias of aliases) {
+    const value = row[normalizeHeader(alias)];
+    if (value !== undefined && String(value).trim() !== "") {
+      return String(value).trim();
+    }
+  }
+  return "";
+}
+
+function normalizeSiteRow(row) {
+  return {
+    sitename: getRowValue(row, ["sitename", "site name", "siteid", "site id", "site"]),
+    regionname: getRowValue(row, ["regionname", "region name", "region", "regioncode"]),
+    cowstatus: getRowValue(row, ["cowstatus", "cow status", "sitestatus", "site status", "status"]),
+    lat: getRowValue(row, ["lat", "latitude", "gpslat"]),
+    lng: getRowValue(row, ["lng", "lon", "long", "longitude", "gpslng", "gpslong"]),
+    nextfuelingplan: getRowValue(row, ["nextfuelingplan", "next fueling plan", "nextfuelingdate", "next fueling date"]),
+    lastfuelingdate: getRowValue(row, ["lastfuelingdate", "last fueling date", "previousfuelingdate"]),
+    lastfuelingqty: getRowValue(row, ["lastfuelingqty", "last fueling qty", "lastfuelingquantity", "last fueling quantity"]),
+    districtname: getRowValue(row, ["districtname", "district name", "district"]),
+    cityname: getRowValue(row, ["cityname", "city name", "city"]),
+    sitelabel: getRowValue(row, ["sitelabel", "site label", "label"]),
+  };
+}
+
 function filterAndValidateSites(rawData) {
   return rawData
+    .map(normalizeSiteRow)
     .filter((row) => {
-      const regionname = row.regionname ? row.regionname.trim() : "";
+      const cowstatus = row.cowstatus.toUpperCase().replace(/[\s_-]/g, "");
+      const acceptedStatuses = ["ONAIR", "INPROGRESS", "ACTIVE", "OPERATIONAL"];
+      const lat = parseFloat(row.lat);
+      const lng = parseFloat(row.lng);
 
-      const cowstatusKey = Object.keys(row).find(
-        (key) => key.toLowerCase() === "cowstatus",
-      );
-      const cowstatus = cowstatusKey
-        ? row[cowstatusKey].trim().toUpperCase()
-        : "";
-
-      const lat = parseFloat(row.lat || row.latitude || "");
-      const lng = parseFloat(row.lng || row.longitude || "");
-      const sitename = row.sitename || "";
-
-      const siteObj = { regionname };
       return (
-        isInSelectedRegion(siteObj) &&
-        (cowstatus === "ON-AIR" || cowstatus === "IN PROGRESS") &&
-        sitename.trim() !== "" &&
-        !isNaN(lat) &&
-        !isNaN(lng)
+        isInSelectedRegion(row) &&
+        acceptedStatuses.includes(cowstatus) &&
+        row.sitename !== "" &&
+        Number.isFinite(lat) &&
+        Number.isFinite(lng)
       );
     })
     .map((row) => {
-      const lat = parseFloat(row.lat || row.latitude || "");
-      const lng = parseFloat(row.lng || row.longitude || "");
-
-      const nextfuelingplanKey = Object.keys(row).find(
-        (key) => key.toLowerCase() === "nextfuelingplan",
-      );
-      const nextfuelingplan = nextfuelingplanKey ? row[nextfuelingplanKey] : "";
-      const fuelDate = parseFuelDate(nextfuelingplan);
+      const lat = parseFloat(row.lat);
+      const lng = parseFloat(row.lng);
+      const fuelDate = parseFuelDate(row.nextfuelingplan);
       const days = dayDiff(fuelDate);
       const statusObj = classify(days);
-
-      const lastfuelingdateKey = Object.keys(row).find(
-        (key) => key.toLowerCase() === "lastfuelingdate",
-      );
-      const lastfuelingdate = lastfuelingdateKey ? row[lastfuelingdateKey] : "";
-
-      const lastfuelingqtyKey = Object.keys(row).find(
-        (key) => key.toLowerCase() === "lastfuelingqty",
-      );
-      const lastfuelingqty = lastfuelingqtyKey ? row[lastfuelingqtyKey] : "";
-
-      const districtKey = Object.keys(row).find(
-        (key) => key.toLowerCase() === "districtname",
-      );
-      const districtname = districtKey ? row[districtKey] : "";
-
-      const cityKey = Object.keys(row).find(
-        (key) => key.toLowerCase() === "cityname",
-      );
-      const cityname = cityKey ? row[cityKey] : "";
-
-      const sitelabelKey = Object.keys(row).find(
-        (key) => key.toLowerCase() === "sitelabel",
-      );
-      const sitelabel = sitelabelKey ? row[sitelabelKey] : "";
-
       let siteColor = statusObj.color;
 
-      if (nextfuelingplan.trim() === "SEC Site") {
+      if (row.nextfuelingplan.toLowerCase() === "sec site") {
         siteColor = "#9b59b6";
       }
 
       return {
-        sitename: row.sitename || "Unknown Site",
-        regionname: row.regionname || "",
-        districtname: districtname || "",
-        cityname: cityname || "",
-        cowstatus: row.cowstatus || "",
-        sitelabel: sitelabel || "",
-        lat: lat,
-        lng: lng,
-        lastfuelingdate: lastfuelingdate || "",
-        lastfuelingqty: lastfuelingqty || "",
-        nextfuelingplan: nextfuelingplan || "",
-        fuelDate: fuelDate,
-        days: days,
+        ...row,
+        lat,
+        lng,
+        fuelDate,
+        days,
         status: statusObj.label,
         color: siteColor,
       };
@@ -1812,9 +1807,24 @@ function isInSelectedRegion(site) {
   }
   const regionLower = site.regionname.toLowerCase().trim();
   if (selectedRegion === "CER") {
-    return regionLower.includes("central") || regionLower.includes("east");
+    return (
+      regionLower.includes("central") ||
+      regionLower.includes("east") ||
+      ["cr", "er", "cer"].includes(regionLower)
+    );
   }
-  return regionLower.includes(selectedRegion.toLowerCase());
+
+  const selected = selectedRegion.toLowerCase();
+  const regionAliases = {
+    west: ["west", "wr"],
+    south: ["south", "sr"],
+    north: ["north", "nr"],
+    central: ["central", "cr"],
+    east: ["east", "er"],
+  };
+  return (regionAliases[selected] || [selected]).some(
+    (alias) => regionLower === alias || regionLower.includes(alias),
+  );
 }
 
 function startDashboard() {
