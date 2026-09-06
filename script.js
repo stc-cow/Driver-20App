@@ -651,7 +651,7 @@ function getRowValue(row, aliases) {
 function normalizeSiteRow(row) {
   return {
     sitename: getRowValue(row, ["sitename", "site name", "siteid", "site id", "site"]),
-    regionname: getRowValue(row, ["regionname", "region name", "region", "regioncode"]),
+    regionname: getRowValue(row, ["regionname", "region name", "region", "regioncode", "area"]),
     cowstatus: getRowValue(row, ["cowstatus", "cow status", "sitestatus", "site status", "status"]),
     lat: getRowValue(row, ["lat", "latitude", "gpslat"]),
     lng: getRowValue(row, ["lng", "lon", "long", "longitude", "gpslng", "gpslong"]),
