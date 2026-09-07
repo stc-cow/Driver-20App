@@ -2,6 +2,49 @@
   const BM_START = new Date(2026, 8, 9);
   BM_START.setHours(0, 0, 0, 0);
 
+  function filterCsvFromBMStart(csvText) {
+    const lines = csvText.replace(/\r/g, "").split("\n");
+    if (lines.length < 2) return csvText;
+
+    const headers = parseCsvLine(lines[0]).map(normalizeKey);
+    const dateColumn = headers.indexOf("nextfuelingplan");
+    if (dateColumn < 0) return csvText;
+
+    const filteredRows = lines.slice(1).filter((line) => {
+      if (!line.trim()) return false;
+      const values = parseCsvLine(line);
+      const date = parseExportDate(values[dateColumn]);
+      return date && date >= BM_START;
+    });
+
+    return [lines[0], ...filteredRows].join("\n");
+  }
+
+  const fetchBeforeBMFilter = window.fetch.bind(window);
+  window.fetch = async function (...args) {
+    const response = await fetchBeforeBMFilter(...args);
+    const url = String(args[0]?.url || args[0] || "");
+
+    if (
+      response.ok &&
+      url.includes("1uWbVwsJ6mgUl9WxJz-zbxMaiCW-dG3DI_9gvKkEca18") &&
+      url.includes("format=csv")
+    ) {
+      const csvText = await response.clone().text();
+      const filteredCsv = filterCsvFromBMStart(csvText);
+      const headers = new Headers(response.headers);
+      headers.set("Content-Type", "text/csv; charset=utf-8");
+      headers.set("Cache-Control", "no-store");
+      return new Response(filteredCsv, {
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+      });
+    }
+
+    return response;
+  };
+
   function parseShortDate(value) {
     const match = String(value || "").trim().match(/^(\d{1,2})\s+([A-Za-z]{3})$/);
     if (!match) return null;
