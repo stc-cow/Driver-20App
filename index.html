@@ -3,31 +3,184 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Central Fuel Plan Dashboard</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
     <link rel="shortcut icon" type="image/svg+xml" href="/favicon.svg?v=3" />
     <link rel="apple-touch-icon" href="/favicon.svg?v=3" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
+    <link rel="shortcut icon" href="/favicon.svg?v=2" />
+    <link rel="apple-touch-icon" href="/favicon.svg?v=2" />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+      href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css"
     />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=3" />
   </head>
   <body>
-    <div class="dashboard">
+    <!-- Login Page -->
+    <div id="loginPage" class="login-page">
+      <div class="login-wrapper">
+        <!-- Hero Section -->
+        <div class="login-hero">
+          <div class="login-hero-content">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F4650ac9d8ec64a8d9e2c7a3167752a4f?format=webp&width=800"
+              alt="ACES MSD Logo"
+              class="login-logo"
+            />
+            <div class="login-title">
+              <p>ACES MSD</p>
+              <p>Fuel Plan Dashboard</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Login Section -->
+        <div class="login-section">
+          <div class="login-form-container">
+            <h2 class="login-form-title">Welcome Back</h2>
+            <p class="login-form-subtitle">Sign in to continue</p>
+            <form class="login-form" id="loginForm" autocomplete="off">
+              <div class="form-group">
+                <label for="username" class="form-label">Username</label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  class="form-input"
+                  placeholder="Enter your username"
+                  autocomplete="username"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="form-input"
+                  placeholder="Enter your password"
+                  autocomplete="current-password"
+                  required
+                />
+              </div>
+              <button type="submit" class="login-button">Sign In</button>
+              <p class="login-error" id="loginError" style="display: none"></p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics Page -->
+    <div id="analyticsPage" class="analytics-page" style="display: none">
+      <div class="analytics-header">
+        <h1>Fuel Analytics & Impact Analysis</h1>
+      </div>
+      <div class="analytics-container">
+        <div class="analytics-card due-sites-card">
+          <h2>Due Sites</h2>
+          <div class="analytics-stat">
+            <div class="stat-value" id="dueSitesCount">0</div>
+            <div class="stat-label">Total Due</div>
+          </div>
+          <div id="dueSitesBreakdown" class="breakdown"></div>
+        </div>
+
+        <div class="analytics-card fuel-impact-card">
+          <h2>Fuel Impact</h2>
+          <div class="analytics-stat">
+            <div class="stat-value" id="affectedSitesCount">0</div>
+            <div class="stat-label">Sites Affected</div>
+          </div>
+          <div id="impactBreakdown" class="breakdown"></div>
+        </div>
+
+        <div class="analytics-card violations-card">
+          <h2>Violations Due to Fuel</h2>
+          <div class="analytics-stat">
+            <div class="stat-value" id="violationsCount">0</div>
+            <div class="stat-label">Total Violations</div>
+          </div>
+          <div id="violationsBreakdown" class="breakdown"></div>
+        </div>
+
+        <div class="analytics-card sites-down-card">
+          <h2>Sites Down Due to Fuel</h2>
+          <div class="analytics-stat">
+            <div class="stat-value" id="sitesDownCount">0</div>
+            <div class="stat-label">Non-Operational</div>
+          </div>
+          <div id="sitesDownList" class="breakdown"></div>
+        </div>
+      </div>
+
+      <div class="analytics-details">
+        <h3>Detailed Due Sites List</h3>
+        <table class="analytics-table">
+          <thead>
+            <tr>
+              <th>Site Name</th>
+              <th>Fueling Date</th>
+              <th>Days Overdue</th>
+              <th>Impact Level</th>
+            </tr>
+          </thead>
+          <tbody id="dueDetailsList"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="dashboard" id="dashboardPage" style="display: none">
       <div class="dashboard-header">
         <div class="header-content">
-          <img
-            src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2Fc540452a3db046ac922bafa84f938adc?format=webp&width=800"
-            alt="STC Logo"
-            class="logo logo-left"
-          />
-          <h1 class="header-title">Central Fuel Plan Dashboard</h1>
-          <img
-            src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F2a2ac0238b1444ef9a1b89619ad94b40?format=webp&width=400"
-            alt="ACES Managed Services Logo"
-            class="logo"
-          />
+          <div class="logo-text logo-left">Managed Services Dept.</div>
+          <h1 class="header-title">stc COW CER FUEL PLAN DASHBOARD</h1>
+          <div class="header-right">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F2a2ac0238b1444ef9a1b89619ad94b40?format=webp&width=400"
+              alt="ACES Managed Services Logo"
+              class="logo"
+            />
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+          </div>
+        </div>
+      </div>
+      <div class="region-tabs">
+        <button class="region-tab" onclick="selectRegion('Central')">
+          Central Region
+        </button>
+        <button class="region-tab" onclick="selectRegion('East')">
+          East Region
+        </button>
+        <button class="region-tab active" onclick="selectRegion('CER')">
+          CER (Central & East)
+        </button>
+        <button class="region-tab analysis-tab" onclick="openAnalysisModal()">
+          📊 Fueling Analysis
+        </button>
+      </div>
+      <div class="date-section">
+        <div id="headerDate" class="header-date"></div>
+        <div class="event-cards" id="eventCardsContainer">
+          <div class="event-card vvvip-card" onclick="showVVVIPModal()">
+            <div class="event-card-label">Royal, MOI & Winter Camps</div>
+            <div class="event-card-count" id="vvvipCount">0</div>
+          </div>
+          <div
+            class="event-card access-permit-card"
+            onclick="showAccessPermitModal()"
+            title="BM access permit focus list"
+          >
+            <div class="event-card-label">Access Permit Required</div>
+          </div>
         </div>
       </div>
       <div class="left-panel">
@@ -38,6 +191,20 @@
             class="search-bar"
             placeholder="Search by Site Name..."
           />
+          <button
+            id="downloadBtn"
+            class="download-btn"
+            onclick="downloadExcel()"
+          >
+            <p>📥 Export Plan</p>
+          </button>
+          <button
+            id="exportInvoiceBtn"
+            class="export-invoice-btn"
+            onclick="showInvoiceModal()"
+          >
+            📋 Export Invoice
+          </button>
         </div>
 
         <div class="metrics-grid">
@@ -59,14 +226,33 @@
           </div>
         </div>
 
+        <div class="kpi-card">
+          <p class="kpi-title"><strong>Fueling Performance KPI</strong></p>
+          <div class="kpi-chart-container">
+            <canvas id="kpiChart"></canvas>
+            <div class="kpi-percentage" id="kpiPercentage">0%</div>
+          </div>
+          <p class="kpi-description">On-time fuel compliance rate</p>
+        </div>
+
         <div class="cards-container">
           <div class="status-card overdue-card">
-            <h3>Due (Overdue)</h3>
+            <div class="table-header-container">
+              <h3>Due (Overdue)</h3>
+              <button
+                class="table-screenshot-btn"
+                onclick="downloadTableScreenshot('overdueTableBody', 'Overdue')"
+                title="Download table as image"
+              >
+                📸 Snap
+              </button>
+            </div>
             <table class="sites-table">
               <thead>
                 <tr>
                   <th>Site Name</th>
-                  <th>Days</th>
+                  <th>City Name</th>
+                  <th>Next Fueling Plan</th>
                 </tr>
               </thead>
               <tbody id="overdueTableBody"></tbody>
@@ -74,35 +260,123 @@
           </div>
 
           <div class="status-card today-card">
-            <h3>Today Schedule</h3>
+            <div class="table-header-container">
+              <h3>Today Schedule</h3>
+              <button
+                class="table-screenshot-btn"
+                onclick="downloadTableScreenshot('todayTableBody', 'Today')"
+                title="Download table as image"
+              >
+                📸 Snap
+              </button>
+            </div>
             <table class="sites-table">
               <thead>
                 <tr>
                   <th>Site Name</th>
-                  <th>Date</th>
+                  <th>City Name</th>
+                  <th>Next Fueling Plan</th>
                 </tr>
               </thead>
               <tbody id="todayTableBody"></tbody>
             </table>
           </div>
+        </div>
 
-          <div class="status-card coming-card">
-            <h3>Coming in 3 Days</h3>
-            <table class="sites-table">
-              <thead>
-                <tr>
-                  <th>Site Name</th>
-                  <th>Days</th>
-                </tr>
-              </thead>
-              <tbody id="comingTableBody"></tbody>
-            </table>
-          </div>
+        <div class="status-card coming-card">
+          <h3>
+            Coming in 3 Days
+            <span id="comingSummary" class="coming-summary"></span>
+          </h3>
+          <table class="sites-table">
+            <thead>
+              <tr>
+                <th>Site Name</th>
+                <th>City Name</th>
+                <th>Days</th>
+              </tr>
+            </thead>
+            <tbody id="comingTableBody"></tbody>
+          </table>
         </div>
       </div>
 
       <div class="right-panel">
+        <h2 class="map-title">Live stc COW Fuel status</h2>
         <div id="map" class="map-container"></div>
+      </div>
+    </div>
+
+    <!-- Invoice Modal -->
+    <div id="invoiceModal" class="modal invoice-modal" style="display: none">
+      <div class="modal-content invoice-modal-content">
+        <div class="modal-header">
+          <h2>Invoice Management</h2>
+          <button class="modal-close" onclick="closeInvoiceModal()">×</button>
+        </div>
+        <div class="modal-body invoice-modal-body">
+          <div class="invoice-filters">
+            <h3>Filter Invoice Data</h3>
+            <div class="filter-group">
+              <label for="invoiceStartDate">Start Date:</label>
+              <input type="date" id="invoiceStartDate" class="date-input" />
+            </div>
+            <div class="filter-group">
+              <label for="invoiceEndDate">End Date:</label>
+              <input type="date" id="invoiceEndDate" class="date-input" />
+            </div>
+            <div class="filter-group">
+              <label for="invoiceRegion">Region:</label>
+              <select id="invoiceRegion" class="region-select">
+                <option value="">All Regions</option>
+                <option value="Central">Central</option>
+                <option value="East">East</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="invoiceSiteName">Site Name:</label>
+              <input
+                type="text"
+                id="invoiceSiteName"
+                class="site-search-input"
+                placeholder="Search by site name..."
+                onkeyup="applyInvoiceFilters()"
+              />
+            </div>
+            <button class="apply-filter-btn" onclick="applyInvoiceFilters()">
+              Apply Filters
+            </button>
+          </div>
+
+          <div class="invoice-table-section">
+            <div class="invoice-summary">
+              <div class="summary-item">
+                <span class="summary-label">Total Rows:</span>
+                <span class="summary-value" id="invoiceRowCount">0</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Total Quantity:</span>
+                <span class="summary-value" id="invoiceTotalQty">0</span>
+              </div>
+            </div>
+
+            <table class="invoice-table">
+              <thead>
+                <tr>
+                  <th>Site Name</th>
+                  <th>Region</th>
+                  <th>Last Fueling Date</th>
+                  <th>Last Fueling Qty</th>
+                </tr>
+              </thead>
+              <tbody id="invoiceTableBody"></tbody>
+            </table>
+          </div>
+
+          <button class="download-invoice-btn" onclick="downloadInvoiceExcel()">
+            📥 Download Invoice (Excel)
+          </button>
+        </div>
       </div>
     </div>
 
@@ -117,7 +391,596 @@
       </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script type="module" src="script.js?v=7"></script>
+
+    <!-- VVVIP Modal -->
+    <div id="vvvipModal" class="modal">
+      <div class="modal-content vvvip-modal-content">
+        <div class="modal-header">
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets%2Fbd65b3cd7a86452e803a3d7dc7a3d048%2F57031e60664c427787ec8c6ca072dfb6?format=webp&width=800"
+            alt="VVVIP Logo"
+            class="stc-logo"
+          />
+          <h2>Royal, MOI & Winter Camps</h2>
+          <button class="modal-close" onclick="closeVVVIPModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <table class="vvvip-table">
+            <thead>
+              <tr>
+                <th>Site Name</th>
+                <th>Next Fueling Plan</th>
+                <th>Site Label</th>
+              </tr>
+            </thead>
+            <tbody id="vvvipTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- BM Access Permit Modal -->
+    <div id="accessPermitModal" class="modal">
+      <div class="modal-content access-permit-modal-content">
+        <div class="modal-header">
+          <div>
+            <h2>🔐 BM Access Permit Required Sites</h2>
+            <p class="access-permit-subtitle">Central and East Region focus list</p>
+          </div>
+          <button class="modal-close" onclick="closeAccessPermitModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="access-permit-controls">
+            <input
+              id="accessPermitSearch"
+              class="analysis-filter-input"
+              type="search"
+              placeholder="Search site, district, permit or location..."
+              oninput="renderAccessPermitTable()"
+            />
+            <select
+              id="accessPermitRegion"
+              class="analysis-filter-select"
+              onchange="renderAccessPermitTable()"
+            >
+              <option value="All">CR & ER</option>
+              <option value="Central">Central Region</option>
+              <option value="East">East Region</option>
+            </select>
+            <span id="accessPermitVisibleCount" class="access-permit-visible-count"></span>
+          </div>
+          <div class="access-permit-table-wrap">
+            <table class="vvvip-table access-permit-table">
+              <thead>
+                <tr>
+                  <th>Site</th>
+                  <th>Region</th>
+                  <th>District</th>
+                  <th>Site Label</th>
+                  <th>Access Permit Requirement</th>
+                  <th>Location / Notes</th>
+                </tr>
+              </thead>
+              <tbody id="accessPermitTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analysis Authentication Modal -->
+    <div
+      id="analysisAuthModal"
+      class="modal analysis-auth-modal"
+      style="display: none"
+    >
+      <div class="modal-content analysis-auth-content">
+        <div class="modal-header">
+          <h2>🔐 Fueling Analysis Access</h2>
+          <button class="modal-close" onclick="closeAnalysisAuthModal()">
+            ×
+          </button>
+        </div>
+        <div class="modal-body analysis-auth-body">
+          <p class="auth-subtitle">This feature requires authentication</p>
+          <form
+            class="analysis-auth-form"
+            id="analysisAuthForm"
+            autocomplete="off"
+          >
+            <div class="form-group">
+              <label for="analysisUsername" class="form-label">Username</label>
+              <input
+                type="text"
+                id="analysisUsername"
+                name="username"
+                class="form-input"
+                placeholder="Enter username"
+                autocomplete="username"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="analysisPassword" class="form-label">Password</label>
+              <input
+                type="password"
+                id="analysisPassword"
+                name="password"
+                class="form-input"
+                placeholder="Enter password"
+                autocomplete="current-password"
+                required
+              />
+            </div>
+            <button type="submit" class="auth-button">Access Analysis</button>
+            <p
+              class="auth-error"
+              id="analysisAuthError"
+              style="display: none"
+            ></p>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fueling Analysis Modal -->
+    <div id="analysisModal" class="modal analysis-modal" style="display: none">
+      <div class="modal-content analysis-modal-content">
+        <div class="modal-header analysis-modal-header">
+          <div class="modal-header-content">
+            <h2>📊 CER Fueling Analysis</h2>
+            <p class="modal-header-subtitle">
+              Data-driven insights for fuel management
+            </p>
+          </div>
+          <div class="modal-controls">
+            <button
+              class="modal-control-btn"
+              id="analysisExpandBtn"
+              onclick="expandAnalysisModal()"
+              title="Expand"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"
+                ></path>
+              </svg>
+            </button>
+            <button
+              class="modal-control-btn"
+              id="analysisMinimizeBtn"
+              onclick="minimizeAnalysisModal()"
+              title="Minimize"
+              style="display: none"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M8 13h8m-4-8v8"></path>
+              </svg>
+            </button>
+            <button class="modal-close" onclick="closeAnalysisModal()">
+              ×
+            </button>
+          </div>
+        </div>
+        <div class="modal-body analysis-modal-body">
+          <div class="analysis-tabs">
+            <button
+              class="analysis-tab-btn active"
+              onclick="switchAnalysisTab('analysis1')"
+            >
+              Fueling vs Consumption
+            </button>
+            <button
+              class="analysis-tab-btn"
+              onclick="switchAnalysisTab('analysis2')"
+            >
+              Schedule Compliance
+            </button>
+            <button
+              class="analysis-tab-btn"
+              onclick="switchAnalysisTab('analysis3')"
+            >
+              Site Summary
+            </button>
+            <button
+              class="analysis-tab-btn"
+              onclick="switchAnalysisTab('analysisChart')"
+            >
+              📈 Top Fueling Sites
+            </button>
+            <button
+              class="analysis-tab-btn"
+              onclick="switchAnalysisTab('discrepancyAnalysis')"
+            >
+              🔍 Discrepancy Analysis
+            </button>
+          </div>
+
+          <!-- Analysis 1: Highest Fueling Quantity vs Consumption -->
+          <div id="analysis1" class="analysis-tab-content">
+            <h3>Analysis 1: Highest Fueling Quantity vs Consumption</h3>
+            <div class="analysis-controls">
+              <input
+                type="text"
+                id="analysis1Filter"
+                class="analysis-filter-input"
+                placeholder="Filter by Site Name..."
+              />
+              <select id="analysis1Status" class="analysis-filter-select">
+                <option value="">All Status</option>
+                <option value="Normal">Normal</option>
+                <option value="High Fueling">High Fueling</option>
+              </select>
+            </div>
+            <div class="analysis-table-wrapper">
+              <table class="analysis-table" id="analysis1Table">
+                <thead>
+                  <tr>
+                    <th onclick="sortAnalysisTable('analysis1', 'sitename')">
+                      Site Name ↕
+                    </th>
+                    <th onclick="sortAnalysisTable('analysis1', 'totalfuel')">
+                      Total Fuel Added ↕
+                    </th>
+                    <th
+                      onclick="sortAnalysisTable('analysis1', 'avgconsumption')"
+                    >
+                      Avg Daily Consumption ↕
+                    </th>
+                    <th onclick="sortAnalysisTable('analysis1', 'variance')">
+                      Difference / Variance ↕
+                    </th>
+                    <th onclick="sortAnalysisTable('analysis1', 'status')">
+                      Status ↕
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="analysis1Body"></tbody>
+              </table>
+            </div>
+            <div
+              id="analysis1Loading"
+              class="analysis-loading"
+              style="display: none"
+            >
+              Loading data...
+            </div>
+            <div
+              id="analysis1NoData"
+              class="analysis-no-data"
+              style="display: none"
+            >
+              Data Not Available
+            </div>
+          </div>
+
+          <!-- Analysis 2: Planned Date Validation -->
+          <div
+            id="analysis2"
+            class="analysis-tab-content"
+            style="display: none"
+          >
+            <h3>Analysis 2: Planned Date Validation (±2 Days Rule)</h3>
+            <div class="analysis-controls">
+              <input
+                type="text"
+                id="analysis2Filter"
+                class="analysis-filter-input"
+                placeholder="Filter by Site Name..."
+              />
+              <select id="analysis2Status" class="analysis-filter-select">
+                <option value="">All Status</option>
+                <option value="OK">OK</option>
+                <option value="Discrepancy">Discrepancy</option>
+              </select>
+            </div>
+            <div class="analysis-table-wrapper">
+              <table class="analysis-table" id="analysis2Table">
+                <thead>
+                  <tr>
+                    <th onclick="sortAnalysisTable('analysis2', 'sitename')">
+                      Site Name ↕
+                    </th>
+                    <th onclick="sortAnalysisTable('analysis2', 'planneddate')">
+                      Planned Date ↕
+                    </th>
+                    <th onclick="sortAnalysisTable('analysis2', 'actualdate')">
+                      Actual Invoice Date ↕
+                    </th>
+                    <th onclick="sortAnalysisTable('analysis2', 'daydiff')">
+                      Day Difference ↕
+                    </th>
+                    <th onclick="sortAnalysisTable('analysis2', 'status')">
+                      Schedule Status ↕
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="analysis2Body"></tbody>
+              </table>
+            </div>
+            <div
+              id="analysis2Loading"
+              class="analysis-loading"
+              style="display: none"
+            >
+              Loading data...
+            </div>
+            <div
+              id="analysis2NoData"
+              class="analysis-no-data"
+              style="display: none"
+            >
+              Data Not Available
+            </div>
+          </div>
+
+          <!-- Analysis 3: Site-Level Fuel Quantity Summary -->
+          <div
+            id="analysis3"
+            class="analysis-tab-content"
+            style="display: none"
+          >
+            <h3>Analysis 3: Site-Level Fuel Quantity Summary</h3>
+            <div class="analysis-controls">
+              <input
+                type="text"
+                id="analysis3Filter"
+                class="analysis-filter-input"
+                placeholder="Filter by Site Name..."
+              />
+            </div>
+            <div class="analysis-table-wrapper">
+              <table class="analysis-table" id="analysis3Table">
+                <thead>
+                  <tr>
+                    <th onclick="sortAnalysisTable('analysis3', 'sitename')">
+                      Site Name ↕
+                    </th>
+                    <th onclick="sortAnalysisTable('analysis3', 'totalqty')">
+                      Total Fuel Quantity Added ↕
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="analysis3Body"></tbody>
+              </table>
+            </div>
+            <div
+              id="analysis3Loading"
+              class="analysis-loading"
+              style="display: none"
+            >
+              Loading data...
+            </div>
+            <div
+              id="analysis3NoData"
+              class="analysis-no-data"
+              style="display: none"
+            >
+              Data Not Available
+            </div>
+          </div>
+
+          <!-- Chart: Top Fueling Sites -->
+          <div
+            id="analysisChart"
+            class="analysis-tab-content"
+            style="display: none"
+          >
+            <h3>📈 Top Fueling Sites (Highest to Lowest)</h3>
+            <div class="chart-controls">
+              <label for="chartLimitSelect">Show Top:</label>
+              <select
+                id="chartLimitSelect"
+                class="chart-limit-select"
+                onchange="updateFuelingChart()"
+              >
+                <option value="10">Top 10</option>
+                <option value="15">Top 15</option>
+                <option value="20">Top 20</option>
+                <option value="999">All Sites</option>
+              </select>
+            </div>
+            <div class="fueling-chart-container">
+              <canvas id="fuelingChart"></canvas>
+            </div>
+            <div class="chart-legend">
+              <p class="chart-legend-text">
+                📌 Chart shows the top fueling sites ranked by total fuel
+                quantity added, from highest to lowest consumption.
+              </p>
+            </div>
+            <div
+              id="analysisChartLoading"
+              class="analysis-loading"
+              style="display: none"
+            >
+              Loading chart...
+            </div>
+            <div
+              id="analysisChartNoData"
+              class="analysis-no-data"
+              style="display: none"
+            >
+              Data Not Available
+            </div>
+          </div>
+
+          <!-- Discrepancy Analysis Section -->
+          <div
+            id="discrepancyAnalysis"
+            class="analysis-tab-content"
+            style="display: none"
+          >
+            <h3>🔍 Fuel Discrepancy Analysis (Duplicated Sites Only)</h3>
+            <div class="discrepancy-config">
+              <label for="toleranceInput">Tolerance (%):</label>
+              <input
+                type="number"
+                id="toleranceInput"
+                class="tolerance-input"
+                min="0"
+                max="100"
+                step="5"
+                value="10"
+              />
+              <button
+                class="apply-tolerance-btn"
+                onclick="applyDiscrepancyTolerance()"
+              >
+                Apply & Refresh
+              </button>
+            </div>
+
+            <div class="discrepancy-tabs">
+              <button
+                class="discrepancy-tab-btn active"
+                onclick="switchDiscrepancyTab('discrepancyTable')"
+              >
+                Discrepancy Analysis
+              </button>
+              <button
+                class="discrepancy-tab-btn"
+                onclick="switchDiscrepancyTab('riskSummaryTable')"
+              >
+                Risk Summary
+              </button>
+            </div>
+
+            <!-- Discrepancy Analysis Table -->
+            <div id="discrepancyTable" class="discrepancy-tab-pane active">
+              <div class="analysis-controls">
+                <input
+                  type="text"
+                  id="discrepancyFilter"
+                  class="analysis-filter-input"
+                  placeholder="Filter by Site Name..."
+                  onkeyup="filterDiscrepancyTable()"
+                />
+                <select
+                  id="discrepancyStatusFilter"
+                  class="analysis-filter-select"
+                  onchange="filterDiscrepancyTable()"
+                >
+                  <option value="">All Status</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Over-Fueling">Over-Fueling</option>
+                  <option value="Under-Fueling">Under-Fueling</option>
+                  <option value="Schedule Discrepancy">
+                    Schedule Discrepancy
+                  </option>
+                  <option value="Data Mismatch">Data Mismatch</option>
+                </select>
+              </div>
+              <div class="analysis-table-wrapper">
+                <table class="analysis-table" id="discrepancyDetailTable">
+                  <thead>
+                    <tr>
+                      <th>Site Name</th>
+                      <th>Last Planned Date</th>
+                      <th>Actual Fuel Date</th>
+                      <th>Span (Days)</th>
+                      <th>Expected Consumption</th>
+                      <th>Actual Fuel Added</th>
+                      <th>Variance</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="discrepancyTableBody"></tbody>
+                </table>
+              </div>
+              <div
+                id="discrepancyLoading"
+                class="analysis-loading"
+                style="display: none"
+              >
+                Analyzing data...
+              </div>
+              <div
+                id="discrepancyNoData"
+                class="analysis-no-data"
+                style="display: none"
+              >
+                No duplicated sites found or insufficient data
+              </div>
+            </div>
+
+            <!-- Risk Summary Table -->
+            <div
+              id="riskSummaryTable"
+              class="discrepancy-tab-pane"
+              style="display: none"
+            >
+              <div class="analysis-controls">
+                <input
+                  type="text"
+                  id="riskFilter"
+                  class="analysis-filter-input"
+                  placeholder="Filter by Site Name..."
+                  onkeyup="filterRiskSummaryTable()"
+                />
+                <select
+                  id="riskTypeFilter"
+                  class="analysis-filter-select"
+                  onchange="filterRiskSummaryTable()"
+                >
+                  <option value="">All Risk Types</option>
+                  <option value="Over-Fueling">Over-Fueling</option>
+                  <option value="Under-Fueling">Under-Fueling</option>
+                  <option value="Date Mismatch">Date Mismatch</option>
+                  <option value="Data Issue">Data Issue</option>
+                </select>
+              </div>
+              <div class="analysis-table-wrapper">
+                <table class="analysis-table" id="riskSummaryTableDetail">
+                  <thead>
+                    <tr>
+                      <th>Site Name</th>
+                      <th>Issue Type</th>
+                      <th>Root Cause Hint</th>
+                    </tr>
+                  </thead>
+                  <tbody id="riskSummaryTableBody"></tbody>
+                </table>
+              </div>
+              <div
+                id="riskLoading"
+                class="analysis-loading"
+                style="display: none"
+              >
+                Analyzing data...
+              </div>
+              <div
+                id="riskNoData"
+                class="analysis-no-data"
+                style="display: none"
+              >
+                No risk issues detected
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
