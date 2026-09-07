@@ -92,7 +92,139 @@
     };
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  function parseCsvLine(line) {
+    const values = [];
+    let value = "";
+    let quoted = false;
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"' && quoted && line[i + 1] === '"') {
+        value += '"';
+        i++;
+      } else if (char === '"') {
+        quoted = !quoted;
+      } else if (char === "," && !quoted) {
+        values.push(value);
+        value = "";
+      } else {
+        value += char;
+      }
+    }
+    values.push(value);
+    return values;
+  }
+
+  function normalizeKey(value) {
+    return String(value || "")
+      .replace(/^\uFEFF/, "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+  }
+
+  function parseCsv(text) {
+    const lines = text.replace(/\r/g, "").trim().split("\n");
+    const headers = parseCsvLine(lines.shift() || "").map(normalizeKey);
+    return lines.filter(Boolean).map((line) => {
+      const values = parseCsvLine(line);
+      const row = {};
+      headers.forEach((header, index) => {
+        if (header) row[header] = String(values[index] || "").trim();
+      });
+      return row;
+    });
+  }
+
+  function field(row, aliases) {
+    for (const alias of aliases) {
+      const value = row[normalizeKey(alias)];
+      if (value !== undefined && String(value).trim()) return String(value).trim();
+    }
+    return "";
+  }
+
+  async function exportPlanWithBM() {
+    const url =
+      "https://docs.google.com/spreadsheets/d/1uWbVwsJ6mgUl9WxJz-zbxMaiCW-dG3DI_9gvKkEca18/export?format=csv&gid=1149576218&t=" +
+      Date.now();
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) throw new Error("Unable to load the current fuel plan");
+
+    const activeRegion =
+      document.querySelector(".region-tab.active")?.textContent || "CER";
+    const regionMode = activeRegion.toLowerCase().includes("central region")
+      ? "central"
+      : activeRegion.toLowerCase().includes("east region")
+        ? "east"
+        : "cer";
+
+    const rows = parseCsv(await response.text())
+      .map((row) => {
+        const site = field(row, ["site", "site name", "sitename", "site id"]);
+        const region = field(row, ["area", "region", "region name"]);
+        const status = field(row, ["cow status", "cowstatus", "site status", "status"]);
+        const nextPlan = field(row, ["next fueling plan", "nextfuelingplan"]);
+        const fuelingDate = parseExportDate(nextPlan);
+        const suffix = fuelingDate && fuelingDate >= BM_START ? " - BM" : "";
+        return {
+          "Site Name": site + suffix,
+          "Region Name": region,
+          "District Name": field(row, ["district name", "districtname", "district"]),
+          "City Name": field(row, ["city name", "cityname", "city"]),
+          "COW Status": status,
+          Latitude: field(row, ["lat", "latitude"]),
+          Longitude: field(row, ["lng", "longitude", "long"]),
+          "Last Fueling Date": field(row, ["last fueling date", "lastfuelingdate"]),
+          "Last Fueling QTY": field(row, ["last fueling qty", "lastfuelingqty"]),
+          "Next Fueling Plan": nextPlan,
+          "Site Label": field(row, ["site label", "sitelabel"]),
+        };
+      })
+      .filter((row) => {
+        const region = row["Region Name"].toLowerCase().trim();
+        const status = row["COW Status"].toUpperCase().replace(/[\s_-]/g, "");
+        const validStatus = ["ONAIR", "INPROGRESS", "ACTIVE", "OPERATIONAL"].includes(status);
+        const validRegion =
+          regionMode === "cer"
+            ? region.includes("central") || region.includes("east") || ["cr", "er", "cer"].includes(region)
+            : region.includes(regionMode) ||
+              (regionMode === "central" && region === "cr") ||
+              (regionMode === "east" && region === "er");
+        return row["Site Name"] && validStatus && validRegion;
+      });
+
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    worksheet["!cols"] = [
+      { wch: 18 }, { wch: 16 }, { wch: 22 }, { wch: 20 },
+      { wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 20 },
+      { wch: 18 }, { wch: 22 }, { wch: 16 },
+    ];
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Central Fuel Plan");
+
+    const now = new Date();
+    const stamp = now.toISOString().replace(/[:T]/g, "-").slice(0, 19);
+    XLSX.writeFile(workbook, `Central_Fuel_Plan_${stamp}.xlsx`);
+  }
+
+    document.addEventListener("DOMContentLoaded", () => {
+    const exportButton = document.getElementById("downloadBtn");
+    if (exportButton) {
+      exportButton.addEventListener(
+        "click",
+        async (event) => {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          try {
+            await exportPlanWithBM();
+          } catch (error) {
+            alert(error.message || "Failed to export the fuel plan");
+          }
+        },
+        true,
+      );
+    }
+
     updateBMExtensions();
     const observer = new MutationObserver(updateBMExtensions);
     ["overdueTableBody", "todayTableBody", "comingTableBody"].forEach((id) => {
